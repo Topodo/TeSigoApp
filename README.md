@@ -1,6 +1,6 @@
 # TeSigoApp, la aplicación para el seguimiento de alumnos con necesidades educativas especiales
 
-## Para compilar: 
+## Para agregar las dependencias: 
 
 * Añadir node_modules: *npm install*
 
