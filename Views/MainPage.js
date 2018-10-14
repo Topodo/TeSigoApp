@@ -13,9 +13,14 @@ export default class MainPage extends React.Component {
         this.state = {
             name: '',
             courses: ['Cuarto básico', 'Quinto básico', 'Sexto básico'],     // Listado de cursos para el profesor
-            defaultCourse: 'Cuarto básico'
+            defaultCourse: 'Quinto básico'
         }
     }
+
+    static navigationOptions = {
+        title: 'Menú Principal'
+    };
+
     render() {
         // Picker que contiene los cursos
         let coursesItems = this.state.courses.map((val, ind) => {

@@ -14,32 +14,33 @@ export default class SignUp extends React.Component {
 
     // state del componente
     constructor(props) {
-         super(props);
-         this.state = {
-             email: '',
-             password: '',
-             repeatPassword: '',
-             name: '',
-             lastname: '',
-             errorMessage: null,
-             isCreated: false,
-             isLoading: false
-         }
+        super(props);
+        this.state = {
+            email: '',
+            password: '',
+            repeatPassword: '',
+            name: '',
+            lastname: '',
+            errorMessage: null,
+            isCreated: false,
+            isLoading: false
+        }
     }
 
     // Método que registra a un usuario
-    signup = () => {
+    async signup () {
         const {email, password, name, lastname} = this.state;
         firebase.auth()
             .createUserWithEmailAndPassword(email, password)
             .then(() => this.setState({ isCreated: true }))
+            .then(() => this.setState({ errorMessage: null }))
             .catch(error => this.setState({ errorMessage: error.toString(),
                 isLoading: false}));
         // Se verifica el estado del registro y se procede a almacenar los otros datos del usuario
         if(this.state.isCreated){
             firebase.auth()
                 .signInWithEmailAndPassword(email, password)
-                .then(() => console.log("yay"))
+                .then(() => this.setState({ errorMessage: null }))
                 .catch(error => this.setState({ errorMessage: error.toString() }));
             // Se obtiene el usuario y se agrega su nombre
             let user = firebase.auth().currentUser;
