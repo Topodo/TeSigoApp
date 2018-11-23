@@ -10,6 +10,9 @@ import {
     ProgressBarAndroid,
     Image
 } from 'react-native';
+import Video from 'react-native-video';
+
+var SoundPlayer = require('react-native-sound');
 
 const width = Dimensions.get('window').width * 0.8;
 const height = Dimensions.get('window').height * 0.6;
@@ -22,6 +25,7 @@ export default class ShowEvidence extends React.Component {
             uri: '',
             name: '',
             date: '',
+            paused: false,
             isLoading: true
         }
     }
@@ -38,14 +42,25 @@ export default class ShowEvidence extends React.Component {
             case 'picture':
                 return (
                     <Image
-                    style={styles.image}
-                    source={{uri: this.state.uri}}
-                  />
+                        style={styles.image}
+                        source={{ uri: this.state.uri }}
+                    />
                 );
             case 'video':
-                return null;
+                return (
+                    <Video
+                        source={{ uri: this.state.uri }}
+                        style={styles.image}
+                        ref={(player) => {
+                            this.player = player;
+                        }}
+                        onEnd={() => {
+                            this.player.seek(0);
+                        }}
+                    />
+                );
             case 'audio':
-                return null;
+                return ;
         }
         return null;
     }
@@ -66,7 +81,6 @@ export default class ShowEvidence extends React.Component {
 
     render() {
         let evidence = this.renderEvidence();
-        console.log(this.state.uri)
         return (
             <ScrollView>
                 <Text>

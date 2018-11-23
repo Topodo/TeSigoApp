@@ -15,7 +15,9 @@
     "react-native-elements": "^0.19.1",
     "react-native-expand": "^1.0.6",
     "react-native-firebase": "^4.3.8",
+    "react-native-sound": "^0.10.9",
     "react-native-vector-icons": "^6.0.1",
+    "react-native-video": "^3.2.1",
     "react-navigation": "^2.12.1",
     "watchman": "^1.0.0"
   },

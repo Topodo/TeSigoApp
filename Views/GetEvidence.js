@@ -51,14 +51,14 @@ export default class GetEvidence extends React.Component {
                     name: 'Video 1',
                     date: 'DD/MM/AA',
                     uri: null,
-                    type: 'picture'
+                    type: 'video'
                 },
                 {
                     id: 4,
                     name: 'Video 2',
                     date: 'DD/MM/AA',
                     uri: null,
-                    type: 'picture'
+                    type: 'video'
                 }
             ],
             audios: [
