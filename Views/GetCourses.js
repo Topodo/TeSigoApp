@@ -24,9 +24,9 @@ export default class GetCourses extends Component {
     }
 
     componentWillMount() {
-        //const { params } = this.props.navigation.state;
+        const { params } = this.props.navigation.state;
         this.setState({
-            idProfessorFirebase: "Qt5i8i3Mk2U3P1fbo1djhV8bHB73"
+            idProfessorFirebase: params.idProfessor
         });
     }
 
@@ -44,7 +44,7 @@ export default class GetCourses extends Component {
     goToStudentsList(infoCourse) {
         this.props.navigation.navigate("StudentList", {
             course: infoCourse.gradoCurso,
-            idCourse: infoCourse.idCurso
+            idCourse: infoCourse.idCurso,
         });
     }
 

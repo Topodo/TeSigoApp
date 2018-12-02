@@ -19,16 +19,25 @@ export default class StudentList extends Component {
             students: null,
             course: null,
             idCourse: -1,
-            expandableItems: []
+            expandableItems: [],
+            subjects: []
         }
         this.APIHandler = new APIHandler();
+    }
+
+    getOAs(student) {
+        this.props.navigation.navigate('GetObjectivesPerStudent', { 
+            idStudent: student.idAlumno,
+            idCourse: this.state.idCourse,
+            studentName: student.nombreAlumno + " " + student.apellidoPaternoAlumno + " " + student.apellidoMaternoAlumno
+        })
     }
 
     componentWillMount() {
         const { params } = this.props.navigation.state;
         this.setState({
             course: params.course,
-            idCourse: params.idCourse
+            idCourse: params.idCourse,
         });
     }
 
@@ -54,13 +63,14 @@ export default class StudentList extends Component {
     // Método que renderiza la información de la lista de alumnos
     renderInfo(info, id) {
         return (
-            <View key={id}>
-                <TouchableOpacity>
-                    {/* Poner método onPress */}
-                    <Text>
-                        {info.nombreAlumno + " " + info.apellidoPaternoAlumno + " " + info.apellidoMaternoAlumno}
-                    </Text>
-                </TouchableOpacity>
+            <View key={id} style={styles.flowRight}>
+                <Text>
+                    {info.nombreAlumno + " " + info.apellidoPaternoAlumno + " " + info.apellidoMaternoAlumno}
+                </Text>
+                <Button title="Objetivos de aprendizaje"
+                        onPress={this.getOAs.bind(this, info)}
+                        style={styles.buttonStyle}>
+                </Button>
             </View>
         );
     }
@@ -88,3 +98,15 @@ export default class StudentList extends Component {
         }
     }
 }
+
+// Definición de estilos
+const styles = StyleSheet.create({
+    flowRight: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        alignSelf: 'stretch',
+    },
+    buttonStyle: {
+        marginRight: 0
+    }
+})

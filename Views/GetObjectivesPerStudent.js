@@ -8,8 +8,11 @@ import {
     TouchableOpacity,
     Picker,
     ProgressBarAndroid,
-    Image
+    Image,
+    ActivityIndicator
 } from 'react-native';
+
+import APIHandler from '../Utils/APIHandler';
 
 const heightDevice = Dimensions.get('window').width * 0.08;
 
@@ -17,38 +20,17 @@ export default class GetObjectivesPerStudent extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            name: 'Pedrito',
-            course: 'Cuarto básico',
-            subjects: ['object1', 'object2'],     // Listado de cursos para el profesor
-            defaultSubject: 'Unidad 1',
-            OAs: [
-                {
-                    id: 1,
-                    name: 'OA1',
-                    percentage: 0.8,
-                    indicators: {
-                        evalIndicators: [
-                            {
-                                id: 1,
-                                description: 'Primer indicador',
-                                percentage: 0.8
-                            },
-                            {
-                                id: 2,
-                                description: 'Segundo indicador',
-                                percentage: 0.8
-                            },
-                            {
-                                id: 3,
-                                description: 'Tercer indicador',
-                                percentage: 0.8
-                            },
-                        ]
-                    }
-                }
-            ],
-            subjectsNames: []
+            name: '',
+            course: '',
+            subjects: [],    
+            defaultSubject: '',
+            subjectsNames: null,
+            idStudent: -1,
+            isLoading: true,
+            idCourse: -1,
+            idSubject: -1
         }
+        this.APIHandler = new APIHandler();
     }
 
     // Método que obtiene los objetivos de aprendizaje para la unidad seleccionada
@@ -176,7 +158,7 @@ export default class GetObjectivesPerStudent extends React.Component {
     goEvaluationIndicators = (indicators) => {
         let aux = {
             OA: indicators.name,
-            evalIndicators: indicators.indicators.evalIndicators
+            evalIndicators: indicators.evalIndicators
         }
         this.props.navigation.navigate('GetEvalIndicator',
             {
@@ -186,9 +168,35 @@ export default class GetObjectivesPerStudent extends React.Component {
     }
 
     // Método que obtiene los nombres de las unidades
-    getSubjectsNames() {
-        // GET
-        return ['Unidad 1', 'Unidad 2'];
+    getSubjectsNames(subjects) {
+        let names = []
+        subjects.forEach(subject => {
+            names.push(subject.nombreUnidad)
+        })
+        return names
+    }
+
+    // Método que obtiene el avance de un alumno en una unidad en específico
+    getCurrentPerformance(idSubject) {
+        // Se obtiene el avance del alumno en la unidad seleccionada
+        this.APIHandler.getFromAPI('http://206.189.195.214:8080/api/unidad/' + idSubject + 
+            '/alumno/' + this.state.idStudent)
+            .then(response => {
+                console.log(response)
+                this.setState({
+                    subjects: response,
+                })
+            }
+        )
+    }
+
+    // Método que obtiene la ID de una unidad
+    getSubjectID(subjectName) {
+        this.state.subjects.forEach(subject => {
+            if(subject.nombreUnidad === subjectName) {
+                return subject.idUnidad
+            }
+        })
     }
 
     static navigationOptions = {
@@ -197,25 +205,62 @@ export default class GetObjectivesPerStudent extends React.Component {
 
     // Método que agrega al state los datos provenientes de la lista de alumnos 
     componentWillMount() {
+        const { params } = this.props.navigation.state
         this.setState({
-            subjects: this.getLearningObjectives(),
-            subjectsNames: this.getSubjectsNames()
+            idStudent: params.idStudent,
+            idCourse: params.idCourse,
+            name: params.studentName
         });
     }
 
+    componentDidMount() {
+        // Se obtienen las unidades
+        this.APIHandler.getFromAPI('http://206.189.195.214:8080/api/curso/' + this.state.idCourse + '/unidades')
+            .then(response => {
+                const names = this.getSubjectsNames(response)
+                this.setState({
+                    subjectsNames: names,
+                    defaultSubject: names[0],
+                    idSubject: response[0].idUnidad,
+                })  
+            })
+            .then(() => {
+                // Se obtiene el avance del alumno en la unidad seleccionada
+                this.APIHandler.getFromAPI('http://206.189.195.214:8080/api/unidad/' + this.state.idSubject + 
+                    '/alumno/' + this.state.idStudent)
+                    .then(response => {
+                        this.setState({
+                            subjects: response,
+                            isLoading: false
+                        })
+                    }
+                )
+            })
+            .catch(error => {
+                console.error(error)
+            }
+        )
+    }
+
     render() {
+        if(this.state.isLoading) {
+            return(
+                <View>
+                    <ActivityIndicator/>
+                </View>
+            );
+        } 
         // Picker que contiene los cursos
-        let subjectsItems = this.getSubjectsNames().map((val, ind) => { // CAMBIAR PARA PONER SETSTATE (subjects)
+        let subjectsItems = !this.state.isLoading ? this.state.subjectsNames.map((val, ind) => { 
             return <Picker.Item key={ind} value={val} label={val} />
-        });
+        }) : null;
         // Se renderizan los objetivos de aprendizaje
-        let learningObjectives = this.getLearningObjectives(this.state.defaultSubject);
-        let learningProgressBars = learningObjectives.OAs.map((index, id) => {
-            let isComplete = index.percentage == 1 ? require('./Images/check.png') : require('./Images/uncheck.png');
+        let learningProgressBars = this.state.subjects.subjects.OAs.map((index, id) => {
+            let isComplete = index.percentage === 1 ? require('./Images/check.png') : require('./Images/uncheck.png');
             return (
                 // Se verifica si el objetivo está cumplido o no
                 <View key={id}>
-                    <View style={styles.flowRight}>
+                    <View >
                         <Text>
                             {index.name}
                         </Text>
@@ -252,7 +297,16 @@ export default class GetObjectivesPerStudent extends React.Component {
                     {this.state.name}
                 </Text>
                 <Picker selectedValue={this.state.defaultSubject}
-                    onValueChange={(subject) => (this.setState({ defaultSubject: subject }))}>
+                        onValueChange={(subject) => {
+                            this.setState({ 
+                                defaultSubject: subject,
+                            })
+                            let idSubject = this.getSubjectID(subject)
+                            this.setState({
+                                idSubject: idSubject
+                            })
+                            this.getCurrentPerformance(idSubject)
+                        }}>
                     {subjectsItems}
                 </Picker>
                 {learningProgressBars}

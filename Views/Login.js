@@ -28,21 +28,6 @@ export default class Login extends React.Component {
         };
     }
 
-    // Método asíncrono para registrar usuario
-  /*  async signUp() {
-        try {
-            await firebase.auth().createUserWithEmailAndPassword(this.state.email, this.state.password);
-            this.setState({
-                errorMessage: 'Cuenta creada correctamente'
-            });
-
-        } catch (error) {
-            this.setState({
-                errorMessage: error.toString()
-            });
-        }
-    }
-
     // Método asíncrono para logear utilizando firebase
     async login() {
         try{
@@ -50,12 +35,9 @@ export default class Login extends React.Component {
             this.setState({
                 isLogged: true
             })
-            setTimeout(() => {
-                console.log("ye")
-            }, 1500);
         } catch (error) {
             this.setState({
-                errorMessage: error.toString(),
+                errorMessage: 'Correo o contraseña incorrectas. Inténtelo nuevamente.',
                 isLogged: false
             })
         }
@@ -66,16 +48,25 @@ export default class Login extends React.Component {
        Salida: Ninguna
      */
     goToMainView = () => {
-        this.setState({
-            isLoading: true
-        });
-        //this.login();
-        // Se verifica si se autentificó correctamente el usuario
-        if(this.state.isLogged) {
+        if(this.state.email === '' || this.state.password === '') {
             this.setState({
-                isLoading: false
+                errorMessage: 'Es necesario completar los campos.'
             })
-
+        } else {
+            this.setState({
+                isLoading: true
+            });
+            this.login()
+                .then(this.setState({
+                    isLoading: false
+                }))
+        
+            // Se verifica si se autentificó correctamente el usuario
+            if(this.state.isLogged) {
+                this.props.navigation.navigate('GetCourses', {
+                    idProfessor: user.uid
+                })
+            }
         }
     };
 
@@ -84,11 +75,22 @@ export default class Login extends React.Component {
         title: 'Autentificación',
     };
 
+    componentDidMount() {
+        // Se verifica si el usuario está logeado en la aplicación
+        firebase.auth().onAuthStateChanged(user => {
+            if(user) {
+                this.props.navigation.navigate('GetCourses', {
+                    idProfessor: user.uid
+                })
+            }
+        })
+    }
+
     render(){
         // Se define una variable que contiene un texto que muestra si hay un error al autentificarse
         let errorText = this.state.errorMessage ?
             <Text style={style.errorText}>
-                Usuario o contraseña errónea, inténtelo nuevamente
+                { this.state.errorMessage }
             </Text> : null;
         // Se define una variable que muestra un botón o un activity indicator
         let loginButton = !this.state.isLoading ?

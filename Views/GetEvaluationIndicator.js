@@ -21,23 +21,7 @@ export default class GetEvaluationIndicator extends React.Component {
             course: 'Cuarto básico',
             evalIndicators: {
                 OA: 'name',
-                evalIndicators: [
-                    {
-                        id: 1,
-                        description: 'Primer indicador',
-                        percentage: 0.8
-                    },
-                    {
-                        id: 2,
-                        description: 'Segundo indicador',
-                        percentage: 0.8
-                    },
-                    {
-                        id: 3,
-                        description: 'Tercer indicador',
-                        percentage: 0.8
-                    },
-                ]
+                evalIndicators: []
             },
         }
     }
@@ -61,38 +45,12 @@ export default class GetEvaluationIndicator extends React.Component {
         title: 'Indicadores de evaluación'
     };
 
-    /*
-        Formato JSON
-
-        indicators: {
-            OA: 'name',
-            evalIndicators: [
-                {
-                    id: 1,
-                    description: 'Primer indicador',
-                    percentage: 0.8
-                },
-                {
-                    id: 2,
-                    description: 'Segundo indicador',
-                    percentage: 0.8
-                },
-                {
-                    id: 3,
-                    description: 'Tercer indicador',
-                    percentage: 0.8
-                },
-            ]
-        }
-    */
-
     render() {
-
         // Se renderizan los indicadores de evaluación
         let progressBars = this.state.evalIndicators.evalIndicators.map((ind, key) => {
-            let isComplete = ind.percentage == 1 ? require('./Images/check.png') : require('./Images/uncheck.png');
+            let isComplete = ind.isComplete ? require('./Images/check.png') : require('./Images/uncheck.png');
             return (
-                <View key={ind.id}>
+                <View key={key}>
                     <View style={styles.flowRight}>
                         <Text>
                             {ind.description}
@@ -102,12 +60,6 @@ export default class GetEvaluationIndicator extends React.Component {
                         </Text>
                     </View>
                     <View style={styles.flowRight}>
-                        <ProgressBarAndroid
-                            style={styles.progressBar}
-                            progress={ind.percentage}
-                            styleAttr="Horizontal"
-                            indeterminate={false}
-                        />
                         <Image
                             resizeMode='cover'
                             style={styles.image}
