@@ -35,134 +35,22 @@ export default class GetObjectivesPerStudent extends React.Component {
 
     // Método que obtiene los objetivos de aprendizaje para la unidad seleccionada
     getLearningObjectives(subject) {
-        // MÉTODO GET
-        OAs = [
-            {
-                id: 1,
-                name: 'OA1',
-                percentage: 0.8,
-                indicators: {
-                    evalIndicators: [
-                        {
-                            id: 1,
-                            description: 'Primer indicador',
-                            percentage: 0.8
-                        },
-                        {
-                            id: 2,
-                            description: 'Segundo indicador',
-                            percentage: 0.8
-                        },
-                        {
-                            id: 3,
-                            description: 'Tercer indicador',
-                            percentage: 0.8
-                        },
-                    ]
-                }
-            },
-            {
-                id: 2,
-                name: 'OA2',
-                percentage: 0.4,
-                indicators: {
-                    evalIndicators: [
-                        {
-                            id: 1,
-                            description: 'Primer indicador',
-                            percentage: 0.8
-                        },
-                        {
-                            id: 2,
-                            description: 'Segundo indicador',
-                            percentage: 0.8
-                        },
-                        {
-                            id: 3,
-                            description: 'Tercer indicador',
-                            percentage: 0.8
-                        },
-                    ]
-                }
-            }
-        ]
-        let unidades = [
-            {
-                id: 1,
-                name: 'Unidad 1',
-                OAs: OAs
-            },
-            {
-                id: 2,
-                name: 'Unidad 2',
-                OAs: [
-                    {
-                        id: 1,
-                        name: 'OA3',
-                        percentage: 0.8,
-                        indicators: {
-                            evalIndicators: [
-                                {
-                                    id: 1,
-                                    description: 'Primer indicador',
-                                    percentage: 0.8
-                                },
-                                {
-                                    id: 2,
-                                    description: 'Segundo indicador',
-                                    percentage: 0.8
-                                },
-                                {
-                                    id: 3,
-                                    description: 'Tercer indicador',
-                                    percentage: 0.8
-                                },
-                            ]
-                        }
-                    },
-                    {
-                        id: 2,
-                        name: 'OA4',
-                        percentage: 0.4,
-                        indicators: {
-                            evalIndicators: [
-                                {
-                                    id: 1,
-                                    description: 'Primer indicador',
-                                    percentage: 0.8
-                                },
-                                {
-                                    id: 2,
-                                    description: 'Segundo indicador',
-                                    percentage: 0.8
-                                },
-                                {
-                                    id: 3,
-                                    description: 'Tercer indicador',
-                                    percentage: 0.8
-                                },
-                            ]
-                        }
-                    }
-                ]
-            }
-        ];
-        for (i = 0; i < unidades.length; i++) {
-            if (unidades[i].name === subject) {
-                return unidades[i];
+        const { subjects } = this.state;
+        for (i = 0; i < subjects.length; i++) {
+            if (subjects[i].name === subject) {
+                return subjects[i];
             }
         }
     }
 
     // Método que redirige la navegación a la vista de los indicadores de evaluación
     goEvaluationIndicators = (indicators) => {
-        let aux = {
-            OA: indicators.name,
-            evalIndicators: indicators.evalIndicators
-        }
         this.props.navigation.navigate('GetEvalIndicator',
             {
-                indicators: aux
+                OAName: indicators.name,
+                indicators: indicators.evalIndicators,
+                studentName: this.state.name,
+                course: this.state.course
             }
         );
     }
@@ -209,7 +97,8 @@ export default class GetObjectivesPerStudent extends React.Component {
         this.setState({
             idStudent: params.idStudent,
             idCourse: params.idCourse,
-            name: params.studentName
+            name: params.studentName,
+            course: params.course
         });
     }
 
@@ -225,9 +114,8 @@ export default class GetObjectivesPerStudent extends React.Component {
                 })  
             })
             .then(() => {
-                // Se obtiene el avance del alumno en la unidad seleccionada
-                this.APIHandler.getFromAPI('http://206.189.195.214:8080/api/unidad/' + this.state.idSubject + 
-                    '/alumno/' + this.state.idStudent)
+                // Se obtiene el avance del alumno en todas las unidades
+                this.APIHandler.getFromAPI('http://206.189.195.214:8080/api/unidad/all/alumno/' + this.state.idStudent)
                     .then(response => {
                         this.setState({
                             subjects: response,
@@ -245,8 +133,11 @@ export default class GetObjectivesPerStudent extends React.Component {
     render() {
         if(this.state.isLoading) {
             return(
-                <View>
-                    <ActivityIndicator/>
+                <View style={styles.activityIndicator}>
+                    <Text style={styles.loadingText}>
+                        Cargando los objetivos de aprendizaje
+                    </Text>
+                    <ActivityIndicator size='large'/>
                 </View>
             );
         } 
@@ -255,60 +146,56 @@ export default class GetObjectivesPerStudent extends React.Component {
             return <Picker.Item key={ind} value={val} label={val} />
         }) : null;
         // Se renderizan los objetivos de aprendizaje
-        let learningProgressBars = this.state.subjects.subjects.OAs.map((index, id) => {
-            let isComplete = index.percentage === 1 ? require('./Images/check.png') : require('./Images/uncheck.png');
+        let learningProgressBars = this.getLearningObjectives(this.state.defaultSubject).OAs.map((OA, id) => {
+            let isComplete = OA.percentage === 1 ? require('./Images/check.png') : require('./Images/uncheck.png');
             return (
                 // Se verifica si el objetivo está cumplido o no
-                <View key={id}>
-                    <View >
-                        <Text>
-                            {index.name}
+                <View key={id} style={styles.OAContainer}>
+                    <View style={styles.flowRight}>
+                        <Text style={styles.OAText}>
+                            {OA.name}
                         </Text>
-                        <Text>
-                            {index.percentage}
-                        </Text>
-                        <TouchableOpacity
-                            onPress={this.goEvaluationIndicators.bind(this, index)}
-                        >
-                            <Text>
-                                Ver indicadores de evaluación
-                        </Text>
-                        </TouchableOpacity>
                     </View>
                     <View style={styles.flowRight}>
                         <ProgressBarAndroid
                             style={styles.progressBar}
-                            progress={index.percentage}
+                            progress={OA.percentage}
                             styleAttr="Horizontal"
                             indeterminate={false}
                         />
+                        <Text style={styles.percentage}>
+                            {(Math.round(OA.percentage * 100)).toString() + '%'}
+                        </Text>
                         <Image
                             resizeMode='cover'
                             style={styles.image}
                             source={isComplete}
                         />
                     </View>
+                    <TouchableOpacity onPress={this.goEvaluationIndicators.bind(this, OA)}
+                        style={styles.button}>
+                        <Text style={styles.textButton}>
+                            Ver indicadores de evaluación
+                        </Text>
+                    </TouchableOpacity>
                 </View>
             );
         });
         return (
-            <ScrollView>
-                <Text>
-                    {this.state.name}
+            <ScrollView style={styles.backColor}>
+                <Text style={styles.titleText}>
+                    {this.state.name + ' - ' + this.state.course}
                 </Text>
-                <Picker selectedValue={this.state.defaultSubject}
-                        onValueChange={(subject) => {
-                            this.setState({ 
-                                defaultSubject: subject,
-                            })
-                            let idSubject = this.getSubjectID(subject)
-                            this.setState({
-                                idSubject: idSubject
-                            })
-                            this.getCurrentPerformance(idSubject)
-                        }}>
-                    {subjectsItems}
-                </Picker>
+                <View style={styles.picker}> 
+                    <Picker selectedValue={this.state.defaultSubject}
+                            onValueChange={(subject) => {
+                                this.setState({ 
+                                    defaultSubject: subject,
+                                })
+                            }}>
+                        {subjectsItems}
+                    </Picker>
+                </View>
                 {learningProgressBars}
             </ScrollView>
         );
@@ -323,10 +210,69 @@ const styles = StyleSheet.create({
         alignSelf: 'stretch',
     },
     progressBar: {
-        width: '80%'
+        width: '60%',
+        marginLeft: '5%',
     },
     image: {
         width: '8%',
         height: heightDevice,
-    }
+        marginRight: '3%'
+    },
+    backColor: {
+        backgroundColor: '#FFFFFF'
+    },
+    picker: {
+        marginLeft: '20%',
+        marginRight: '20%',
+        marginBottom: '3%',
+        borderRadius: 8,
+        borderWidth: 1.5,
+        borderColor: '#429b00'
+    },
+    loadingText: {
+        fontSize: 22,
+        textAlign: 'center',
+        marginBottom: '8%'
+    },
+    activityIndicator: {
+        margin: 'auto',
+        marginTop: '4%'
+    },
+    titleText: {
+        fontSize: 20,
+        textAlign: 'center',
+        marginTop: '7%',
+        marginBottom: '3%'
+    },
+    OAContainer: {
+        marginLeft: '1%',
+        marginRight: '1%',
+        borderWidth: 1.5,
+        borderRadius: 8,
+        borderColor: '#429b00',
+    },
+    percentage: {
+        marginLeft: '5%',
+        marginRight: '5%'
+    },
+    OAText: {
+        marginTop: '3%',
+        marginLeft: '5%',
+        marginRight: '5%'
+    },
+    button: {
+        marginLeft: '10%',
+        marginRight: '10%',
+        textAlign: 'center',
+        marginTop: '3%',
+        marginBottom: '3%',
+        backgroundColor: '#429b00',
+        alignItems: 'center',
+        height: 40
+    },
+    textButton: {
+        marginTop: '2%',
+        color: '#FFFFFF',
+        fontSize: 18,
+    },
 })

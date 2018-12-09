@@ -17,24 +17,24 @@ export default class GetEvaluationIndicator extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            name: 'Pedrito',
-            course: 'Cuarto básico',
-            evalIndicators: {
-                OA: 'name',
-                evalIndicators: []
-            },
+            name: '',
+            course: '',
+            evalIndicators: [],
+            OAName: ''
         }
     }
 
     // Para modificar el state al cambiar de un componente a otro
     componentWillMount() {
-        let learningObjectives = this.getEvalIndicators();
+        const { params } = this.props.navigation.state;
         this.setState({
-            evalIndicators: learningObjectives
+            evalIndicators: params.indicators,
+            name: params.studentName,
+            course: params.course,
+            OAName: params.OAName
         });
     }
 
-    // Método que redirige la navegación a la vista de los indicadores de evaluación
     // Método que obtiene los indicadores de evaluación
     getEvalIndicators() {
         const { params } = this.props.navigation.state;
@@ -47,19 +47,16 @@ export default class GetEvaluationIndicator extends React.Component {
 
     render() {
         // Se renderizan los indicadores de evaluación
-        let progressBars = this.state.evalIndicators.evalIndicators.map((ind, key) => {
+        let checkImages = this.state.evalIndicators.map((ind, key) => {
             let isComplete = ind.isComplete ? require('./Images/check.png') : require('./Images/uncheck.png');
             return (
-                <View key={key}>
+                <View key={key} style={styles.IEContainer}>
                     <View style={styles.flowRight}>
-                        <Text>
-                            {ind.description}
-                        </Text>
-                        <Text>
-                            {ind.percentage + '%'}
-                        </Text>
-                    </View>
-                    <View style={styles.flowRight}>
+                        <View style={styles.IESubContainer}>
+                            <Text style={styles.IEText}>
+                                {ind.description}
+                            </Text>
+                        </View>
                         <Image
                             resizeMode='cover'
                             style={styles.image}
@@ -71,14 +68,14 @@ export default class GetEvaluationIndicator extends React.Component {
         })
 
         return (
-            <ScrollView>
-                <Text>
+            <ScrollView style={styles.backColor}>
+                <Text style={styles.titleText}>
                     {this.state.name + ' - ' + this.state.course}
                 </Text>
-                <Text>
+                <Text style={styles.IEText}>
                     {this.state.evalIndicators.OA}
                 </Text>
-                {progressBars}
+                {checkImages}
             </ScrollView>
         );
     }
@@ -97,5 +94,31 @@ const styles = StyleSheet.create({
     image: {
         width: '8%',
         height: heightDevice,
-    }
+        marginRight: '3%'
+    },
+    backColor: {
+        backgroundColor: '#FFFFFF'
+    },
+    titleText: {
+        fontSize: 20,
+        textAlign: 'center',
+        marginTop: '7%',
+        marginBottom: '3%',
+    },
+    IEContainer: {
+        marginLeft: '1%',
+        marginRight: '1%',
+        borderWidth: 1.5,
+        borderRadius: 8,
+        borderColor: '#429b00',
+    },
+    IESubContainer: {
+        width: '85%',
+        marginBottom: '3%',
+    },
+    IEText: {
+        marginTop: '3%',
+        marginLeft: '5%',
+        marginRight: '5%',
+    },
 })

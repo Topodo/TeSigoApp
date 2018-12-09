@@ -29,7 +29,8 @@ export default class StudentList extends Component {
         this.props.navigation.navigate('GetObjectivesPerStudent', { 
             idStudent: student.idAlumno,
             idCourse: this.state.idCourse,
-            studentName: student.nombreAlumno + " " + student.apellidoPaternoAlumno + " " + student.apellidoMaternoAlumno
+            studentName: student.nombreAlumno + " " + student.apellidoPaternoAlumno + " " + student.apellidoMaternoAlumno,
+            course: this.state.course
         })
     }
 
