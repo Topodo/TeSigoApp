@@ -54,7 +54,7 @@ export default class GetEvaluationIndicator extends React.Component {
                     <View style={styles.flowRight}>
                         <View style={styles.IESubContainer}>
                             <Text style={styles.IEText}>
-                                {ind.description}
+                                {(key + 1).toString() + '.- ' + ind.description}
                             </Text>
                         </View>
                         <Image
@@ -111,6 +111,7 @@ const styles = StyleSheet.create({
         borderWidth: 1.5,
         borderRadius: 8,
         borderColor: '#429b00',
+        marginBottom: 10
     },
     IESubContainer: {
         width: '85%',

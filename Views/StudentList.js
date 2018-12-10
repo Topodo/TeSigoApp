@@ -34,6 +34,15 @@ export default class StudentList extends Component {
         })
     }
 
+    setOAs(student) {
+        this.props.navigation.navigate('SetObjectivesPerStudent', {
+            idStudent: student.idAlumno,
+            idCourse: this.state.idCourse,
+            studentName: student.nombreAlumno + " " + student.apellidoPaternoAlumno + " " + student.apellidoMaternoAlumno,
+            course: this.state.course
+        })
+    }
+
     componentWillMount() {
         const { params } = this.props.navigation.state;
         this.setState({
@@ -64,14 +73,26 @@ export default class StudentList extends Component {
     // Método que renderiza la información de la lista de alumnos
     renderInfo(info, id) {
         return (
-            <View key={id} style={styles.flowRight}>
-                <Text>
-                    {info.nombreAlumno + " " + info.apellidoPaternoAlumno + " " + info.apellidoMaternoAlumno}
+            <View key={id} style={styles.CourseContainer}>
+                <Text key={id + 1} style={styles.StudentText}>
+                    {(id + 1).toString() + '.- ' + info.nombreAlumno + " " + info.apellidoPaternoAlumno + " " + info.apellidoMaternoAlumno}
                 </Text>
-                <Button title="Objetivos de aprendizaje"
-                        onPress={this.getOAs.bind(this, info)}
-                        style={styles.buttonStyle}>
-                </Button>
+                <View key={id + 2} style={styles.flowRight}>
+                    <View style={styles.button}>
+                        <Button key={id + 3}
+                                title='Ver avance'
+                                color='#429b00'
+                                onPress={this.getOAs.bind(this, info)}>
+                        </Button>
+                    </View>
+                    <View>
+                        <Button key={id + 4}
+                                title="Asignar avance"
+                                color='#429b00'
+                                onPress={this.getOAs.bind(this, info)}>
+                        </Button>
+                    </View>
+                </View>
             </View>
         );
     }
@@ -83,15 +104,18 @@ export default class StudentList extends Component {
         });
         if(this.state.isLoading) {
             return(
-                <View>
-                    <ActivityIndicator/>
+                <View style={styles.activityIndicator}>
+                    <Text style={styles.loadingText}>
+                        Cargando listado de alumnos
+                    </Text>
+                    <ActivityIndicator size='large'/>
                 </View>
             );
         } else {
             return (
                 <ScrollView>
-                    <Text>
-                        {this.state.course}
+                    <Text style={styles.titleText}>
+                        {'Curso: ' + this.state.course}
                     </Text>
                     {studentsList}
                 </ScrollView>
@@ -105,9 +129,40 @@ const styles = StyleSheet.create({
     flowRight: {
         flexDirection: 'row',
         alignItems: 'center',
-        alignSelf: 'stretch',
+        alignSelf: 'center',
+        marginBottom: 10
     },
-    buttonStyle: {
-        marginRight: 0
-    }
+    activityIndicator: {
+        margin: 'auto',
+        marginTop: '4%'
+    },
+    loadingText: {
+        fontSize: 22,
+        textAlign: 'center',
+        marginBottom: '8%',
+        marginTop: '5%'
+    },
+    titleText: {
+        fontSize: 20,
+        textAlign: 'center',
+        marginTop: '7%',
+        marginBottom: '7%'
+    },
+    StudentText: {
+        fontSize: 18,
+        textAlign: 'center',
+        marginBottom: '3%',
+        marginTop: '3%'
+    },
+    button: {
+        marginRight: '5%'
+    },
+    CourseContainer: {
+        marginLeft: '4%',
+        marginRight: '4%',
+        borderWidth: 1.5,
+        borderColor: '#429b00',
+        alignItems: 'center',
+        marginBottom: 10,
+    },
 })

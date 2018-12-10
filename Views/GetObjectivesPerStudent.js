@@ -9,7 +9,8 @@ import {
     Picker,
     ProgressBarAndroid,
     Image,
-    ActivityIndicator
+    ActivityIndicator,
+    Button
 } from 'react-native';
 
 import APIHandler from '../Utils/APIHandler';
@@ -153,7 +154,7 @@ export default class GetObjectivesPerStudent extends React.Component {
                 <View key={id} style={styles.OAContainer}>
                     <View style={styles.flowRight}>
                         <Text style={styles.OAText}>
-                            {OA.name}
+                            {(id + 1).toString() + '.- ' + OA.name}
                         </Text>
                     </View>
                     <View style={styles.flowRight}>
@@ -172,12 +173,12 @@ export default class GetObjectivesPerStudent extends React.Component {
                             source={isComplete}
                         />
                     </View>
-                    <TouchableOpacity onPress={this.goEvaluationIndicators.bind(this, OA)}
-                        style={styles.button}>
-                        <Text style={styles.textButton}>
-                            Ver indicadores de evaluación
-                        </Text>
-                    </TouchableOpacity>
+                    <View style={styles.button}>
+                        <Button onPress={this.goEvaluationIndicators.bind(this, OA)}
+                            color='#429b00'
+                            title="Ver indicadores de evaluación">
+                        </Button>
+                    </View>
                 </View>
             );
         });
@@ -224,7 +225,7 @@ const styles = StyleSheet.create({
     picker: {
         marginLeft: '20%',
         marginRight: '20%',
-        marginBottom: '3%',
+        marginBottom: '7%',
         borderRadius: 8,
         borderWidth: 1.5,
         borderColor: '#429b00'
@@ -236,13 +237,13 @@ const styles = StyleSheet.create({
     },
     activityIndicator: {
         margin: 'auto',
-        marginTop: '4%'
+        marginTop: '4%',
     },
     titleText: {
         fontSize: 20,
         textAlign: 'center',
         marginTop: '7%',
-        marginBottom: '3%'
+        marginBottom: '7%'
     },
     OAContainer: {
         marginLeft: '1%',
@@ -250,6 +251,7 @@ const styles = StyleSheet.create({
         borderWidth: 1.5,
         borderRadius: 8,
         borderColor: '#429b00',
+        marginBottom: 10,
     },
     percentage: {
         marginLeft: '5%',
@@ -264,10 +266,8 @@ const styles = StyleSheet.create({
         marginLeft: '10%',
         marginRight: '10%',
         textAlign: 'center',
-        marginTop: '3%',
+        marginTop: '2%',
         marginBottom: '3%',
-        backgroundColor: '#429b00',
-        alignItems: 'center',
         height: 40
     },
     textButton: {

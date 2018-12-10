@@ -7,7 +7,8 @@ import {
 } from 'react-native';
 import { 
     StackNavigator,
-    createStackNavigator
+    createStackNavigator,
+    createDrawerNavigator
 } from 'react-navigation';
 import Login from './Views/Login';
 import MainPage from './Views/MainPage';
@@ -22,7 +23,7 @@ import StudentList from './Views/StudentList';
 import GetCourses from './Views/GetCourses';
  
 
-const App = createStackNavigator({
+const AppNavigator = createStackNavigator({
     Home: { screen: Login },
     SetEvalIndicator: { screen: SetEvaluationIndicator },
     GetEvalIndicator: { screen: GetEvaluationIndicator },
@@ -32,4 +33,11 @@ const App = createStackNavigator({
     GetObjectivesPerStudent: { screen: GetObjectivesPerStudent }
 });
 
-export default App;
+const Drawer = createDrawerNavigator({
+    Home: {
+        screen: AppNavigator
+    },
+    GetCourses: { screen: GetCourses },
+})
+
+export default Drawer;
