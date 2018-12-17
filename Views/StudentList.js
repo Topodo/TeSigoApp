@@ -100,7 +100,7 @@ export default class StudentList extends Component {
                         <Button key={id + 4}
                                 title="Asignar avance"
                                 color='#429b00'
-                                onPress={this.getOAs.bind(this, info)}>
+                                onPress={this.setOAs.bind(this, info)}>
                         </Button>
                     </View>
                 </View>

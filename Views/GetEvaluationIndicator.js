@@ -35,12 +35,6 @@ export default class GetEvaluationIndicator extends React.Component {
         });
     }
 
-    // Método que obtiene los indicadores de evaluación
-    getEvalIndicators() {
-        const { params } = this.props.navigation.state;
-        return params.indicators;
-    }
-
     static navigationOptions = {
         title: 'Indicadores de evaluación'
     };
@@ -72,9 +66,11 @@ export default class GetEvaluationIndicator extends React.Component {
                 <Text style={styles.titleText}>
                     {this.state.name + ' - ' + this.state.course}
                 </Text>
-                <Text style={styles.IEText}>
-                    {this.state.evalIndicators.OA}
-                </Text>
+                <View style={styles.OATitleContainer}>
+                    <Text style={styles.OATitle}>
+                        {this.state.OAName}
+                    </Text>
+                </View>
                 {checkImages}
             </ScrollView>
         );
@@ -122,4 +118,15 @@ const styles = StyleSheet.create({
         marginLeft: '5%',
         marginRight: '5%',
     },
+    OATitle: {
+        fontSize: 18,
+        textAlign: 'center',
+        marginTop: '7%',
+        marginBottom: '3%',
+    },
+    OATitleContainer: {
+        marginLeft: '3%',
+        marginRight: '3%',
+        marginBottom: '4%'
+    }
 })

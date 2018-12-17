@@ -65,29 +65,6 @@ export default class GetObjectivesPerStudent extends React.Component {
         return names
     }
 
-    // Método que obtiene el avance de un alumno en una unidad en específico
-    getCurrentPerformance(idSubject) {
-        // Se obtiene el avance del alumno en la unidad seleccionada
-        this.APIHandler.getFromAPI('http://206.189.195.214:8080/api/unidad/' + idSubject + 
-            '/alumno/' + this.state.idStudent)
-            .then(response => {
-                console.log(response)
-                this.setState({
-                    subjects: response,
-                })
-            }
-        )
-    }
-
-    // Método que obtiene la ID de una unidad
-    getSubjectID(subjectName) {
-        this.state.subjects.forEach(subject => {
-            if(subject.nombreUnidad === subjectName) {
-                return subject.idUnidad
-            }
-        })
-    }
-
     static navigationOptions = {
         title: 'Objetivos por alumno'
     };

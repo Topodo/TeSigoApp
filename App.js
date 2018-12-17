@@ -31,7 +31,8 @@ const AppNavigator = createStackNavigator({
     GetEvidence: { screen: GetEvidence },
     StudentList: { screen: StudentList },
     GetCourses: { screen: GetCourses },
-    GetObjectivesPerStudent: { screen: GetObjectivesPerStudent }
+    GetObjectivesPerStudent: { screen: GetObjectivesPerStudent },
+    SetObjectivesPerStudent: { screen: SetObjectivesPerStudent }
 });
 
 const Drawer = createDrawerNavigator({

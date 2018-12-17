@@ -6,21 +6,27 @@ import {
     Button,
     StyleSheet,
     TouchableOpacity,
-    Picker
+    Picker,
+    ActivityIndicator,
+    Alert
 } from 'react-native';
 import { CheckBox } from 'react-native-elements';
+import APIHandler from '../Utils/APIHandler';
 
 export default class ObjectivesPerStudent extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            name: 'Pedrito',
-            subjects: ['object1', 'object2'],     // Listado de cursos para el profesor
-            defaultSubject: 'Unidad 1',
-            subjectsNames: ['Unidad 1', 'Unidad 2'],
+            name: '',
+            subjects: [],     // Listado de cursos para el profesor
+            defaultSubject: '',
+            subjectsNames: [],
             isLoading: true,
-            checkedItems: []
+            checkedItems: [],
+            idStudent: '',
+            idCourse: ''
         }
+        this.APIHandler = new APIHandler();
     }
 
     static navigationOptions = {
@@ -28,228 +34,213 @@ export default class ObjectivesPerStudent extends React.Component {
     };
 
     // Método que obtiene los nombres de las unidades
-    getSubjectsNames() {
-        // GET
-        return ['Unidad 1', 'Unidad 2'];
+    getSubjectsNames(subjects) {
+        let names = []
+        subjects.forEach(subject => {
+            names.push(subject.nombreUnidad)
+        })
+        return names
     }
 
     // Método que obtiene los objetivos de aprendizaje para la unidad seleccionada
     getLearningObjectives(subject) {
-        // MÉTODO GET
-        OAs = [
-            {
-                id: 1,
-                name: 'OA1',
-                percentage: 1,
-                indicators: {
-                    evalIndicators: [
-                        {
-                            id: 1,
-                            description: 'Primer indicador',
-                            percentage: 0.8
-                        },
-                        {
-                            id: 2,
-                            description: 'Segundo indicador',
-                            percentage: 0.8
-                        },
-                        {
-                            id: 3,
-                            description: 'Tercer indicador',
-                            percentage: 0.8
-                        },
-                    ]
-                }
-            },
-            {
-                id: 2,
-                name: 'OA2',
-                percentage: 1,
-                indicators: {
-                    evalIndicators: [
-                        {
-                            id: 1,
-                            description: 'Primer indicador',
-                            percentage: 0.8
-                        },
-                        {
-                            id: 2,
-                            description: 'Segundo indicador',
-                            percentage: 0.8
-                        },
-                        {
-                            id: 3,
-                            description: 'Tercer indicador',
-                            percentage: 0.8
-                        },
-                    ]
-                }
-            }
-        ]
-        let unidades = [
-            {
-                id: 1,
-                name: 'Unidad 1',
-                OAs: OAs
-            },
-            {
-                id: 2,
-                name: 'Unidad 2',
-                OAs: [
-                    {
-                        id: 1,
-                        name: 'OA3',
-                        percentage: 0.8,
-                        indicators: {
-                            evalIndicators: [
-                                {
-                                    id: 1,
-                                    description: 'Primer indicador',
-                                    percentage: 0.8
-                                },
-                                {
-                                    id: 2,
-                                    description: 'Segundo indicador',
-                                    percentage: 0.8
-                                },
-                                {
-                                    id: 3,
-                                    description: 'Tercer indicador',
-                                    percentage: 0.8
-                                },
-                            ]
-                        }
-                    },
-                    {
-                        id: 2,
-                        name: 'OA4',
-                        percentage: 0.4,
-                        indicators: {
-                            evalIndicators: [
-                                {
-                                    id: 1,
-                                    description: 'Primer indicador',
-                                    percentage: 0.8
-                                },
-                                {
-                                    id: 2,
-                                    description: 'Segundo indicador',
-                                    percentage: 0.8
-                                },
-                                {
-                                    id: 3,
-                                    description: 'Tercer indicador',
-                                    percentage: 0.8
-                                },
-                            ]
-                        }
-                    }
-                ]
-            }
-        ];
-        for (i = 0; i < unidades.length; i++) {
-            if (unidades[i].name === subject) {
-                return unidades[i];
+        const { subjects } = this.state;
+        for (i = 0; i < subjects.length; i++) {
+            if (subjects[i].name === subject) {
+                return subjects[i];
             }
         }
-    }
-
-    // Método que envía los indicadores de evaluación del objetivo de aprendizaje seleccionado a la vista correspondiente
-    setEvalIndicators = () => {
-        const { subjects } = this.state;
-        console.log(this.state.subjects)
-        /* this.props.navigation.navigate('SetEvalIndicator', {
-            indicators:    
-            [
-                {
-                    "id": 1,
-                    "name": 'OA1',
-                    "percentage": 0.4
-                },
-                {
-                    "id": 2,
-                    "name": 'OA2',
-                    "percentage": 0.4
-                }
-            ],
-            OA: this.state.defaultSubject
-        }); */
     }
 
     // Método que redirige a la vista GetEvaluationIndicator con los indicadores de evaluación del objetivo seleccionado
     goEvaluationIndicator(indicators) {
-        let aux = {
-            OA: indicators.name,
-            evalIndicators: indicators.indicators.evalIndicators
-        }
         this.props.navigation.navigate('SetEvalIndicator', {
-            indicators: aux
+                OAName: indicators.name,
+                indicators: indicators.evalIndicators,
+                studentName: this.state.name,
+                course: this.state.course,
+                idStudent: this.state.idStudent
+            }
+        );
+    }
+
+    // Método que cambia el estado de los checkboxes, indicando los OAS asignados a la unidad en específico en la cual se está trabajando
+    assignCheckboxesValues() {        
+        let checkedItems = [];                        
+        this.getLearningObjectives(this.state.defaultSubject).OAs.forEach((item) => {
+            let isComplete = item.percentage == 1 ? true : false;
+            checkedItems.push({
+                isComplete: isComplete,
+                idOA: item.id
+            });
+        });
+        this.setState({
+            checkedItems: checkedItems,
+            isLoading: false
         })
     }
 
-    componentWillMount() {
-        let subjectsNames = this.getSubjectsNames();
-        let subjects = this.getLearningObjectives(subjectsNames[0]);
-        let checkedItems = [];
-        subjects.OAs.forEach((item) => {
-            let isComplete = item.percentage == 1 ? true : false;
-            checkedItems.push(isComplete);
-        });
+    // Método que se encarga de envíar los datos actualizados hacia el servidor
+    updateOASStatuses() {
+        // Se crea el body que se adjuntará en el request 
+        let body = []
+        this.getLearningObjectives(this.state.defaultSubject).OAs.forEach(OA => {
+            this.state.checkedItems.forEach(item => {                
+                if(item.idOA === OA.id && item.isComplete) {
+                    OA.evalIndicators.forEach(EA => {
+                        body.push({
+                            idIndicador: EA.id,
+                            status: true
+                        })
+                    })
+                }
+            })
+        })        
+        return body
+    }
 
+    componentWillMount() {
+        const { params } = this.props.navigation.state
         this.setState({
-            subjectsNames: subjectsNames,
-            defaultSubject: subjectsNames[0],
-            subjects: subjects,
-            checkedItems: checkedItems
+            idStudent: params.idStudent,
+            idCourse: params.idCourse,
+            name: params.studentName,
+            course: params.course
         });
     }
 
+    componentDidMount() {
+        // Se obtienen las unidades
+        this.APIHandler.getFromAPI('http://206.189.195.214:8080/api/curso/' + this.state.idCourse + '/unidades')
+            .then(response => {
+                const names = this.getSubjectsNames(response)
+                this.setState({
+                    subjectsNames: names,
+                    defaultSubject: names[0],
+                    idSubject: response[0].idUnidad,
+                })  
+            })
+            .then(() => {
+                // Se obtiene el avance del alumno en todas las unidades
+                this.APIHandler.getFromAPI('http://206.189.195.214:8080/api/unidad/all/alumno/' + this.state.idStudent)
+                    .then(response => {
+                        this.setState({
+                            subjects: response,
+                        })
+                    })
+                    .then(() => {                        
+                        // Se verifica el porcentaje de avance de los objetivos de aprendizaje
+                        this.assignCheckboxesValues()
+                    }
+                ).catch(error => console.error(error))
+            })
+            .catch(error => {
+                console.error(error)
+            }
+        )
+    }
+
     render() {
+        if(this.state.isLoading) {
+            return(
+                <View style={styles.activityIndicator}>
+                    <Text style={styles.loadingText}>
+                        Cargando los objetivos de aprendizaje
+                    </Text>
+                    <ActivityIndicator size='large'/>
+                </View>
+            );
+        } 
         // Picker que contiene los cursos
         let subjectsItems = this.state.subjectsNames.map((val, ind) => {
             return <Picker.Item key={ind} value={val} label={val} />
         });
 
         // Se mapean los objetivos de aprendizaje de la unidad
-        let learningCheckBoxes = this.getLearningObjectives(this.state.defaultSubject).OAs.map((oa, id) => {
+        let learningCheckBoxes = this.getLearningObjectives(this.state.defaultSubject).OAs.map((OA, id) => {
             return (
-                <View style={styles.flowRight} key={id}>
-                    <TouchableOpacity
-                        onPress={this.goEvaluationIndicator.bind(this, oa)}
-                    >   
-                        <Text>{oa.name}</Text>
-                    </TouchableOpacity>
-                    <Text>
-                        {oa.percentage * 100 + '%'}
-                    </Text>     
-                    <CheckBox
-                        key={id}
-                        checked={this.state.checkedItems[id]}
-                        onPress={() => {
-                            let tmp = this.state.checkedItems;
-                            tmp[id] = !this.state.checkedItems[id];
-                            this.setState({
-                                checkedItems: tmp
-                            })
-                        }}
-                    />
+                <View style={styles.OAContainer} key={id}>
+                    <View style={[styles.flowRight]}>
+                        <View style={styles.OAText}>
+                            <Text>
+                                {(id + 1).toString() + '.- ' + OA.name}
+                            </Text>
+                        </View>
+                        <Text>
+                            {(Math.round(OA.percentage * 100)).toString() + '%'}
+                        </Text>     
+                        <CheckBox
+                            key={id}
+                            checked={this.state.checkedItems[id].isComplete}
+                            onPress={() => {
+                                let tmp = this.state.checkedItems;
+                                tmp[id].isComplete = !this.state.checkedItems[id].isComplete;
+                                this.setState({
+                                    checkedItems: tmp
+                                })
+                            }}
+                            containerStyle={styles.CheckBoxStyle}/>
+                    </View>
+                    <View style={styles.button}>
+                        <Button 
+                            onPress={this.goEvaluationIndicator.bind(this, OA)}
+                            color='#429b00'
+                            title="Asignar indicadores de evaluación">
+                        </Button>
+                    </View>
                 </View>
             );
         });
         return (
-            <ScrollView>
-                <Text>
-                    {this.state.name}
+            <ScrollView style={styles.backColor}>
+                <Text style={styles.titleText}>
+                    {this.state.name + ' - ' + this.state.course}
                 </Text>
-                <Picker selectedValue={this.state.defaultSubject}
-                    onValueChange={(subject) => (this.setState({ defaultSubject: subject }))}>
-                    {subjectsItems}
-                </Picker>
+                <View style={styles.picker}>
+                    <Picker selectedValue={this.state.defaultSubject}
+                        onValueChange={(subject) => {
+                            this.setState({ defaultSubject: subject })
+                                .then(() => {
+                                    this.assignCheckboxesValues()
+                                })
+                        }}>
+                        {subjectsItems}
+                    </Picker>
+                </View>
                 {learningCheckBoxes}
-                <Button
-                    title={'Actualizar'}
-                    onPress={this.setEvalIndicators}
-                />
+                <View style={styles.button}>
+                    <Button
+                        title={'Actualizar avance'}
+                        color='#429b00'
+                        onPress={() => {
+                            const body = this.updateOASStatuses()
+                            this.APIHandler.putToAPI('http://206.189.195.214:8080/api/acompletado/update/' + this.state.idStudent + '/indicadores', body)
+                                .then(response => {
+                                    // Una vez se haya realizado los cambios, se lanza una alerta indicando si hubo éxito o no
+                                    let title = 'Actualización de objetivos'
+                                    let subTitle = 'Cambios realizados exitosamente'
+                                    if(response.status) {
+                                        subTitle = 'Ocurrió un error interno, inténtelo nuevamente'
+                                    } else {
+                                        // Se obtiene el avance del alumno en todas las unidades
+                                        this.APIHandler.getFromAPI('http://206.189.195.214:8080/api/unidad/all/alumno/' + this.state.idStudent)
+                                            .then(response => {
+                                                this.setState({
+                                                    subjects: response,
+                                                })
+                                            })
+                                            .catch(error => console.error(error)
+                                        )
+                                    }
+                                    // Se lanza una alerta indicando el estado de la actualización
+                                    Alert.alert(
+                                        title,
+                                        subTitle,
+                                        [ { text: 'OK' } ]
+                                    )
+                                })
+                        }}/>
+                </View>
             </ScrollView>
         )
     }
@@ -261,5 +252,79 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         alignSelf: 'stretch',
+    },
+    activityIndicator: {
+        margin: 'auto',
+        marginTop: '4%'
+    },
+    loadingText: {
+        fontSize: 22,
+        textAlign: 'center',
+        marginBottom: '8%',
+        marginTop: '5%'
+    },
+    backColor: {
+        backgroundColor: 'white'
+    },
+    picker: {
+        marginLeft: '20%',
+        marginRight: '20%',
+        marginBottom: '7%',
+        borderRadius: 8,
+        borderWidth: 1.5,
+        borderColor: '#429b00'
+    },
+    loadingText: {
+        fontSize: 22,
+        textAlign: 'center',
+        marginBottom: '8%'
+    },
+    activityIndicator: {
+        margin: 'auto',
+        marginTop: '4%',
+    },
+    titleText: {
+        fontSize: 20,
+        textAlign: 'center',
+        marginTop: '7%',
+        marginBottom: '7%'
+    },
+    OAContainer: {
+        marginLeft: '1%',
+        marginRight: '1%',
+        borderWidth: 1.5,
+        borderRadius: 8,
+        borderColor: '#429b00',
+        marginBottom: 10,
+    },
+    percentage: {
+        marginLeft: '5%',
+        marginRight: '5%'
+    },
+    OAText: {
+        marginTop: '3%',
+        marginLeft: '5%',
+        marginRight: '5%',
+        width: '60%',
+        marginBottom: '3%'
+    },
+    button: {
+        marginLeft: '10%',
+        marginRight: '10%',
+        textAlign: 'center',
+        marginTop: '2%',
+        marginBottom: '3%',
+        height: 40
+    },
+    textButton: {
+        marginTop: '2%',
+        color: '#FFFFFF',
+        fontSize: 18,
+    },
+    CheckBoxStyle: {
+        backgroundColor: 'white',
+        borderColor: 'white',
+        width: '15%',
+        marginRight: '10%'
     }
 })
