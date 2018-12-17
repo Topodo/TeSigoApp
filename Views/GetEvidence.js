@@ -8,7 +8,9 @@ import {
     TouchableOpacity,
     Picker,
     ProgressBarAndroid,
-    Image
+    Image, 
+    Button,
+    ActivityIndicator  
 } from 'react-native';
 
 export default class GetEvidence extends React.Component {
@@ -20,7 +22,8 @@ export default class GetEvidence extends React.Component {
             course: '',
             evidence: [],
             expandableItems: [false, false, false], // [0]: Fotografías, [1]: Videos, [2]: Audios
-            isLoading: true
+            isLoading: true,
+            idStudent: ''
         }
     }
 
@@ -93,25 +96,44 @@ export default class GetEvidence extends React.Component {
             <View key={id} style={styles.infoButton}>
                 <TouchableOpacity
                     onPress={this.showEvidence.bind(this, info)}>
-                    <Text>
-                        {info.name}
-                    </Text>
-                    <Text>
-                        {info.date}
-                    </Text>
+                    <View style={[styles.EvidenceContainer, styles.flowRight]}>
+                        <View style={styles.PreviewText}>
+                            <Text>
+                                {info.name}
+                            </Text>
+                            <Text>
+                                {info.date}
+                            </Text>
+                        </View>
+                        <View style={styles.Button}>
+                            <Button title="Ver evidencia"
+                                    color='#429b00'>
+                            </Button>
+                        </View>
+                    </View>
                 </TouchableOpacity>
             </View>
         );
     }
 
     componentWillMount() {
-        let evidence = this.getEvidence();
+        const evidence = this.getEvidence()
+        const { params } = this.props.navigation.state;
         this.setState({
-            name: 'Pedrito',
-            course: 'Cuarto básico',
-            evidence: evidence,
-            expandableItems: [false, false, false]
+            name: params.studentName,
+            course: params.course,
+            expandableItems: [false, false, false],
+            idStudent: params.idStudent,
+            evidence: evidence
         });
+    }
+
+    componentDidMount() {
+        setTimeout(() => {
+            this.setState({
+                isLoading: false
+            })
+        }, 1000);
     }
 
     static navigationOptions = {
@@ -119,77 +141,175 @@ export default class GetEvidence extends React.Component {
     };
     
     render() {
+        if(this.state.isLoading) {
+            return(
+                <View style={styles.activityIndicator}>
+                    <Text style={styles.loadingText}>
+                        Cargando el listado de evidencias cualitativas
+                    </Text>
+                    <ActivityIndicator size='large'/>
+                </View>
+            );
+        } 
         // Fotografías
         let photos = this.state.expandableItems[0] === true ?
             this.state.evidence.pictures.map((info, id) => {
                 return (this.renderInfo(info, id))
             }) : null;
+        let photosArrow = this.state.expandableItems[0] === true ?
+            [{rotate: '-180deg'}] : [{rotate: '0deg'}];
         // Videos
         let videos = this.state.expandableItems[1] === true ?
             this.state.evidence.videos.map((info, id) => {
                 return (this.renderInfo(info, id))
             }) : null;
+        let videosArrow = this.state.expandableItems[1] === true ?
+            [{rotate: '-180deg'}] : [{rotate: '0deg'}];
         // Audios
         let audios = this.state.expandableItems[2] === true ?
             this.state.evidence.audios.map((info, id) => {
                 return (this.renderInfo(info, id))
             }) : null;
+        let audiosArrow = this.state.expandableItems[2] === true ?
+            [{rotate: '-180deg'}] : [{rotate: '0deg'}];
 
         return (
-            <ScrollView>
-                <Text>
+            <ScrollView style={styles.backColor}>
+                <Text style={styles.titleText}>
                     {this.state.name + ' - ' + this.state.course}
                 </Text>
-                <TouchableOpacity
-                    onPress={() => {
-                        let tmp = this.state.expandableItems;
-                        tmp[0] = !this.state.expandableItems[0];
-                        this.setState({
-                            expandableItems: tmp
-                        });
-                    }}>
-                    <Text>
-                        Fotografías
-                    </Text>
-                </TouchableOpacity>
-                {photos}
-                <TouchableOpacity
-                    onPress={() => {
-                        let tmp = this.state.expandableItems;
-                        tmp[1] = !this.state.expandableItems[1];
-                        this.setState({
-                            expandableItems: tmp
-                        });
-                    }}>
-                    <Text>
-                        Videos
-                    </Text>
-                </TouchableOpacity>
-                {videos}
-                <TouchableOpacity
-                    onPress={() => {
-                        let tmp = this.state.expandableItems;
-                        tmp[2] = !this.state.expandableItems[2];
-                        this.setState({
-                            expandableItems: tmp
-                        });
-                    }}>
-                    <Text>
-                        Audios
-                    </Text>
-                </TouchableOpacity>
-                {audios}
+                <View>
+                    <TouchableOpacity style={styles.ColapsableTouchable}
+                        onPress={() => {
+                            let tmp = this.state.expandableItems;
+                            tmp[0] = !this.state.expandableItems[0];
+                            this.setState({
+                                expandableItems: tmp
+                            });
+                        }}>
+                        <View style={[styles.flowRight]}>
+                            <Text style={styles.SubItemText}>
+                                Fotografías
+                            </Text>
+                            <Image source={require('./Images/expand-arrow.png')} 
+                                style={[styles.ArrowImage, {transform: photosArrow}, {marginLeft: '19%'}]}/>
+                        </View>
+                    </TouchableOpacity>
+                    <View style={styles.EvidenceContainer}>
+                        {photos}
+                    </View>
+                </View>
+                <View>
+                    <TouchableOpacity style={styles.ColapsableTouchable}
+                        onPress={() => {
+                            let tmp = this.state.expandableItems;
+                            tmp[1] = !this.state.expandableItems[1];
+                            this.setState({
+                                expandableItems: tmp
+                            });
+                        }}>
+                        <View style={[styles.flowRight]}>
+                            <Text style={styles.SubItemText}>
+                                Videos
+                            </Text>
+                            <Image source={require('./Images/expand-arrow.png')} 
+                                style={[styles.ArrowImage, {transform: videosArrow}, {marginLeft: '25%'}]}/>
+                        </View>
+                    </TouchableOpacity>
+                    <View style={styles.EvidenceContainer}>
+                        {videos}
+                    </View>
+                </View>
+                <View>
+                    <TouchableOpacity style={styles.ColapsableTouchable}
+                        onPress={() => {
+                            let tmp = this.state.expandableItems;
+                            tmp[2] = !this.state.expandableItems[2];
+                            this.setState({
+                                expandableItems: tmp
+                            });
+                        }}>
+                        <View style={[styles.flowRight]}>
+                            <Text style={styles.SubItemText}>
+                                Audios
+                            </Text>
+                            <Image source={require('./Images/expand-arrow.png')} 
+                                style={[styles.ArrowImage, {transform: audiosArrow}, {marginLeft: '25%'}]}/>
+                        </View>
+                    </TouchableOpacity>
+                    <View style={styles.EvidenceContainer}>
+                        {audios}
+                    </View>
+                </View>
             </ScrollView >
         );
     }
 }
-
+const width = Dimensions.get('window').height * 0.8;
+const height = Dimensions.get('window').height * 0.04;
 const styles = StyleSheet.create({
     infoButton: {
-        marginLeft: 30,
-        marginTop: 10
+        marginTop: 5
     },
     touchable: {
         marginBottom: 20,
-    }
+    },
+    backColor: {
+        backgroundColor: '#FFFFFF'
+    },
+    titleText: {
+        fontSize: 20,
+        textAlign: 'center',
+        marginTop: '7%',
+        marginBottom: '7%'
+    },
+    EvidenceContainer: {
+        marginLeft: '10%',
+        marginRight: '10%',
+        borderWidth: 1.5,
+        borderColor: '#429b00',
+        alignItems: 'center',
+        marginBottom: 10,
+        marginTop: 10
+    },
+    ColapsableTouchable: {
+        marginLeft: 4,
+        marginRight: 4,
+        width: width,
+        backgroundColor: '#f7ffe6'
+    },
+    flowRight: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        alignSelf: 'center',
+        marginBottom: 10
+    },
+    Button: {
+        marginTop: 10,
+        marginBottom: 10,
+        marginLeft: '5%',
+        marginRight: 10
+    },
+    PreviewText: {
+        alignItems: 'center',
+        marginLeft: 10
+    },
+    ArrowImage: {
+        width: '4%',
+        height: height,
+        marginTop: 8
+    },
+    SubItemText: {
+        marginTop: 8,
+    },
+    activityIndicator: {
+        margin: 'auto',
+        marginTop: '4%'
+    },
+    loadingText: {
+        fontSize: 22,
+        textAlign: 'center',
+        marginBottom: '8%',
+        marginTop: '5%'
+    },
 });

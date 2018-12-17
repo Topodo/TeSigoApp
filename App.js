@@ -28,6 +28,7 @@ const AppNavigator = createStackNavigator({
     SetEvalIndicator: { screen: SetEvaluationIndicator },
     GetEvalIndicator: { screen: GetEvaluationIndicator },
     ShowEvidence: { screen: ShowEvidence },
+    GetEvidence: { screen: GetEvidence },
     StudentList: { screen: StudentList },
     GetCourses: { screen: GetCourses },
     GetObjectivesPerStudent: { screen: GetObjectivesPerStudent }

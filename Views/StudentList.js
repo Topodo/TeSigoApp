@@ -25,6 +25,7 @@ export default class StudentList extends Component {
         this.APIHandler = new APIHandler();
     }
 
+    // Método que redirige la navegación a la vista de visualización de objetivos de aprendizaje
     getOAs(student) {
         this.props.navigation.navigate('GetObjectivesPerStudent', { 
             idStudent: student.idAlumno,
@@ -34,10 +35,20 @@ export default class StudentList extends Component {
         })
     }
 
+    // Método que redirige la navegación a la vista de asignación de objetivos de aprendizaje
     setOAs(student) {
         this.props.navigation.navigate('SetObjectivesPerStudent', {
             idStudent: student.idAlumno,
             idCourse: this.state.idCourse,
+            studentName: student.nombreAlumno + " " + student.apellidoPaternoAlumno + " " + student.apellidoMaternoAlumno,
+            course: this.state.course
+        })
+    }
+
+    // Método que redirige la navegación a la vista de visualización de evidencia
+    getEvidences(student) {
+        this.props.navigation.navigate('GetEvidence', {
+            idStudent: student.idAlumno,
             studentName: student.nombreAlumno + " " + student.apellidoPaternoAlumno + " " + student.apellidoMaternoAlumno,
             course: this.state.course
         })
@@ -93,6 +104,22 @@ export default class StudentList extends Component {
                         </Button>
                     </View>
                 </View>
+                <View style={styles.flowRight}>
+                    <View style={styles.button}>
+                        <Button key={id + 3}
+                                title='Ver evidencias'
+                                color='#429b00'
+                                onPress={this.getEvidences.bind(this, info)}>
+                        </Button>
+                    </View>
+                    <View>
+                        <Button key={id + 4}
+                                title="Asignar evidencias"
+                                color='#429b00'
+                                onPress={this.getOAs.bind(this, info)}>
+                        </Button>
+                    </View>
+                </View>
             </View>
         );
     }
@@ -113,7 +140,7 @@ export default class StudentList extends Component {
             );
         } else {
             return (
-                <ScrollView>
+                <ScrollView style={styles.backColor}>
                     <Text style={styles.titleText}>
                         {'Curso: ' + this.state.course}
                     </Text>
@@ -164,5 +191,8 @@ const styles = StyleSheet.create({
         borderColor: '#429b00',
         alignItems: 'center',
         marginBottom: 10,
+    },
+    backColor: {
+        backgroundColor: '#FFFFFF'
     },
 })
