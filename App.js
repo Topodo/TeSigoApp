@@ -21,10 +21,11 @@ import GetEvidence from './Views/GetEvidence';
 import ShowEvidence from './Views/ShowEvidence';
 import StudentList from './Views/StudentList';
 import GetCourses from './Views/GetCourses';
- 
+import StudentProfile from './Views/StudentProfile';
+import EvidenceForm from './Views/EvidenceForm' 
 
 const AppNavigator = createStackNavigator({
-    Home: { screen: Login },
+    Home: { screen: EvidenceForm },
     SetEvalIndicator: { screen: SetEvaluationIndicator },
     GetEvalIndicator: { screen: GetEvaluationIndicator },
     ShowEvidence: { screen: ShowEvidence },
@@ -32,7 +33,8 @@ const AppNavigator = createStackNavigator({
     StudentList: { screen: StudentList },
     GetCourses: { screen: GetCourses },
     GetObjectivesPerStudent: { screen: GetObjectivesPerStudent },
-    SetObjectivesPerStudent: { screen: SetObjectivesPerStudent }
+    SetObjectivesPerStudent: { screen: SetObjectivesPerStudent },
+    StudentProfile: { screen: StudentProfile }
 });
 
 const Drawer = createDrawerNavigator({

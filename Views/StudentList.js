@@ -25,32 +25,14 @@ export default class StudentList extends Component {
         this.APIHandler = new APIHandler();
     }
 
-    // Método que redirige la navegación a la vista de visualización de objetivos de aprendizaje
-    getOAs(student) {
-        this.props.navigation.navigate('GetObjectivesPerStudent', { 
+    // Método que redirige la navegación al perfil del alumno
+    getStudentProfile(student) {
+        this.props.navigation.navigate('StudentProfile', { 
             idStudent: student.idAlumno,
             idCourse: this.state.idCourse,
             studentName: student.nombreAlumno + " " + student.apellidoPaternoAlumno + " " + student.apellidoMaternoAlumno,
-            course: this.state.course
-        })
-    }
-
-    // Método que redirige la navegación a la vista de asignación de objetivos de aprendizaje
-    setOAs(student) {
-        this.props.navigation.navigate('SetObjectivesPerStudent', {
-            idStudent: student.idAlumno,
-            idCourse: this.state.idCourse,
-            studentName: student.nombreAlumno + " " + student.apellidoPaternoAlumno + " " + student.apellidoMaternoAlumno,
-            course: this.state.course
-        })
-    }
-
-    // Método que redirige la navegación a la vista de visualización de evidencia
-    getEvidences(student) {
-        this.props.navigation.navigate('GetEvidence', {
-            idStudent: student.idAlumno,
-            studentName: student.nombreAlumno + " " + student.apellidoPaternoAlumno + " " + student.apellidoMaternoAlumno,
-            course: this.state.course
+            course: this.state.course,
+            student: student
         })
     }
 
@@ -91,32 +73,9 @@ export default class StudentList extends Component {
                 <View key={id + 2} style={styles.flowRight}>
                     <View style={styles.button}>
                         <Button key={id + 3}
-                                title='Ver avance'
+                                title='Ver Perfil'
                                 color='#429b00'
-                                onPress={this.getOAs.bind(this, info)}>
-                        </Button>
-                    </View>
-                    <View>
-                        <Button key={id + 4}
-                                title="Asignar avance"
-                                color='#429b00'
-                                onPress={this.setOAs.bind(this, info)}>
-                        </Button>
-                    </View>
-                </View>
-                <View style={styles.flowRight}>
-                    <View style={styles.button}>
-                        <Button key={id + 3}
-                                title='Ver evidencias'
-                                color='#429b00'
-                                onPress={this.getEvidences.bind(this, info)}>
-                        </Button>
-                    </View>
-                    <View>
-                        <Button key={id + 4}
-                                title="Asignar evidencias"
-                                color='#429b00'
-                                onPress={this.getOAs.bind(this, info)}>
+                                onPress={this.getStudentProfile.bind(this, info)}>
                         </Button>
                     </View>
                 </View>

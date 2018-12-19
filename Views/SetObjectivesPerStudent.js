@@ -18,13 +18,13 @@ export default class ObjectivesPerStudent extends React.Component {
         super(props);
         this.state = {
             name: '',
-            subjects: [],     // Listado de cursos para el profesor
+            subjects: [],  
             defaultSubject: '',
             subjectsNames: [],
             isLoading: true,
             checkedItems: [],
             idStudent: '',
-            idCourse: ''
+            idCourse: '',
         }
         this.APIHandler = new APIHandler();
     }
@@ -32,6 +32,7 @@ export default class ObjectivesPerStudent extends React.Component {
     static navigationOptions = {
         title: 'Objetivos por Alumno'
     };
+
 
     // Método que obtiene los nombres de las unidades
     getSubjectsNames(subjects) {
@@ -59,13 +60,14 @@ export default class ObjectivesPerStudent extends React.Component {
                 indicators: indicators.evalIndicators,
                 studentName: this.state.name,
                 course: this.state.course,
-                idStudent: this.state.idStudent
+                idStudent: this.state.idStudent,
+                idCourse: this.state.idCourse
             }
         );
     }
 
     // Método que cambia el estado de los checkboxes, indicando los OAS asignados a la unidad en específico en la cual se está trabajando
-    assignCheckboxesValues() {        
+    assignCheckboxesValues() {     
         let checkedItems = [];                        
         this.getLearningObjectives(this.state.defaultSubject).OAs.forEach((item) => {
             let isComplete = item.percentage == 1 ? true : false;
@@ -76,7 +78,6 @@ export default class ObjectivesPerStudent extends React.Component {
         });
         this.setState({
             checkedItems: checkedItems,
-            isLoading: false
         })
     }
 
@@ -99,17 +100,8 @@ export default class ObjectivesPerStudent extends React.Component {
         return body
     }
 
-    componentWillMount() {
-        const { params } = this.props.navigation.state
-        this.setState({
-            idStudent: params.idStudent,
-            idCourse: params.idCourse,
-            name: params.studentName,
-            course: params.course
-        });
-    }
-
-    componentDidMount() {
+    // Método que obtiene la data de los OAS desde el servidor
+    getOASData() {
         // Se obtienen las unidades
         this.APIHandler.getFromAPI('http://206.189.195.214:8080/api/curso/' + this.state.idCourse + '/unidades')
             .then(response => {
@@ -131,6 +123,9 @@ export default class ObjectivesPerStudent extends React.Component {
                     .then(() => {                        
                         // Se verifica el porcentaje de avance de los objetivos de aprendizaje
                         this.assignCheckboxesValues()
+                        this.setState({
+                            isLoading: false,
+                        })
                     }
                 ).catch(error => console.error(error))
             })
@@ -138,6 +133,41 @@ export default class ObjectivesPerStudent extends React.Component {
                 console.error(error)
             }
         )
+    }
+
+    // Método que obtiene la data desde la vista de asignación de IEs
+    getDataFromIE() {
+        // Se obtiene el avance del alumno en todas las unidades
+        this.APIHandler.getFromAPI('http://206.189.195.214:8080/api/unidad/all/alumno/' + this.state.idStudent)
+        .then(response => {
+            this.setState({
+                subjects: response,
+            })
+        })
+        .then(() => {                        
+            // Se verifica el porcentaje de avance de los objetivos de aprendizaje
+            this.assignCheckboxesValues()
+        })
+        .then(() => {
+            this.setState({
+                isLoading: false,
+            })
+        })
+        .catch(error => console.error(error))
+    }
+
+    componentWillMount() {
+        const { params } = this.props.navigation.state
+        this.setState({
+            idStudent: params.idStudent,
+            idCourse: params.idCourse,
+            name: params.studentName,
+            course: params.course
+        });
+    }
+
+    componentDidMount() {
+        this.getOASData()
     }
 
     render() {

@@ -21,7 +21,8 @@ export default class EvaluationIndicator extends Component {
             OAName: '',
             checkedItems: [],
             isLoading: true,
-            idStudent: ''
+            idStudent: '',
+            student: {}
         };
         this.APIHandler = new APIHandler();
     }
@@ -29,6 +30,17 @@ export default class EvaluationIndicator extends Component {
     static navigationOptions = {
         title: 'Indicadores de evaluación'
     };
+
+    // Método que redirige la navegación a la vista de asignación de objetivos de aprendizaje
+    goToStudentProfile() {
+        this.props.navigation.navigate('StudentProfile', {
+            idStudent: this.state.idStudent,
+            idCourse: this.state.idCourse,
+            studentName: this.state.name,
+            course: this.state.course,
+            student: this.state.student
+        })
+    }
 
     // Para modificar el state al cambiar de un componente a otro
     componentWillMount() {
@@ -38,7 +50,8 @@ export default class EvaluationIndicator extends Component {
             name: params.studentName,
             course: params.course,
             OAName: params.OAName,
-            idStudent: params.idStudent
+            idStudent: params.idStudent,
+            student: params.student
         })
     }
 
@@ -128,6 +141,9 @@ export default class EvaluationIndicator extends Component {
                                         subTitle,
                                         [ { text: 'OK' } ]
                                     )
+                                })
+                                .then(() => {
+                                    this.goToStudentProfile()
                                 })
                         }}/>
                 </View>

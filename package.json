@@ -11,6 +11,7 @@
     "react": "16.4.1",
     "react-native": "0.56.0",
     "react-native-accordion": "^1.0.1",
+    "react-native-calendars": "^1.21.0",
     "react-native-collapsible": "^1.0.1",
     "react-native-elements": "^0.19.1",
     "react-native-expand": "^1.0.6",
