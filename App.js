@@ -25,9 +25,11 @@ import StudentProfile from './Views/StudentProfile';
 import EvidenceForm from './Views/EvidenceForm' 
 import CreateReport from './Views/CreateReport'
 import ReportsList from './Views/ReportsList'
+import CourseSubjectProgress from './Views/CourseSubjectProgress'
+import OACourseProgress from './Views/OACourseProgress'
 
 const AppNavigator = createStackNavigator({
-    Home: { screen: CreateReport },
+    Home: { screen: OACourseProgress },
     SetEvalIndicator: { screen: SetEvaluationIndicator },
     GetEvalIndicator: { screen: GetEvaluationIndicator },
     ShowEvidence: { screen: ShowEvidence },
@@ -38,7 +40,9 @@ const AppNavigator = createStackNavigator({
     SetObjectivesPerStudent: { screen: SetObjectivesPerStudent },
     StudentProfile: { screen: StudentProfile },
     CreateReport: { screen: CreateReport },
-    ReportsList: { screen: ReportsList }
+    ReportsList: { screen: ReportsList },
+    CourseSubjectProgress: { screen: CourseSubjectProgress },
+    OACourseProgress: { screen: OACourseProgress }
 });
 
 const Drawer = createDrawerNavigator({

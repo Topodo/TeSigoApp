@@ -58,7 +58,7 @@ export default class GetObjectivesPerStudent extends React.Component {
 
     // Método que obtiene los nombres de las unidades
     getSubjectsNames(subjects) {
-        let names = []
+        let names = [];
         subjects.forEach(subject => {
             names.push(subject.nombreUnidad)
         })
