@@ -27,7 +27,7 @@ import CreateReport from './Views/CreateReport'
 import ReportsList from './Views/ReportsList'
 
 const AppNavigator = createStackNavigator({
-    Home: { screen: ReportsList },
+    Home: { screen: CreateReport },
     SetEvalIndicator: { screen: SetEvaluationIndicator },
     GetEvalIndicator: { screen: GetEvaluationIndicator },
     ShowEvidence: { screen: ShowEvidence },
