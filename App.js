@@ -23,9 +23,11 @@ import StudentList from './Views/StudentList';
 import GetCourses from './Views/GetCourses';
 import StudentProfile from './Views/StudentProfile';
 import EvidenceForm from './Views/EvidenceForm' 
+import CreateReport from './Views/CreateReport'
+import ReportsList from './Views/ReportsList'
 
 const AppNavigator = createStackNavigator({
-    Home: { screen: EvidenceForm },
+    Home: { screen: ReportsList },
     SetEvalIndicator: { screen: SetEvaluationIndicator },
     GetEvalIndicator: { screen: GetEvaluationIndicator },
     ShowEvidence: { screen: ShowEvidence },
@@ -34,7 +36,9 @@ const AppNavigator = createStackNavigator({
     GetCourses: { screen: GetCourses },
     GetObjectivesPerStudent: { screen: GetObjectivesPerStudent },
     SetObjectivesPerStudent: { screen: SetObjectivesPerStudent },
-    StudentProfile: { screen: StudentProfile }
+    StudentProfile: { screen: StudentProfile },
+    CreateReport: { screen: CreateReport },
+    ReportsList: { screen: ReportsList }
 });
 
 const Drawer = createDrawerNavigator({
