@@ -118,7 +118,23 @@ export default class StudentProfile extends Component {
         })
     }
 
+    componentDidMount() {
+        this.setState({
+            isLoading: false
+        })
+    }
+
     render() {
+        if(this.state.isLoading) {
+            return(
+                <View style={styles.activityIndicator}>
+                    <Text style={styles.loadingText}>
+                        Cargando la lista del curso
+                    </Text>
+                    <ActivityIndicator size='large'/>
+                </View>
+            );
+        } 
         const studentComp = this.renderInfo(this.state.student, 0)
         return(
             <ScrollView style={styles.backColor}>

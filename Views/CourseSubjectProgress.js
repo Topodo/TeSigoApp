@@ -177,6 +177,16 @@ export default class CourseSubjectProgress extends Component {
 
 // Definición de estilos
 const styles = StyleSheet.create({
+    activityIndicator: {
+        margin: 'auto',
+        marginTop: '4%'
+    },
+    loadingText: {
+        fontSize: 22,
+        textAlign: 'center',
+        marginBottom: '8%',
+        marginTop: '5%'
+    },
     progressBar: {
         width: '60%',
         marginLeft: '5%',

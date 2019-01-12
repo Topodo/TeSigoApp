@@ -5,8 +5,6 @@ import {
     View,
     Text,
     Button,
-    Alert,
-    Picker,
     ActivityIndicator
 } from 'react-native';
 import APIHandler from '../Utils/APIHandler'
@@ -26,12 +24,12 @@ export default class OACourseProgress extends Component {
     }
 
     componentWillMount() {
-        /* const { params } = this.props.navigation.state
+        const { params } = this.props.navigation.state
         this.setState({
             idCourse: params.idCourse,
             course: params.course,
             idOA: params.idOA
-        }) */
+        })
     }
 
     componentDidMount() {
@@ -39,13 +37,21 @@ export default class OACourseProgress extends Component {
         this.APIHandler.getFromAPI('http://206.189.195.214:8080/api/objetivoAprendizaje/' + this.state.idOA
                                     + '/curso/' + this.state.idCourse + '/avance')
             .then(response => {
-                console.log(response)
                 this.setState({
                     IEs: response,
                     isLoading: false
                 })
             })
             .catch(error => console.error(error))
+    }
+
+    // Método que redirige la navegación hacia el listado de alumnos ordenados por IE Completo/Incompleto
+    goIEStudentProgress(info) {
+        this.props.navigation.navigate('IEStudentsProgress', {
+            idIE: info.idIE,
+            idCourse: this.state.idCourse,
+            course: this.state.course
+        })
     }
 
     // Método que renderiza la información de un IE
@@ -58,9 +64,11 @@ export default class OACourseProgress extends Component {
                     </Text>
                 </View>
                 <View style={styles.button}>
-                    <Button onPress={() => {}}
-                            color='#429b00'
-                            title="Lista de alumnos"/>
+                    <Button onPress={() => {
+                        this.goIEStudentProgress(IE)
+                    }}
+                        color='#429b00'
+                        title="Lista de alumnos"/>
                 </View>
             </View>
         )
@@ -97,14 +105,30 @@ export default class OACourseProgress extends Component {
         ]
 
         return(
-            <View key={1} style={styles.graphContainer}>
-                <PureChart data={data} type='bar'/>
+            <View style={[styles.graphContainer]}>
+                <Text style={styles.titleText}>Gráfico</Text>
+                <View style={styles.legendContainer}>
+                    <Text style={{fontSize: 10}}> Completos </Text>
+                    <View style={[styles.legendTag, { backgroundColor: 'green' }]}/>
+                    <Text style={{fontSize: 10}}> Incompletos </Text>
+                    <View style={[styles.legendTag, { backgroundColor: 'red' }]}/>
+                </View>
+                <View style={styles.yLabel}>    
+                    <Text style={[styles.labelText]}> Cantidad de </Text>
+                    <Text style={styles.labelText}> alumnos </Text>
+                </View>
+                <View style={{width: '93%'}}>
+                    <PureChart data={data} type='bar'/>
+                </View>
+                <View style={{alignItems: 'center', marginBottom: 12}}>
+                    <Text style={styles.labelText}> Indicadores de Evaluación </Text>
+                </View>
             </View>
         )
     }
 
     static navigationOptions = {
-        title: 'Detalles del objetivo de aprendizaje'
+        title: 'Indicadores de evaluación'
     }
 
     render() {
@@ -112,7 +136,7 @@ export default class OACourseProgress extends Component {
             return(
                 <View style={styles.activityIndicator}>
                     <Text style={styles.loadingText}>
-                        Cargando los Indicadores de evalución
+                        Cargando los indicadores de evaluación
                     </Text>
                     <ActivityIndicator size='large'/>
                 </View>
@@ -123,9 +147,7 @@ export default class OACourseProgress extends Component {
         })
         return(
             <ScrollView style={styles.backColor}>
-                <Text style={styles.titleText}>
-                    Indicadores de evaluación
-                </Text>
+                <Text style={styles.titleText}> {this.state.course} </Text>
                 {IEs}
                 {this.renderGraph(this.state.IEs)}
             </ScrollView>
@@ -135,6 +157,34 @@ export default class OACourseProgress extends Component {
 
 // Definición de estilos
 const styles = StyleSheet.create({
+    legendTag: {
+        width: '10%',
+        height: '10%',
+    },
+    legendContainer: {
+        borderWidth: 1.5,
+        borderRadius: 8,
+        borderColor: '#429b00',
+        width: '35%',
+        height: '12%',
+        marginLeft: '50%',
+        alignItems: 'center',
+    },
+    yLabel: {
+        alignItems: 'center',
+        width: '35%',
+        marginRight: '65%'
+    },
+    xLabel: {
+        marginBottom: '7%',
+        alignItems: 'center',
+        width: '35%',
+        marginRight: '65%'
+    },
+    labelText: {
+        color: 'black',
+        fontSize: 12
+    },
     button: {
         marginRight: '5%',
         textAlign: 'center',
@@ -142,18 +192,25 @@ const styles = StyleSheet.create({
         marginBottom: '3%',
         width: '30%'
     },
+    activityIndicator: {
+        margin: 'auto',
+        marginTop: '4%'
+    },
     loadingText: {
         fontSize: 22,
         textAlign: 'center',
-        marginBottom: '8%'
-    },
-    activityIndicator: {
-        margin: 'auto',
-        marginTop: '4%',
+        marginBottom: '8%',
+        marginTop: '5%'
     },
     graphContainer: {
-        width: '95%',
-        marginRight: '5%'
+        borderWidth: 1.5,
+        borderRadius: 8,
+        borderColor: '#429b00',
+        width: '94%',
+        marginRight: '3%',
+        marginLeft: '3%',
+        alignItems: 'center',
+        marginBottom: 12
     },
     progressBar: {
         width: '60%',
