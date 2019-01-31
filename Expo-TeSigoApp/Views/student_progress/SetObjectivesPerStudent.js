@@ -11,7 +11,7 @@ import {
     Alert
 } from 'react-native';
 import { CheckBox } from 'react-native-elements';
-import APIHandler from '../Utils/APIHandler';
+import APIHandler from '../../Utils/APIHandler';
 
 export default class ObjectivesPerStudent extends React.Component {
     constructor(props) {

@@ -9,7 +9,7 @@ import {
     Picker,
     ActivityIndicator
 } from 'react-native';
-import APIHandler from '../Utils/APIHandler'
+import APIHandler from '../../Utils/APIHandler'
 
 export default class CourseSubjectProgress extends Component {
     constructor(props) {

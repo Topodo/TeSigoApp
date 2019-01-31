@@ -9,7 +9,7 @@ import {
     Image, 
     ActivityIndicator  
 } from 'react-native';
-import APIHandler from '../Utils/APIHandler'
+import APIHandler from '../../Utils/APIHandler'
 
 export default class ReportsList extends Component {
     constructor(props) {
@@ -80,7 +80,7 @@ export default class ReportsList extends Component {
                                 { (index + 1).toString() + '.- ' + report['asunto'] }
                             </Text>
                         </View>
-                        <Image source={require('./Images/expand-arrow.png')} 
+                        <Image source={require('../Images/expand-arrow.png')} 
                             style={[styles.ArrowImage, {transform: arrowRotation}, {marginRight: '20%'}]}/>
                     </View>
                 </TouchableOpacity>

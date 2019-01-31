@@ -8,7 +8,7 @@ import {
     Alert
 } from 'react-native';
 import { FormLabel, FormInput, FormValidationMessage } from 'react-native-elements'
-import APIHandler from '../Utils/APIHandler'
+import APIHandler from '../../Utils/APIHandler'
 
 export default class CreateReport extends Component {
     constructor(props) {

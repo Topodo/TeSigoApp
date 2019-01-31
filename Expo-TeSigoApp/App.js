@@ -13,20 +13,20 @@ import {
 import Login from './Views/Login';
 import MainPage from './Views/MainPage';
 import SignUp from './Views/SignUp';
-import SetEvaluationIndicator from './Views/SetEvaluationIndicator';
-import SetObjectivesPerStudent from './Views/SetObjectivesPerStudent';
-import GetObjectivesPerStudent from './Views/GetObjectivesPerStudent';
-import GetEvaluationIndicator from './Views/GetEvaluationIndicator';
-import GetEvidence from './Views/GetEvidence';
+import SetEvaluationIndicator from './Views/student_progress/SetEvaluationIndicator';
+import SetObjectivesPerStudent from './Views/student_progress/SetObjectivesPerStudent';
+import GetObjectivesPerStudent from './Views/student_progress/GetObjectivesPerStudent';
+import GetEvaluationIndicator from './Views/student_progress/GetEvaluationIndicator';
+import GetEvidence from './Views/evidences/GetEvidence';
 import StudentList from './Views/StudentList';
 import GetCourses from './Views/GetCourses';
 import StudentProfile from './Views/StudentProfile';
-import EvidenceForm from './Views/EvidenceForm' 
-import CreateReport from './Views/CreateReport'
-import ReportsList from './Views/ReportsList'
-import CourseSubjectProgress from './Views/CourseSubjectProgress'
-import OACourseProgress from './Views/OACourseProgress'
-import IEStudentsProgress from './Views/IEStudentsProgress'
+import EvidenceForm from './Views/evidences/EvidenceForm' 
+import CreateReport from './Views/reports/CreateReport'
+import ReportsList from './Views/reports/ReportsList'
+import CourseSubjectProgress from './Views/course_progress/CourseSubjectProgress'
+import OACourseProgress from './Views/course_progress/OACourseProgress'
+import IEStudentsProgress from './Views/course_progress/IEStudentsProgress'
 
 const AppNavigator = createStackNavigator({
     Home: { screen: Login },

@@ -14,7 +14,7 @@ import {
     LocaleConfig
 } from 'react-native-calendars'
 
-import APIHandler from '../Utils/APIHandler'
+import APIHandler from '../../Utils/APIHandler'
 
 // Configuración del calendario en español
 LocaleConfig.locales['cl'] = {
@@ -78,7 +78,7 @@ export default class EvidenceForm extends Component {
                         <FormLabel>
                             Fecha de la evidencia
                         </FormLabel>
-                        <Image source={require('./Images/expand-arrow.png')}
+                        <Image source={require('../Images/expand-arrow.png')}
                             style={[styles.ArrowImage, {transform: calendarArrow}]}/>
                     </View>
                 </TouchableOpacity>

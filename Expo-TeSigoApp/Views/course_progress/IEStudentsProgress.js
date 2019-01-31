@@ -10,7 +10,7 @@ import {
     Image,
     Dimensions
 } from 'react-native';
-import APIHandler from '../Utils/APIHandler'
+import APIHandler from '../../Utils/APIHandler'
 
 export default class IEStudentsProgress extends Component {
     constructor(props) {
@@ -122,7 +122,7 @@ export default class IEStudentsProgress extends Component {
                         <View style={styles.SubItemText}>
                             <Text style={styles.touchableText}> { IEStatus } </Text>
                         </View>
-                        <Image source={require('./Images/expand-arrow.png')} 
+                        <Image source={require('../Images/expand-arrow.png')} 
                             style={[styles.ArrowImage, {transform: arrowRotation}, {marginRight: '20%'}]}/>
                     </View>
                 </TouchableOpacity>

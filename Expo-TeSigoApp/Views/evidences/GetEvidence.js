@@ -191,7 +191,7 @@ export default class GetEvidence extends React.Component {
                             <Text style={styles.SubItemText}>
                                 Fotografías
                             </Text>
-                            <Image source={require('./Images/expand-arrow.png')} 
+                            <Image source={require('../Images/expand-arrow.png')} 
                                 style={[styles.ArrowImage, {transform: photosArrow}, {marginLeft: '19%'}]}/>
                         </View>
                     </TouchableOpacity>
@@ -212,7 +212,7 @@ export default class GetEvidence extends React.Component {
                             <Text style={styles.SubItemText}>
                                 Videos
                             </Text>
-                            <Image source={require('./Images/expand-arrow.png')} 
+                            <Image source={require('../Images/expand-arrow.png')} 
                                 style={[styles.ArrowImage, {transform: videosArrow}, {marginLeft: '25%'}]}/>
                         </View>
                     </TouchableOpacity>
@@ -233,7 +233,7 @@ export default class GetEvidence extends React.Component {
                             <Text style={styles.SubItemText}>
                                 Audios
                             </Text>
-                            <Image source={require('./Images/expand-arrow.png')} 
+                            <Image source={require('../Images/expand-arrow.png')} 
                                 style={[styles.ArrowImage, {transform: audiosArrow}, {marginLeft: '25%'}]}/>
                         </View>
                     </TouchableOpacity>

@@ -42,7 +42,7 @@ export default class GetEvaluationIndicator extends React.Component {
     render() {
         // Se renderizan los indicadores de evaluación
         let checkImages = this.state.evalIndicators.map((ind, key) => {
-            let isComplete = ind.isComplete ? require('./Images/check.png') : require('./Images/uncheck.png');
+            let isComplete = ind.isComplete ? require('../Images/check.png') : require('../Images/uncheck.png');
             return (
                 <View key={key} style={styles.IEContainer}>
                     <View style={styles.flowRight}>

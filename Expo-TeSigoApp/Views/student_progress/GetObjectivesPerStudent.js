@@ -13,7 +13,7 @@ import {
     Button
 } from 'react-native';
 
-import APIHandler from '../Utils/APIHandler';
+import APIHandler from '../../Utils/APIHandler';
 
 const heightDevice = Dimensions.get('window').width * 0.08;
 
@@ -125,7 +125,7 @@ export default class GetObjectivesPerStudent extends React.Component {
         }) : null;
         // Se renderizan los objetivos de aprendizaje
         let learningProgressBars = this.getLearningObjectives(this.state.defaultSubject).OAs.map((OA, id) => {
-            let isComplete = OA.percentage === 1 ? require('./Images/check.png') : require('./Images/uncheck.png');
+            let isComplete = OA.percentage === 1 ? require('../Images/check.png') : require('../Images/uncheck.png');
             return (
                 // Se verifica si el objetivo está cumplido o no
                 <View key={id} style={styles.OAContainer}>

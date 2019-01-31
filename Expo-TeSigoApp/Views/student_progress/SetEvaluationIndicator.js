@@ -8,7 +8,7 @@ import {
     ActivityIndicator,
     Alert
 } from 'react-native';
-import APIHandler from '../Utils/APIHandler';
+import APIHandler from '../../Utils/APIHandler';
 import { CheckBox } from 'react-native-elements';
 
 export default class EvaluationIndicator extends Component {

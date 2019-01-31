@@ -7,7 +7,7 @@ import {
     Button,
     ActivityIndicator
 } from 'react-native';
-import APIHandler from '../Utils/APIHandler'
+import APIHandler from '../../Utils/APIHandler'
 import PureChart from 'react-native-pure-chart'
 
 export default class OACourseProgress extends Component {
