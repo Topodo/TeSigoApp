@@ -63,6 +63,14 @@ export default class StudentList extends Component {
         title: 'Lista de alumnos'
     };
 
+    // Método que redirige la navegación a la vista de avance general del curso
+    getCourseSubjectProgress() {
+        this.props.navigation.navigate('CourseSubjectProgress', {
+            idCourse: this.state.idCourse,
+            course: this.state.course
+        })
+    }
+
     // Método que renderiza la información de la lista de alumnos
     renderInfo(info, id) {
         return (
@@ -103,6 +111,12 @@ export default class StudentList extends Component {
                     <Text style={styles.titleText}>
                         {'Curso: ' + this.state.course}
                     </Text>
+                    <View style={styles.progressButton}>
+                        <Button title="Ver avance del curso"
+                                color='#429b00'
+                                onPress={this.getCourseSubjectProgress.bind(this)}>
+                        </Button>
+                    </View>
                     {studentsList}
                 </ScrollView>
             );
@@ -141,7 +155,12 @@ const styles = StyleSheet.create({
         marginTop: '3%'
     },
     button: {
-        marginRight: '5%'
+        marginRight: '0%'
+    },
+    progressButton: {
+        width: '80%',
+        marginBottom: 16,
+        marginLeft: '10%'
     },
     CourseContainer: {
         marginLeft: '4%',

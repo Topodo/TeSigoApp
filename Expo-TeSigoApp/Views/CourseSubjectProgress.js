@@ -59,11 +59,11 @@ export default class CourseSubjectProgress extends Component {
     }
 
     componentWillMount() {
-        /* const { params } = this.props.navigation.state
+        const { params } = this.props.navigation.state
         this.setState({
             idCourse: params.idCourse,
             course: params.course,
-        }) */
+        })
     }
 
     componentDidMount() {

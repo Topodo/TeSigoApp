@@ -31,10 +31,8 @@ export default class GetCourses extends Component {
     }
 
     componentDidMount() {
-        console.log(this.state.idProfessorFirebase)
         this.apiHandler.getFromAPI('http://206.189.195.214:8080/api/profesor/' + this.state.idProfessorFirebase + '/cursos').
             then(resultJSON => {
-                console.log(resultJSON)
                 this.setState({
                     courses: resultJSON,
                     isLoading: false

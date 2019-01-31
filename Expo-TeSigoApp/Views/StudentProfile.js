@@ -5,8 +5,6 @@ import {
     Text,
     Button,
     StyleSheet,
-    TouchableOpacity,
-    Picker,
     ActivityIndicator
 } from 'react-native';
 import APIHandler from '../Utils/APIHandler';
