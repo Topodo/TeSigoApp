@@ -30,7 +30,12 @@ export default class ReportsList extends Component {
     }
 
     componentWillMount() {
-
+        const { params } = this.props.navigation.state
+        this.setState({
+            idStudent: params.idStudent,
+            studentName: params.studentName,
+            course: params.course
+        })
     }
 
     componentDidMount() {

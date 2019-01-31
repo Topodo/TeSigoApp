@@ -29,12 +29,12 @@ export default class CreateReport extends Component {
     }
 
     componentWillMount() {
-        /* const { params } = this.props.navigation.state
+        const { params } = this.props.navigation.state
         this.setState({
             idStudent: params.idStudent,
             studentName: params.studentName,
             course: params.course
-        }) */
+        })
     }
 
     // Método que redirige la navegación a la vista del listado de reportes del alumno, luego de subir el reporte

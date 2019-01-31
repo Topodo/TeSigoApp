@@ -29,7 +29,7 @@ import OACourseProgress from './Views/OACourseProgress'
 import IEStudentsProgress from './Views/IEStudentsProgress'
 
 const AppNavigator = createStackNavigator({
-    Home: { screen: CourseSubjectProgress },
+    Home: { screen: Login },
     SetEvalIndicator: { screen: SetEvaluationIndicator },
     GetEvalIndicator: { screen: GetEvaluationIndicator },
     GetEvidence: { screen: GetEvidence },

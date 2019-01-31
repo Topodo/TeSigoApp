@@ -52,6 +52,24 @@ export default class StudentProfile extends Component {
         })
     }
 
+    // Método que redirige la navegación a la vista de visualización de reportes
+    getReports(student) {
+        this.props.navigation.navigate('ReportsList', {
+            idStudent: student.idAlumno,
+            studentName: student.nombreAlumno + " " + student.apellidoPaternoAlumno + " " + student.apellidoMaternoAlumno,
+            course: this.state.course
+        })
+    }
+
+    // Método que redirige la navegación a la vista de asignación de reportes
+    setReports(student) {
+        this.props.navigation.navigate('CreateReport', {
+            idStudent: student.idAlumno,
+            studentName: student.nombreAlumno + " " + student.apellidoPaternoAlumno + " " + student.apellidoMaternoAlumno,
+            course: this.state.course
+        })
+    }
+
     // Método que redirige la navegación a la vista de visualización de evidencia
     getEvidences(student) {
         this.props.navigation.navigate('GetEvidence', {
@@ -71,37 +89,47 @@ export default class StudentProfile extends Component {
                 <Text style={styles.CourseText}>
                     {this.state.course}
                 </Text>
-                <View key={id + 2} style={styles.flowRight}>
-                    <View style={styles.button}>
-                        <Button key={id + 3}
-                                title='Ver avance'
-                                color='#429b00'
-                                onPress={this.getOAs.bind(this, info)}>
-                        </Button>
-                    </View>
-                    <View>
-                        <Button key={id + 4}
-                                title="Asignar avance"
-                                color='#429b00'
-                                onPress={this.setOAs.bind(this, info)}>
-                        </Button>
-                    </View>
+                <View style={styles.button}>
+                    <Button key={id + 3}
+                            title='Ver avance'
+                            color='#429b00'
+                            onPress={this.getOAs.bind(this, info)}>
+                    </Button>
                 </View>
-                <View style={styles.flowRight}>
-                    <View style={styles.button}>
-                        <Button key={id + 3}
-                                title='Ver evidencias'
-                                color='#429b00'
-                                onPress={this.getEvidences.bind(this, info)}>
-                        </Button>
-                    </View>
-                    <View>
-                        <Button key={id + 4}
-                                title="Asignar evidencias"
-                                color='#429b00'
-                                onPress={this.getOAs.bind(this, info)}>
-                        </Button>
-                    </View>
+                <View style={styles.button}>
+                    <Button key={id + 4}
+                            title="Asignar avance"
+                            color='#429b00'
+                            onPress={this.setOAs.bind(this, info)}>
+                    </Button>
+                </View>
+                <View style={styles.button}>
+                    <Button key={id + 3}
+                            title='Ver evidencias'
+                            color='#429b00'
+                            onPress={this.getEvidences.bind(this, info)}>
+                    </Button>
+                </View>
+                <View style={styles.button}>
+                    <Button key={id + 4}
+                            title="Asignar evidencias"
+                            color='#429b00'
+                            onPress={this.getOAs.bind(this, info)}>
+                    </Button>
+                </View>
+                <View style={styles.button}>
+                    <Button key={id + 4}
+                            title="Ver reportes"
+                            color='#429b00'
+                            onPress={this.getReports.bind(this, info)}>
+                    </Button>
+                </View>
+                <View style={styles.button}>
+                    <Button key={id + 4}
+                            title="Asignar reportes"
+                            color='#429b00'
+                            onPress={this.setReports.bind(this, info)}>
+                    </Button>
                 </View>
             </View>
         );
@@ -180,7 +208,10 @@ const styles = StyleSheet.create({
         marginBottom: '3%',
     },
     button: {
-        marginRight: '5%'
+        width: '70%',
+        marginRight: '5%',
+        marginBottom: 10,
+        marginLeft: '5%'
     },
     CourseContainer: {
         marginTop: 15,
