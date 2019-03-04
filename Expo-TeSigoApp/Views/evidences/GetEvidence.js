@@ -12,6 +12,7 @@ import {
     Button,
     ActivityIndicator  
 } from 'react-native';
+import ShowCamera from './camera_utils/Camera'
 
 export default class GetEvidence extends React.Component {
 
@@ -175,6 +176,7 @@ export default class GetEvidence extends React.Component {
 
         return (
             <ScrollView style={styles.backColor}>
+                <ShowCamera/>
                 <Text style={styles.titleText}>
                     {this.state.name + ' - ' + this.state.course}
                 </Text>
