@@ -34,17 +34,29 @@ export default class EvidenceForm extends Component {
             evidenceContext: '',
             evidenceDate: '',
             fileType: '',
-            showCalendar: false
+            showCalendar: false,
+            idStudent: -1,
+            studentName: null,
+            idCourse: -1,
+            courseName: null
         }
         this.APIHandler = new APIHandler()
     }
 
+    static navigationOptions = {
+        title: 'Formulario de evidencia'
+    }
+
     componentWillMount() {
-        /* const { params } = this.props.navigation.state
+        const { params } = this.props.navigation.state
         this.setState({
             file: params.file,
-            fileType: params.fileType
-        }) */
+            fileType: params.fileType,
+            idStudent: params.idStudent,
+            studentName: params.studentName,
+            idCourse: params.idCourse,
+            courseName: params.courseName
+        })
     }
 
     render() {

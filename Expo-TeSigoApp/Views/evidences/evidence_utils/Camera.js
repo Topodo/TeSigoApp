@@ -42,6 +42,16 @@ export default class ShowCamera extends React.Component {
         }
     }
 
+    // Método que envía la data de la fotografía tomada al componente padre
+    sendFileData() {
+        this.props.fileData(this.state.image)
+    }
+
+    // Método que cierra la cámara
+    closeCamera() {
+        this.props.closeCamera()
+    }
+
     render() {
         // Se verifican los permisos de la cámara
         if (this.state.hasCameraPermission === null) {
@@ -59,20 +69,20 @@ export default class ShowCamera extends React.Component {
 
                 let flashIcon = this.state.flashOn ? 'ios-flash' : 'ios-flash-off'
                 let flashState = this.state.flashOn ? Camera.Constants.FlashMode.on : Camera.Constants.FlashMode.off
-                
+
                 return (
                     <View>
                         <View style={styles.cameraview}>
-                            <Camera style={styles.camera} type={this.state.type} 
+                            <Camera style={styles.camera} type={this.state.type}
                                 ref={ref => {
                                     this.camera = ref
                                 }}
                                 flashMode={flashState}
-                                zoom={this.state.zoomValue}/>
+                                zoom={this.state.zoomValue} />
                         </View>
-                        <View style={{backgroundColor: 'black'}}>
+                        <View style={{ backgroundColor: 'black' }}>
                             <View style={styles.zoomSlider}>
-                                <MaterialIcons name='zoom-out' style={styles.zoomIcon} 
+                                <MaterialIcons name='zoom-out' style={styles.zoomIcon}
                                     onPress={() => {
                                         let { zoomValue } = this.state
                                         if (zoomValue >= 0) {
@@ -81,14 +91,15 @@ export default class ShowCamera extends React.Component {
                                         this.setState({
                                             zoomValue: zoomValue
                                         })
-                                    }}/>
+                                    }} />
                                 <Slider onValueChange={value => {
                                     this.setState({
                                         zoomValue: value
-                                    })}}
+                                    })
+                                }}
                                     value={this.state.zoomValue}
-                                    style={{width: width * 0.4}}/>
-                                <MaterialIcons name='zoom-in' style={styles.zoomIcon} 
+                                    style={{ width: width * 0.4 }} />
+                                <MaterialIcons name='zoom-in' style={styles.zoomIcon}
                                     onPress={() => {
                                         let { zoomValue } = this.state
                                         if (zoomValue <= 1) {
@@ -97,18 +108,21 @@ export default class ShowCamera extends React.Component {
                                         this.setState({
                                             zoomValue: zoomValue
                                         })
-                                    }}/>
+                                    }} />
                             </View>
                             <View style={styles.toolbar}>
+                                <MaterialIcons name="close" style={styles.closeCamera}
+                                    onPress={this.closeCamera.bind(this)} />
                                 <MaterialCommunityIcons name="circle-outline" style={styles.snap}
                                     onPress={() => {
                                         this.snap()
-                                    }}/>
-                                <Icon name={flashIcon} style={{ color : 'white' }}
+                                    }} />
+                                <Icon name={flashIcon} style={{ color: 'white' }}
                                     onPress={() => {
                                         this.setState({
                                             flashOn: !this.state.flashOn
-                                        })}}/>
+                                        })
+                                    }} />
                             </View>
                         </View>
                     </View>
@@ -116,8 +130,8 @@ export default class ShowCamera extends React.Component {
             } else {
                 return (
                     <View>
-                        <Image source={{ uri: this.state.image.uri }} 
-                            style={styles.image}/>
+                        <Image source={{ uri: this.state.image.uri }}
+                            style={styles.image} />
                         <View style={styles.imageToolbar}>
                             <MaterialIcons name="delete" style={styles.deleteIcon}
                                 onPress={() => {
@@ -126,7 +140,7 @@ export default class ShowCamera extends React.Component {
                                     })
                                 }} />
                             <MaterialIcons name="send" style={styles.sendIcon}
-                                onPress={() => {}} />
+                                onPress={this.sendFileData.bind(this)} />
                         </View>
                     </View>
                 )
@@ -143,6 +157,10 @@ const styles = StyleSheet.create({
         fontSize: height * 0.05,
         color: 'white',
         marginTop: height * 0.05
+    },
+    closeCamera: { 
+        color: 'white', 
+        fontSize: height * 0.05
     },
     deleteIcon: {
         fontSize: height * 0.05,
@@ -172,11 +190,11 @@ const styles = StyleSheet.create({
         color: 'white',
         fontSize: height * 0.05,
     },
-    snap: { 
+    snap: {
         color: 'white',
         fontSize: height * 0.1,
         marginRight: width * 0.25,
-        marginLeft: width * 0.3
+        marginLeft: width * 0.225
     },
     toolbar: {
         width: width,
