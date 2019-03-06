@@ -44,7 +44,7 @@ export default class ShowCamera extends React.Component {
 
     // Método que envía la data de la fotografía tomada al componente padre
     sendFileData() {
-        this.props.fileData(this.state.image)
+        this.props.fileData(this.state.image.uri)
     }
 
     // Método que cierra la cámara

@@ -77,8 +77,8 @@ export default class SelectEvidence extends Component {
                             showModal: false,
                             onDevice: true,
                             fileType: 1,
-                            mode: 1
                         })
+                        this.renderCameraRoll()
                     }}>
                     <Text style={styles.touchableText}> Seleccionar fotografía </Text>
                 </TouchableOpacity>
@@ -185,10 +185,8 @@ export default class SelectEvidence extends Component {
     // Método que abre la galería de imágenes
     async renderCameraRoll() {
         let result = await ImagePicker.launchImageLibraryAsync({
-            allowsEditing: true,
-            aspect: [4, 3]
+            allowsEditing: false,
         })
-        console.log("asdas")
         if (!result.cancelled) {
             this.setState({
                 file: result.uri,
@@ -215,6 +213,8 @@ export default class SelectEvidence extends Component {
     } */
 
     render() {
+        console.log(this.state);
+        
         // Switch-case para verificar el modo de la vista, según el tipo de archivo
         switch (this.state.mode) {
             case 0: // Menú
@@ -224,8 +224,6 @@ export default class SelectEvidence extends Component {
             case 1: // Fotografías
                 if (!this.state.onDevice)
                     return (this.renderCamera())
-                else
-                    return (this.renderCameraRoll())
 
             case 2: // Videos
 
