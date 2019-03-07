@@ -5,6 +5,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import ShowCamera from './evidence_utils/Camera'
 import VideoRecorder from './evidence_utils/VideoRecorder'
+import AudioRecorder from './evidence_utils/AudioRecorder'
 import Modal from 'react-native-modal'
 
 export default class SelectEvidence extends Component {
@@ -192,6 +193,15 @@ export default class SelectEvidence extends Component {
         )
     }
 
+    // Método que renderiza el audio recorder
+    renderAudioRecorder() {
+        return (
+            <View>
+                <AudioRecorder fileData={this.receiveData.bind(this)} closeAudioRecorder={this.setMenuMode.bind(this)} />
+            </View>
+        )
+    }
+
     // Método que abre la galería de imágenes
     async renderCameraRoll(mediaType) {
         let result = await ImagePicker.launchImageLibraryAsync({
@@ -239,6 +249,8 @@ export default class SelectEvidence extends Component {
                     return (this.renderVideoRecorder())
 
             case 3: // Audio
+                if (!this.state.onDevice)
+                    return (this.renderAudioRecorder())
         }
     }
 }

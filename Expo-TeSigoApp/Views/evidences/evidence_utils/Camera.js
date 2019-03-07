@@ -95,7 +95,6 @@ export default class ShowCamera extends React.Component {
                                         zoomValue: value
                                     })
                                 }}
-                                    value={this.state.zoomValue}
                                     style={{ width: width * 0.4 }} />
                                 <MaterialIcons name='zoom-in' style={styles.zoomIcon}
                                     onPress={() => {

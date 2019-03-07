@@ -40,15 +40,16 @@ export default class ShowCamera extends React.Component {
     // Método que se encarga de comenzar la grabación
     async recordVideo() {
         if (this.camera) {
+            await this.setState({
+                onRecord: true,
+                recordTime: 0
+            })
             this.timer = setInterval(() => {
                 // Cada un segundo se aumenta el contador
                 this.setState({
                     recordTime: this.state.recordTime + 1
                 })
             }, 1000)
-            await this.setState({
-                onRecord: true
-            })
             let video = await this.camera.recordAsync({
                 quality: Camera.Constants.VideoQuality['720p']
             })
@@ -64,7 +65,6 @@ export default class ShowCamera extends React.Component {
         clearInterval(this.timer)
         this.setState({
             onRecord: false,
-            recordTime: 0
         })
     }
 
@@ -121,11 +121,10 @@ export default class ShowCamera extends React.Component {
                                         })
                                     }} />
                                 <Slider onValueChange={value => {
-                                    this.setState({
-                                        zoomValue: value
-                                    })
-                                }}
-                                    value={this.state.zoomValue}
+                                        this.setState({
+                                            zoomValue: value
+                                        })
+                                    }}
                                     style={{ width: width * 0.4 }} />
                                 <MaterialIcons name='zoom-in' style={styles.zoomIcon}
                                     onPress={() => {
@@ -167,7 +166,8 @@ export default class ShowCamera extends React.Component {
                             <MaterialIcons name="delete" style={styles.deleteIcon}
                                 onPress={() => {
                                     this.setState({
-                                        video: null
+                                        video: null,
+                                        recordTime: 0
                                     })
                                 }} />
                             <MaterialIcons name="send" style={styles.sendIcon}
