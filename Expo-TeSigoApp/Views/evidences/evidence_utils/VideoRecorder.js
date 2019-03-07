@@ -1,9 +1,11 @@
 import React from "react"
 import { StyleSheet, Text, View, Dimensions, Slider, Image } from "react-native"
-import { Camera, Permissions, Audio } from 'expo'
+import { Camera, Permissions, Video } from 'expo'
 import { Icon } from 'native-base'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
+import Entypo from 'react-native-vector-icons/Entypo'
+var TimeFormat = require('hh-mm-ss')
 
 export default class ShowCamera extends React.Component {
     constructor(props) {
@@ -13,41 +15,57 @@ export default class ShowCamera extends React.Component {
             type: Camera.Constants.Type.back,
             flashOn: false,
             zoomValue: 0,
-            image: null
+            video: null,
+            onRecord: false,
+            recordTime: 0
         }
     }
 
     async componentWillMount() {
         //Getting Permission result from app details.
-        const { status } = await Permissions.askAsync(Permissions.CAMERA);
+        const { status } = await Permissions.askAsync(Permissions.CAMERA, Permissions.AUDIO_RECORDING);
         this.setState({ hasCameraPermission: status === 'granted' });
-    }
-
-    // Método que se encarga de tomar la foto
-    async snap() {
-        if (this.camera) {
-            let photo = await this.camera.takePictureAsync()
-            const soundObject = new Audio.Sound();
-            try {
-                await soundObject.loadAsync(require('../../../audio/camera-shutter-click-08.mp3'));
-                await soundObject.playAsync();
-                await this.setState({
-                    image: photo
-                })
-            } catch (error) {
-                console.error(error)
-            }
-        }
     }
 
     // Método que envía la data de la fotografía tomada al componente padre
     sendFileData() {
-        this.props.fileData(this.state.image.uri)
+        this.props.fileData(this.state.video.uri)
     }
 
     // Método que cierra la cámara
     closeCamera() {
         this.props.closeCamera()
+    }
+
+    // Método que se encarga de comenzar la grabación
+    async recordVideo() {
+        if (this.camera) {
+            this.timer = setInterval(() => {
+                // Cada un segundo se aumenta el contador
+                this.setState({
+                    recordTime: this.state.recordTime + 1
+                })
+            }, 1000)
+            await this.setState({
+                onRecord: true
+            })
+            let video = await this.camera.recordAsync({
+                quality: Camera.Constants.VideoQuality['720p']
+            })
+            await this.setState({
+                video: video
+            })
+        }
+    }
+
+    // Método que se encarga de detener la grabación
+    stopVideoRecord() {
+        this.camera.stopRecording()
+        clearInterval(this.timer)
+        this.setState({
+            onRecord: false,
+            recordTime: 0
+        })
     }
 
     render() {
@@ -63,13 +81,25 @@ export default class ShowCamera extends React.Component {
                 </View>
             )
         } else {
-            if (this.state.image === null) { // Si la imagen no ha sido tomada o ha sido descartada
+            if (this.state.video === null) { // Si la imagen no ha sido tomada o ha sido descartada
 
                 let flashIcon = this.state.flashOn ? 'ios-flash' : 'ios-flash-off'
                 let flashState = this.state.flashOn ? Camera.Constants.FlashMode.on : Camera.Constants.FlashMode.off
+                let videoButton = !this.state.onRecord ?
+                    <Entypo name="controller-record" style={styles.snap}
+                        onPress={() => {
+                            this.recordVideo()
+                        }} /> :
+                    <Entypo name="controller-stop" style={[styles.snap, { color: 'red' }]}
+                        onPress={() => {
+                            this.stopVideoRecord()
+                        }} />
 
                 return (
                     <View>
+                        <View style={styles.timerContainer}>
+                            <Text style={styles.timerText}>{TimeFormat.fromS(this.state.recordTime, 'hh:mm:ss')}</Text>
+                        </View>
                         <View style={styles.cameraview}>
                             <Camera style={styles.camera} type={this.state.type}
                                 ref={ref => {
@@ -111,10 +141,7 @@ export default class ShowCamera extends React.Component {
                             <View style={styles.toolbar}>
                                 <MaterialIcons name="close" style={styles.closeCamera}
                                     onPress={this.closeCamera.bind(this)} />
-                                <MaterialCommunityIcons name="circle-outline" style={styles.snap}
-                                    onPress={() => {
-                                        this.snap()
-                                    }} />
+                                {videoButton}
                                 <Icon name={flashIcon} style={{ color: 'white' }}
                                     onPress={() => {
                                         this.setState({
@@ -128,13 +155,19 @@ export default class ShowCamera extends React.Component {
             } else {
                 return (
                     <View>
-                        <Image source={{ uri: this.state.image.uri }}
+                        <View style={styles.timerContainer} />
+                        <Video source={{ uri: this.state.video.uri }}
+                            rate={1.0}
+                            volume={1.0}
+                            isMuted={false}
+                            resizeMode="cover"
+                            shouldPlay
                             style={styles.image} />
                         <View style={styles.imageToolbar}>
                             <MaterialIcons name="delete" style={styles.deleteIcon}
                                 onPress={() => {
                                     this.setState({
-                                        image: null
+                                        video: null
                                     })
                                 }} />
                             <MaterialIcons name="send" style={styles.sendIcon}
@@ -151,13 +184,23 @@ const height = Dimensions.get('screen').height
 const width = Dimensions.get('screen').width
 
 const styles = StyleSheet.create({
+    timerContainer: {
+        backgroundColor: 'black',
+        width: width,
+        height: height * 0.05,
+        alignItems: 'center'
+    },
+    timerText: {
+        color: 'white',
+        fontSize: 16,
+    },
     sendIcon: {
         fontSize: height * 0.05,
         color: 'white',
         marginTop: height * 0.05
     },
-    closeCamera: { 
-        color: 'white', 
+    closeCamera: {
+        color: 'white',
         fontSize: height * 0.05
     },
     deleteIcon: {
@@ -169,7 +212,7 @@ const styles = StyleSheet.create({
     },
     image: {
         width: width,
-        height: height * 0.65,
+        height: height * 0.6,
     },
     imageToolbar: {
         width: width,
@@ -209,7 +252,7 @@ const styles = StyleSheet.create({
         alignItems: "center"
     },
     cameraview: {
-        height: height * 0.65,
+        height: height * 0.6,
         width: width,
         justifyContent: "center",
         alignItems: "center"

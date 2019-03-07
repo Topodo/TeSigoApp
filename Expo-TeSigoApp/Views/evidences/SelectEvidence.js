@@ -4,6 +4,7 @@ import { ImagePicker } from 'expo'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import ShowCamera from './evidence_utils/Camera'
+import VideoRecorder from './evidence_utils/VideoRecorder'
 import Modal from 'react-native-modal'
 
 export default class SelectEvidence extends Component {
@@ -78,7 +79,7 @@ export default class SelectEvidence extends Component {
                             onDevice: true,
                             fileType: 1,
                         })
-                        this.renderCameraRoll()
+                        this.renderCameraRoll(ImagePicker.MediaTypeOptions.Images)
                     }}>
                     <Text style={styles.touchableText}> Seleccionar fotografía </Text>
                 </TouchableOpacity>
@@ -88,8 +89,8 @@ export default class SelectEvidence extends Component {
                             showModal: false,
                             onDevice: true,
                             fileType: 2,
-                            mode: 2
                         })
+                        this.renderCameraRoll(ImagePicker.MediaTypeOptions.Videos)
                     }}>
                     <Text style={styles.touchableText}> Seleccionar video </Text>
                 </TouchableOpacity>
@@ -182,10 +183,20 @@ export default class SelectEvidence extends Component {
         )
     }
 
+    // Método que renderiza la cámara
+    renderVideoRecorder() {
+        return (
+            <View>
+                <VideoRecorder fileData={this.receiveData.bind(this)} closeCamera={this.setMenuMode.bind(this)} />
+            </View>
+        )
+    }
+
     // Método que abre la galería de imágenes
-    async renderCameraRoll() {
+    async renderCameraRoll(mediaType) {
         let result = await ImagePicker.launchImageLibraryAsync({
             allowsEditing: false,
+            mediaTypes: mediaType
         })
         if (!result.cancelled) {
             this.setState({
@@ -213,8 +224,6 @@ export default class SelectEvidence extends Component {
     } */
 
     render() {
-        console.log(this.state);
-        
         // Switch-case para verificar el modo de la vista, según el tipo de archivo
         switch (this.state.mode) {
             case 0: // Menú
@@ -226,6 +235,8 @@ export default class SelectEvidence extends Component {
                     return (this.renderCamera())
 
             case 2: // Videos
+                if (!this.state.onDevice)
+                    return (this.renderVideoRecorder())
 
             case 3: // Audio
         }
