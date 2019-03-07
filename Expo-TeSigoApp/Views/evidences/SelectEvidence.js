@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { ScrollView, Text, Button, StyleSheet, Dimensions, View, Alert, TouchableOpacity } from 'react-native'
-import { ImagePicker } from 'expo'
+import { ImagePicker, DocumentPicker } from 'expo'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import ShowCamera from './evidence_utils/Camera'
@@ -80,7 +80,7 @@ export default class SelectEvidence extends Component {
                             onDevice: true,
                             fileType: 1,
                         })
-                        this.renderCameraRoll(ImagePicker.MediaTypeOptions.Images)
+                        this.renderCameraRoll(ImagePicker.MediaTypeOptions.Images, 1)
                     }}>
                     <Text style={styles.touchableText}> Seleccionar fotografía </Text>
                 </TouchableOpacity>
@@ -91,7 +91,7 @@ export default class SelectEvidence extends Component {
                             onDevice: true,
                             fileType: 2,
                         })
-                        this.renderCameraRoll(ImagePicker.MediaTypeOptions.Videos)
+                        this.renderCameraRoll(ImagePicker.MediaTypeOptions.Videos, 2)
                     }}>
                     <Text style={styles.touchableText}> Seleccionar video </Text>
                 </TouchableOpacity>
@@ -101,8 +101,8 @@ export default class SelectEvidence extends Component {
                             showModal: false,
                             onDevice: true,
                             fileType: 3,
-                            mode: 3
                         })
+                        this.renderAudioPicker()
                     }}>
                     <Text style={styles.touchableText}> Seleccionar audio </Text>
                 </TouchableOpacity>
@@ -203,7 +203,7 @@ export default class SelectEvidence extends Component {
     }
 
     // Método que abre la galería de imágenes
-    async renderCameraRoll(mediaType) {
+    async renderCameraRoll(mediaType, fileType) {
         let result = await ImagePicker.launchImageLibraryAsync({
             allowsEditing: false,
             mediaTypes: mediaType
@@ -211,7 +211,27 @@ export default class SelectEvidence extends Component {
         if (!result.cancelled) {
             this.setState({
                 file: result.uri,
-                fileType: 1,
+                fileType: fileType,
+                mode: 0,
+                onDevice: false
+            })
+        } else {
+            this.setState({
+                mode: 0,
+                onDevice: false
+            })
+        }
+    }
+
+    // Método que abre la galería de archivos de audio
+    async renderAudioPicker() {
+        let result = await DocumentPicker.getDocumentAsync({
+            type: 'audio/*'
+        })
+        if (!result.cancelled) {
+            this.setState({
+                file: result.uri,
+                fileType: 3,
                 mode: 0,
                 onDevice: false
             })
