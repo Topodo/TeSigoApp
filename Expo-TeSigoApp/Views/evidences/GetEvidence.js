@@ -8,10 +8,11 @@ import {
     TouchableOpacity,
     Picker,
     ProgressBarAndroid,
-    Image, 
+    Image,
     Button,
-    ActivityIndicator  
+    ActivityIndicator
 } from 'react-native';
+import APIHandler from '../../Utils/APIHandler'
 
 export default class GetEvidence extends React.Component {
 
@@ -23,155 +24,119 @@ export default class GetEvidence extends React.Component {
             evidence: [],
             expandableItems: [false, false, false], // [0]: Fotografías, [1]: Videos, [2]: Audios
             isLoading: true,
-            idStudent: ''
+            idStudent: '',
         }
+        this.APIHandler = new APIHandler()
     }
 
-    // Método que recupera la información de las evidencias del alumno
-    getEvidence() {
-        // GET
-        // El nombre y el curso del alumno viene desde la vista anterior
-        let evidence = {
-            pictures: [
-                {
-                    id: 1,
-                    name: 'Foto 1',
-                    date: 'DD/MM/AA',
-                    uri: 'https://k30.kn3.net/taringa/7/7/9/8/3/D/guitar_gero/2B1.jpg',
-                    type: 'picture'
-                },
-                {
-                    id: 2,
-                    name: 'Foto 2',
-                    date: 'DD/MM/AA',
-                    uri: 'https://k30.kn3.net/taringa/7/7/9/8/3/D/guitar_gero/2B1.jpg',
-                    type: 'picture'
-                },
-            ],
-            videos: [
-                {
-                    id: 3,
-                    name: 'Video 1',
-                    date: 'DD/MM/AA',
-                    uri: null,
-                    type: 'video'
-                },
-                {
-                    id: 4,
-                    name: 'Video 2',
-                    date: 'DD/MM/AA',
-                    uri: null,
-                    type: 'video'
-                }
-            ],
-            audios: [
-                {
-                    id: 5,
-                    name: 'Audio 1',
-                    date: 'DD/MM/AA',
-                    uri: null,
-                    type: 'picture'
-                },
-                {
-                    id: 6,
-                    name: 'Audio 2',
-                    date: 'DD/MM/AA',
-                    uri: null,
-                    type: 'picture'
-                }
-            ]
+    // Método que retorna la fecha en formato DD/MM/AA
+    formatDate(date) {
+        let year = ''
+        let month = ''
+        let day = ''
+        for (i = 0; i < 4; i++) {
+            year = year + date[i]
         }
-        return evidence;
+        for (j = 5; j < 7; j++) {
+            month = month + date[j]
+        }
+        for (k = 8; k < 10; k++) {
+            day = day + date[k]
+        }
+        return day + '/' + month + '/' + year
     }
 
     // Método que redirige a la vista previa de la evidencia
     showEvidence(evidence) {
         this.props.navigation.navigate('ShowEvidence', {
-            evidence: evidence
+            evidence: evidence,
         })
     }
     // Método que renderiza la información de las evidencias
     renderInfo(info, id) {
         return (
             <View key={id} style={styles.infoButton}>
-                <TouchableOpacity
-                    onPress={this.showEvidence.bind(this, info)}>
-                    <View style={[styles.EvidenceContainer, styles.flowRight]}>
-                        <View style={styles.PreviewText}>
-                            <Text>
-                                {info.name}
-                            </Text>
-                            <Text>
-                                {info.date}
-                            </Text>
-                        </View>
-                        <View style={styles.Button}>
-                            <Button title="Ver evidencia"
-                                    color='#429b00'>
-                            </Button>
-                        </View>
+                <View style={[styles.EvidenceContainer, styles.flowRight]}>
+                    <View style={styles.PreviewText}>
+                        <Text>
+                            {info.nombreEvidencia}
+                        </Text>
+                        <Text>
+                            {this.formatDate(info.fechaEvidencia)}
+                        </Text>
                     </View>
-                </TouchableOpacity>
+                    <View style={styles.Button}>
+                        <Button title="Ver evidencia"
+                            color='#429b00'
+                            onPress={this.showEvidence.bind(this, info)}>
+                        </Button>
+                    </View>
+                </View>
             </View>
         );
     }
 
     componentWillMount() {
-        const evidence = this.getEvidence()
         const { params } = this.props.navigation.state;
         this.setState({
             name: params.studentName,
             course: params.course,
             expandableItems: [false, false, false],
             idStudent: params.idStudent,
-            evidence: evidence
         });
     }
 
     componentDidMount() {
-        setTimeout(() => {
-            this.setState({
-                isLoading: false
+        this.APIHandler.getFromAPI('http://206.189.195.214:8080/api/formularioEvidencia/alumno/' + this.state.idStudent)
+            .then(response => {
+                const evidence = {
+                    pictures: response[1].evidencias,
+                    videos: response[0].evidencias,
+                    audios: response[2].evidencias
+                }
+                this.setState({
+                    evidence: evidence,
+                    isLoading: false
+                })
             })
-        }, 1000);
     }
 
     static navigationOptions = {
         title: 'Evidencia cualitativa'
     };
-    
+
     render() {
-        if(this.state.isLoading) {
-            return(
+        if (this.state.isLoading) {
+            return (
                 <View style={styles.activityIndicator}>
                     <Text style={styles.loadingText}>
                         Cargando el listado de evidencias cualitativas
                     </Text>
-                    <ActivityIndicator size='large'/>
+                    <ActivityIndicator size='large' />
                 </View>
             );
-        } 
+        }
         // Fotografías
         let photos = this.state.expandableItems[0] === true ?
             this.state.evidence.pictures.map((info, id) => {
                 return (this.renderInfo(info, id))
             }) : null;
         let photosArrow = this.state.expandableItems[0] === true ?
-            [{rotate: '-180deg'}] : [{rotate: '0deg'}];
+            [{ rotate: '-180deg' }] : [{ rotate: '0deg' }];
         // Videos
         let videos = this.state.expandableItems[1] === true ?
             this.state.evidence.videos.map((info, id) => {
                 return (this.renderInfo(info, id))
             }) : null;
         let videosArrow = this.state.expandableItems[1] === true ?
-            [{rotate: '-180deg'}] : [{rotate: '0deg'}];
+            [{ rotate: '-180deg' }] : [{ rotate: '0deg' }];
         // Audios
         let audios = this.state.expandableItems[2] === true ?
             this.state.evidence.audios.map((info, id) => {
                 return (this.renderInfo(info, id))
             }) : null;
         let audiosArrow = this.state.expandableItems[2] === true ?
-            [{rotate: '-180deg'}] : [{rotate: '0deg'}];
+            [{ rotate: '-180deg' }] : [{ rotate: '0deg' }];
 
         return (
             <ScrollView style={styles.backColor}>
@@ -191,11 +156,11 @@ export default class GetEvidence extends React.Component {
                             <Text style={styles.SubItemText}>
                                 Fotografías
                             </Text>
-                            <Image source={require('../Images/expand-arrow.png')} 
-                                style={[styles.ArrowImage, {transform: photosArrow}, {marginLeft: '19%'}]}/>
+                            <Image source={require('../Images/expand-arrow.png')}
+                                style={[styles.ArrowImage, { transform: photosArrow }, { marginLeft: '19%' }]} />
                         </View>
                     </TouchableOpacity>
-                    <View style={styles.EvidenceContainer}>
+                    <View style={styles.sectionContainer}>
                         {photos}
                     </View>
                 </View>
@@ -212,11 +177,11 @@ export default class GetEvidence extends React.Component {
                             <Text style={styles.SubItemText}>
                                 Videos
                             </Text>
-                            <Image source={require('../Images/expand-arrow.png')} 
-                                style={[styles.ArrowImage, {transform: videosArrow}, {marginLeft: '25%'}]}/>
+                            <Image source={require('../Images/expand-arrow.png')}
+                                style={[styles.ArrowImage, { transform: videosArrow }, { marginLeft: '25%' }]} />
                         </View>
                     </TouchableOpacity>
-                    <View style={styles.EvidenceContainer}>
+                    <View style={styles.sectionContainer}>
                         {videos}
                     </View>
                 </View>
@@ -233,11 +198,11 @@ export default class GetEvidence extends React.Component {
                             <Text style={styles.SubItemText}>
                                 Audios
                             </Text>
-                            <Image source={require('../Images/expand-arrow.png')} 
-                                style={[styles.ArrowImage, {transform: audiosArrow}, {marginLeft: '25%'}]}/>
+                            <Image source={require('../Images/expand-arrow.png')}
+                                style={[styles.ArrowImage, { transform: audiosArrow }, { marginLeft: '25%' }]} />
                         </View>
                     </TouchableOpacity>
-                    <View style={styles.EvidenceContainer}>
+                    <View style={styles.sectionContainer}>
                         {audios}
                     </View>
                 </View>
@@ -272,6 +237,11 @@ const styles = StyleSheet.create({
         marginBottom: 10,
         marginTop: 10
     },
+    sectionContainer: {
+        alignItems: 'center',
+        marginBottom: 10,
+        marginTop: 10
+    },
     ColapsableTouchable: {
         marginLeft: 4,
         marginRight: 4,
@@ -292,7 +262,8 @@ const styles = StyleSheet.create({
     },
     PreviewText: {
         alignItems: 'center',
-        marginLeft: 10
+        marginLeft: 10,
+        width: '60%'
     },
     ArrowImage: {
         width: '4%',
