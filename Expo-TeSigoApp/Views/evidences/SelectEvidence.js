@@ -243,7 +243,7 @@ export default class SelectEvidence extends Component {
         }
     }
 
-    /* async componentWillMount() {
+    async componentWillMount() {
         const { params } = this.props.navigation.state
         await this.setState({
             idStudent: params.idStudent,
@@ -251,7 +251,7 @@ export default class SelectEvidence extends Component {
             idCourse: params.idCourse,
             courseName: params.courseName
         })
-    } */
+    }
 
     render() {
         // Switch-case para verificar el modo de la vista, según el tipo de archivo

@@ -77,6 +77,16 @@ export default class StudentProfile extends Component {
         })
     }
 
+    // Método que redirige la navegación a la vista de asignación de evidencias
+    setEvidences(student) {
+        this.props.navigation.navigate('SelectEvidence', {
+            idStudent: student.idAlumno,
+            studentName: student.nombreAlumno + " " + student.apellidoPaternoAlumno + " " + student.apellidoMaternoAlumno,
+            idCourse: this.state.idCourse,
+            courseName: this.state.course
+        })
+    }
+
     // Método que renderiza la información del alumno
     renderInfo(info, id) {
         return (
@@ -112,7 +122,7 @@ export default class StudentProfile extends Component {
                     <Button key={id + 4}
                             title="Asignar evidencias"
                             color='#429b00'
-                            onPress={this.getOAs.bind(this, info)}>
+                            onPress={this.setEvidences.bind(this, info)}>
                     </Button>
                 </View>
                 <View style={styles.button}>

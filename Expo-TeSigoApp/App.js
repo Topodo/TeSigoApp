@@ -5,7 +5,7 @@ import {
     Text,
     View
 } from 'react-native';
-import { 
+import {
     StackNavigator,
     createStackNavigator,
     createDrawerNavigator
@@ -21,7 +21,7 @@ import GetEvidence from './Views/evidences/GetEvidence';
 import StudentList from './Views/StudentList';
 import GetCourses from './Views/GetCourses';
 import StudentProfile from './Views/StudentProfile';
-import EvidenceForm from './Views/evidences/EvidenceForm' 
+import EvidenceForm from './Views/evidences/EvidenceForm'
 import CreateReport from './Views/reports/CreateReport'
 import ReportsList from './Views/reports/ReportsList'
 import CourseSubjectProgress from './Views/course_progress/CourseSubjectProgress'
@@ -30,7 +30,7 @@ import IEStudentsProgress from './Views/course_progress/IEStudentsProgress'
 import SelectEvidence from './Views/evidences/SelectEvidence'
 
 const AppNavigator = createStackNavigator({
-    Home: { screen: SelectEvidence },
+    Home: { screen: Login },
     SetEvalIndicator: { screen: SetEvaluationIndicator },
     GetEvalIndicator: { screen: GetEvaluationIndicator },
     GetEvidence: { screen: GetEvidence },
@@ -44,7 +44,8 @@ const AppNavigator = createStackNavigator({
     OACourseProgress: { screen: OACourseProgress },
     IEStudentsProgress: { screen: IEStudentsProgress },
     StudentProfile: { screen: StudentProfile },
-    EvidenceForm: { screen: EvidenceForm }
+    EvidenceForm: { screen: EvidenceForm },
+    SelectEvidence: { screen: SelectEvidence }
 });
 
 const Drawer = createDrawerNavigator({

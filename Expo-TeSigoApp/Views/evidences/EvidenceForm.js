@@ -6,14 +6,18 @@ import {
     Image,
     View,
     Dimensions,
-    Button
+    Button,
+    Alert,
+    ActivityIndicator,
+    Text
 } from 'react-native';
-import { FormLabel, FormInput, FormValidationMessage } from 'react-native-elements'
+import { FormLabel, FormInput } from 'react-native-elements'
 import {
     Calendar,
     LocaleConfig
 } from 'react-native-calendars'
 
+import * as firebase from 'firebase';
 import APIHandler from '../../Utils/APIHandler'
 
 // Configuración del calendario en español
@@ -24,6 +28,8 @@ LocaleConfig.locales['cl'] = {
     dayNamesShort: ['Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab', 'Dom']
 }
 LocaleConfig.defaultLocale = 'cl'
+
+console.disableYellowBox = true;
 
 export default class EvidenceForm extends Component {
     constructor(props) {
@@ -38,7 +44,8 @@ export default class EvidenceForm extends Component {
             idStudent: -1,
             studentName: null,
             idCourse: -1,
-            courseName: null
+            courseName: null,
+            isUploading: false
         }
         this.APIHandler = new APIHandler()
     }
@@ -47,27 +54,156 @@ export default class EvidenceForm extends Component {
         title: 'Formulario de evidencia'
     }
 
+    // Método encargado de subir el archivo a Firebase, para luego subir el formulario hacia la base de datos
+    async uploadFileToFirebase(uri) {
+        // Se verifica que los campos hayan sido completados
+        if (this.state.evidenceName === '' || this.state.evidenceContext === '' || this.state.evidenceDate === '') {
+            Alert.alert(
+                'Los campos y fecha son obligatorios',
+                'Alguno de los campos no han sido completados, inténtelo nuevamente',
+                [{ text: 'OK' }]
+            )
+            return;
+        }
+        else if (this.checkIfExists(this.state.evidenceName)) // Se verifica que la evidencia no exista
+            return;
+        else { // Se procede a subir el archivo
+            await this.setState({
+                isUploading: true
+            })
+            const blob = await new Promise((resolve, reject) => {
+                const xhr = new XMLHttpRequest();
+                xhr.onload = function () {
+                    resolve(xhr.response);
+                };
+                xhr.onerror = function (e) {
+                    console.log(e);
+                    reject(new TypeError('Network request failed'));
+                };
+                xhr.responseType = 'blob';
+                xhr.open('GET', uri, true);
+                xhr.send(null);
+            });
+
+            const ref = firebase
+                .storage()
+                .ref()
+                .child(this.state.evidenceName.replace(' ', ''));
+            const snapshot = await ref.put(blob);
+
+            blob.close();
+
+            const downloadURL = await snapshot.ref.getDownloadURL();
+
+
+            // Se sube el formulario a la base de datos
+            this.APIHandler.postToAPI('http://206.189.195.214:8080/api/formularioEvidencia/alumno/' + this.state.idStudent, {
+                nombreEvidencia: this.state.evidenceName,
+                contextoEvidencia: this.state.evidenceContext,
+                fechaEvidencia: this.state.evidenceDate,
+                firebaseID: downloadURL,
+                tipoEvidencia: this.state.fileType
+            }).then(response => {
+                this.setState({
+                    isUploading: false
+                }) // Una vez se haya realizado los cambios, se lanza una alerta indicando si hubo éxito o no
+                let title = 'Formulario creado'
+                let subTitle = 'Formulario creado y evidencia subida correctamente'
+                if (response.status) {
+                    title = "Error al cargar los datos"
+                    subTitle = 'Ocurrió un error interno, inténtelo nuevamente'
+                }
+                // Se lanza una alerta indicando el estado de la actualización
+                Alert.alert(
+                    title,
+                    subTitle,
+                    [{ text: 'OK' }]
+                )
+                this.props.navigation.navigate('SelectEvidence', {
+                    idStudent: this.state.idStudent,
+                    studentName: this.state.studentName,
+                    idCourse: this.state.idCourse,
+                    courseName: this.state.courseName
+                })
+            })
+        }
+    }
+
+    // Método que verifica si una evidencia ya existe en la base de datos
+    checkIfExists(evidenceName) {
+        this.APIHandler.getFromAPI('http://206.189.195.214:8080/api/formularioEvidencia/alumno/' + this.state.idStudent)
+            .then(response => {
+                response.forEach(evidences => {
+                    evidences.evidencias.forEach(evidence => {
+                        if (evidence.nombreEvidencia === evidenceName) {
+                            // Se lanza una alerta indicando que se debe cambiar el nombre de la evidencia
+                            Alert.alert(
+                                'Evidencia existente',
+                                'Ya existe una evidencia con este nombre, por favor ingrese uno nuevo',
+                                [{ text: 'OK' }]
+                            )
+                            return true
+                        }
+                    })
+                })
+            })
+        return false
+    }
+
+    getFileType(typeID) {
+        switch (typeID) {
+            case 1:
+                return 'photo'
+            case 2:
+                return 'video'
+            case 3:
+                return 'audio'
+        }
+    }
+
+    renderActivityIndicator() {
+        return (
+            <View style={styles.activityIndicator}>
+                <Text style={styles.loadingText}>
+                    Subiendo la evidencia
+                </Text>
+                <ActivityIndicator size='large' />
+            </View>
+        )
+    }
+
+    renderUploadButton() {
+        return (
+            <View style={styles.button}>
+                <Button title="Subir archivo"
+                    color='#429b00'
+                    onPress={() => { this.uploadFileToFirebase(this.state.file) }} />
+            </View>
+        )
+    }
+
     componentWillMount() {
         const { params } = this.props.navigation.state
         this.setState({
             file: params.file,
-            fileType: params.fileType,
+            fileType: this.getFileType(params.fileType),
             idStudent: params.idStudent,
             studentName: params.studentName,
             idCourse: params.idCourse,
-            courseName: params.courseName
+            courseName: params.courseName,
         })
     }
 
     render() {
-        let calendar = this.state.showCalendar ? 
+        let calendar = this.state.showCalendar ?
             <Calendar onDayPress={day => {
                 this.setState({ evidenceDate: day.dateString })
-            }}/> : null
-        let calendarArrow = this.state.showCalendar ? 
-            [{rotate: '-180deg'}] : [{rotate: '0deg'}] 
-            
-        return(
+            }} /> : null
+        let calendarArrow = this.state.showCalendar ?
+            [{ rotate: '-180deg' }] : [{ rotate: '0deg' }]
+
+        let uploadStatus = this.state.isUploading ? this.renderActivityIndicator() : this.renderUploadButton()
+        return (
             <ScrollView style={styles.backColor}>
                 <FormLabel>
                     Nombre de la evidencia
@@ -75,31 +211,29 @@ export default class EvidenceForm extends Component {
                 <FormInput onChangeText={text => {
                     this.setState({
                         evidenceName: text
-                    })}}
-                    containerStyle={styles.InputContainer}/>
+                    })
+                }}
+                    containerStyle={styles.InputContainer} />
                 <FormLabel>
                     Contexto de la evidencia
                 </FormLabel>
                 <FormInput onChangeText={text => {
                     this.setState({
                         evidenceContext: text
-                    })}}
-                    containerStyle={styles.InputContainer}/>
+                    })
+                }}
+                    containerStyle={styles.InputContainer} />
                 <TouchableOpacity onPress={() => this.setState({ showCalendar: !this.state.showCalendar })}>
-                    <View style={[styles.flowRight, {marginBottom: '12%'}]}>
+                    <View style={[styles.flowRight, { marginBottom: '12%' }]}>
                         <FormLabel>
                             Fecha de la evidencia
                         </FormLabel>
                         <Image source={require('../Images/expand-arrow.png')}
-                            style={[styles.ArrowImage, {transform: calendarArrow}]}/>
+                            style={[styles.ArrowImage, { transform: calendarArrow }]} />
                     </View>
                 </TouchableOpacity>
-                { calendar }
-                <View style={styles.button}>
-                    <Button title="Subir archivo"
-                            color='#429b00'
-                            onPress={() => {}}/>
-                </View>
+                {calendar}
+                {uploadStatus}
             </ScrollView>
         )
     }
@@ -109,6 +243,12 @@ const height = Dimensions.get('window').height * 0.03;
 
 // Definición de estilos
 const styles = StyleSheet.create({
+    loadingText: {
+        fontSize: 22,
+        textAlign: 'center',
+        marginBottom: '8%',
+        marginTop: '5%'
+    },
     flowRight: {
         flexDirection: 'row',
         alignItems: 'center',
