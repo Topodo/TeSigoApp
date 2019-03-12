@@ -35,7 +35,7 @@ export default class OACourseProgress extends Component {
     componentDidMount() {
         // Se obtiene la data de los IEs del OA
         this.APIHandler.getFromAPI('http://206.189.195.214:8080/api/objetivoAprendizaje/' + this.state.idOA
-                                    + '/curso/' + this.state.idCourse + '/avance')
+            + '/curso/' + this.state.idCourse + '/avance')
             .then(response => {
                 this.setState({
                     IEs: response,
@@ -56,11 +56,11 @@ export default class OACourseProgress extends Component {
 
     // Método que renderiza la información de un IE
     renderIE(IE, index) {
-        return(
+        return (
             <View key={index} style={[styles.flowRight, styles.IEContainer]}>
                 <View style={styles.IETitleContainer}>
                     <Text>
-                        { 'IE' + (index + 1).toString() + ': ' + IE.IEName}
+                        {'IE' + (index + 1).toString() + ': ' + IE.IEName}
                     </Text>
                 </View>
                 <View style={styles.button}>
@@ -68,7 +68,7 @@ export default class OACourseProgress extends Component {
                         this.goIEStudentProgress(IE)
                     }}
                         color='#429b00'
-                        title="Lista de alumnos"/>
+                        title="Lista de alumnos" />
                 </View>
             </View>
         )
@@ -104,23 +104,23 @@ export default class OACourseProgress extends Component {
             }
         ]
 
-        return(
+        return (
             <View style={[styles.graphContainer]}>
                 <Text style={styles.titleText}>Gráfico</Text>
                 <View style={styles.legendContainer}>
-                    <Text style={{fontSize: 10}}> Completos </Text>
-                    <View style={[styles.legendTag, { backgroundColor: 'green' }]}/>
-                    <Text style={{fontSize: 10}}> Incompletos </Text>
-                    <View style={[styles.legendTag, { backgroundColor: 'red' }]}/>
+                    <Text style={{ fontSize: 10 }}> Completos </Text>
+                    <View style={[styles.legendTag, { backgroundColor: 'green' }]} />
+                    <Text style={{ fontSize: 10 }}> Incompletos </Text>
+                    <View style={[styles.legendTag, { backgroundColor: 'red' }]} />
                 </View>
-                <View style={styles.yLabel}>    
+                <View style={styles.yLabel}>
                     <Text style={[styles.labelText]}> Cantidad de </Text>
                     <Text style={styles.labelText}> alumnos </Text>
                 </View>
-                <View style={{width: '93%'}}>
-                    <PureChart data={data} type='bar'/>
+                <View style={{ width: '93%' }}>
+                    <PureChart data={data} type='bar' />
                 </View>
-                <View style={{alignItems: 'center', marginBottom: 12}}>
+                <View style={{ alignItems: 'center', marginBottom: 12 }}>
                     <Text style={styles.labelText}> Indicadores de Evaluación </Text>
                 </View>
             </View>
@@ -128,24 +128,34 @@ export default class OACourseProgress extends Component {
     }
 
     static navigationOptions = {
-        title: 'Indicadores de evaluación'
+        title: 'Indicadores de evaluación',
+        headerStyle: {
+            backgroundColor: 'green',
+        },
+        headerTitleStyle: {
+            fontWeight: "bold",
+            color: "#fff",
+            fontSize: 18,
+            zIndex: 1,
+            lineHeight: 23
+        },
     }
 
     render() {
-        if(this.state.isLoading) {
-            return(
+        if (this.state.isLoading) {
+            return (
                 <View style={styles.activityIndicator}>
                     <Text style={styles.loadingText}>
                         Cargando los indicadores de evaluación
                     </Text>
-                    <ActivityIndicator size='large'/>
+                    <ActivityIndicator size='large' />
                 </View>
             );
-        } 
+        }
         let IEs = this.state.IEs.map((IE, index) => {
-            return(this.renderIE(IE, index))
+            return (this.renderIE(IE, index))
         })
-        return(
+        return (
             <ScrollView style={styles.backColor}>
                 <Text style={styles.titleText}> {this.state.course} </Text>
                 {IEs}

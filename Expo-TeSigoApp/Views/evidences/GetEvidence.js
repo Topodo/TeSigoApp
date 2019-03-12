@@ -102,7 +102,17 @@ export default class GetEvidence extends React.Component {
     }
 
     static navigationOptions = {
-        title: 'Evidencia cualitativa'
+        title: 'Evidencia cualitativa',
+        headerStyle: {
+            backgroundColor: 'green',
+        },
+        headerTitleStyle: {
+            fontWeight: "bold",
+            color: "#fff",
+            fontSize: 18,
+            zIndex: 1,
+            lineHeight: 23
+        },
     };
 
     render() {

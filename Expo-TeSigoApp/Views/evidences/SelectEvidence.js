@@ -26,7 +26,17 @@ export default class SelectEvidence extends Component {
     }
 
     static navigationOptions = {
-        title: "Evidencia cualitativa"
+        title: "Evidencia cualitativa",
+        headerStyle: {
+            backgroundColor: 'green',
+        },
+        headerTitleStyle: {
+            fontWeight: "bold",
+            color: "#fff",
+            fontSize: 18,
+            zIndex: 1,
+            lineHeight: 23
+        },
     }
 
     // Método que redirige la navegación hacia la vista con el formulario de la evidencia
@@ -302,7 +312,8 @@ const styles = StyleSheet.create({
         marginLeft: '25%',
         textAlign: 'center',
         marginTop: 20,
-        width: '50%'
+        width: '50%',
+        marginBottom: '10%'
     },
     touchable: {
         height: '20%',

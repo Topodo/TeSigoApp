@@ -29,9 +29,26 @@ import OACourseProgress from './Views/course_progress/OACourseProgress'
 import IEStudentsProgress from './Views/course_progress/IEStudentsProgress'
 import SelectEvidence from './Views/evidences/SelectEvidence'
 import ShowEvidence from './Views/evidences/ShowEvidence'
+import Logout from './Views/Logout'
+
+const headerStyle = {
+    headerStyle: {
+        backgroundColor: '#008000',
+    },
+    headerTintColor: '#fff',
+    headerTitleStyle: {
+        fontWeight: 'bold',
+        color: '#fff'
+    },
+}
 
 const AppNavigator = createStackNavigator({
-    Home: { screen: Login },
+    Home: {
+        screen: MainPage,
+        navigationOptions: {
+            header: null,
+        }
+    },
     SetEvalIndicator: { screen: SetEvaluationIndicator },
     GetEvalIndicator: { screen: GetEvaluationIndicator },
     GetEvidence: { screen: GetEvidence },
@@ -47,7 +64,9 @@ const AppNavigator = createStackNavigator({
     StudentProfile: { screen: StudentProfile },
     EvidenceForm: { screen: EvidenceForm },
     SelectEvidence: { screen: SelectEvidence },
-    ShowEvidence: { screen: ShowEvidence }
+    ShowEvidence: { screen: ShowEvidence },
+    Login: { screen: Login },
+    Logout: { screen: Logout }
 });
 
 const Drawer = createDrawerNavigator({
@@ -55,6 +74,7 @@ const Drawer = createDrawerNavigator({
         screen: AppNavigator
     },
     GetCourses: { screen: GetCourses },
+    Logout: { screen: Logout }
 })
 
 export default Drawer;

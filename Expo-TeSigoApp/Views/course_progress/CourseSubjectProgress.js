@@ -42,8 +42,8 @@ export default class CourseSubjectProgress extends Component {
     // Método que obtiene la data de la unidad seleccionada 
     getSubjectData(selectedSubject) {
         const { progress } = this.state
-        for(i = 0; i < progress.length; i++) {
-            if(progress[i].idSubject === selectedSubject) {
+        for (i = 0; i < progress.length; i++) {
+            if (progress[i].idSubject === selectedSubject) {
                 return progress[i].progress
             }
         }
@@ -80,22 +80,22 @@ export default class CourseSubjectProgress extends Component {
                     defaultSubject: names[0].id,
                     idSubject: response[0].idUnidad,
                     idsSubjects: aux
-                })  
+                })
             })
-            .then(() => {        
+            .then(() => {
                 // Se obtiene el avance del curso en todas las unidades 
                 let progressAux = []
                 let count = 0
-                this.state.idsSubjects.forEach(id => {                    
-                    this.APIHandler.getFromAPI('http://206.189.195.214:8080/api/unidad/' + 
-                                id.toString() + '/curso/' + this.state.idCourse + '/avance')
-                        .then(response => {                                                      
+                this.state.idsSubjects.forEach(id => {
+                    this.APIHandler.getFromAPI('http://206.189.195.214:8080/api/unidad/' +
+                        id.toString() + '/curso/' + this.state.idCourse + '/avance')
+                        .then(response => {
                             progressAux.push({
                                 idSubject: id,
                                 progress: response
                             })
                             count++
-                            if(count === this.state.idsSubjects.length) {
+                            if (count === this.state.idsSubjects.length) {
                                 this.setState({
                                     progress: progressAux,
                                     isLoading: false
@@ -108,44 +108,55 @@ export default class CourseSubjectProgress extends Component {
     }
 
     static navigationOptions = {
-        title: 'Objetivos de aprendizaje (Curso)'
+        title: 'Objetivos de aprendizaje (Curso)',
+        headerStyle: {
+            backgroundColor: 'green',
+        },
+        headerTitleStyle: {
+            fontWeight: "bold",
+            color: "#fff",
+            fontSize: 18,
+            zIndex: 1,
+            lineHeight: 23
+        },
     }
 
     render() {
-        if(this.state.isLoading) {
-            return(
+        if (this.state.isLoading) {
+            return (
                 <View style={styles.activityIndicator}>
                     <Text style={styles.loadingText}>
                         Cargando los objetivos de aprendizaje
                     </Text>
-                    <ActivityIndicator size='large'/>
+                    <ActivityIndicator size='large' />
                 </View>
             );
-        } 
-        
+        }
+
         // Se renderiza el picker con las unidades
         let picker = this.state.subjectsNames.map((subjectName, index) => {
             return <Picker.Item key={index} value={subjectName.id} label={subjectName.name} />
         })
         // Se renderiza los avances en cada uno de los objetivos de aprendizaje
         let progress = this.getSubjectData(this.state.defaultSubject).map((OA, index) => {
-            return(
+            return (
                 <View key={index} style={styles.OAContainer}>
                     <View style={[styles.flowRight]}>
                         <View style={styles.OATitleContainer}>
                             <Text>
-                                { (index + 1).toString() + '.- ' + OA.OAName }
+                                {(index + 1).toString() + '.- ' + OA.OAName}
                             </Text>
                         </View>
                         <View>
                             <Text>
-                                { (Math.round(OA.percentage * 100)).toString() + '%' }
+                                {(Math.round(OA.percentage * 100)).toString() + '%'}
                             </Text>
                         </View>
                     </View>
                     <View>
                         <Button onPress={() => {
-                            this.goOAView(OA.idOA)}}
+                            this.goOAView(OA.idOA)
+                        }}
                             color='#429b00'
                             title="Ver indicadores de evaluación">
                         </Button>
@@ -154,22 +165,22 @@ export default class CourseSubjectProgress extends Component {
             )
         })
 
-        return(
+        return (
             <ScrollView style={styles.backColor}>
                 <Text style={styles.titleText}>
                     {this.state.course}
                 </Text>
                 <View style={styles.picker}>
                     <Picker selectedValue={this.state.defaultSubject}
-                            onValueChange={(subject) => {
-                                this.setState({ 
-                                    defaultSubject: subject,
-                                })
-                            }}>
-                        { picker }
+                        onValueChange={(subject) => {
+                            this.setState({
+                                defaultSubject: subject,
+                            })
+                        }}>
+                        {picker}
                     </Picker>
                 </View>
-                { progress }
+                {progress}
             </ScrollView>
         )
     }

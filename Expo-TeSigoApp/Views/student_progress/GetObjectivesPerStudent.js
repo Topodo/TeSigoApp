@@ -23,7 +23,7 @@ export default class GetObjectivesPerStudent extends React.Component {
         this.state = {
             name: '',
             course: '',
-            subjects: [],    
+            subjects: [],
             defaultSubject: '',
             subjectsNames: null,
             idStudent: -1,
@@ -66,7 +66,17 @@ export default class GetObjectivesPerStudent extends React.Component {
     }
 
     static navigationOptions = {
-        title: 'Objetivos por alumno'
+        title: 'Objetivos por alumno',
+        headerStyle: {
+            backgroundColor: 'green',
+        },
+        headerTitleStyle: {
+            fontWeight: "bold",
+            color: "#fff",
+            fontSize: 18,
+            zIndex: 1,
+            lineHeight: 23
+        },
     };
 
     // Método que agrega al state los datos provenientes de la lista de alumnos 
@@ -89,7 +99,7 @@ export default class GetObjectivesPerStudent extends React.Component {
                     subjectsNames: names,
                     defaultSubject: names[0],
                     idSubject: response[0].idUnidad,
-                })  
+                })
             })
             .then(() => {
                 // Se obtiene el avance del alumno en todas las unidades
@@ -100,27 +110,27 @@ export default class GetObjectivesPerStudent extends React.Component {
                             isLoading: false
                         })
                     }
-                )
+                    )
             })
             .catch(error => {
                 console.error(error)
             }
-        )
+            )
     }
 
     render() {
-        if(this.state.isLoading) {
-            return(
+        if (this.state.isLoading) {
+            return (
                 <View style={styles.activityIndicator}>
                     <Text style={styles.loadingText}>
                         Cargando los objetivos de aprendizaje
                     </Text>
-                    <ActivityIndicator size='large'/>
+                    <ActivityIndicator size='large' />
                 </View>
             );
-        } 
+        }
         // Picker que contiene los cursos
-        let subjectsItems = !this.state.isLoading ? this.state.subjectsNames.map((val, ind) => { 
+        let subjectsItems = !this.state.isLoading ? this.state.subjectsNames.map((val, ind) => {
             return <Picker.Item key={ind} value={val} label={val} />
         }) : null;
         // Se renderizan los objetivos de aprendizaje
@@ -164,13 +174,13 @@ export default class GetObjectivesPerStudent extends React.Component {
                 <Text style={styles.titleText}>
                     {this.state.name + ' - ' + this.state.course}
                 </Text>
-                <View style={styles.picker}> 
+                <View style={styles.picker}>
                     <Picker selectedValue={this.state.defaultSubject}
-                            onValueChange={(subject) => {
-                                this.setState({ 
-                                    defaultSubject: subject,
-                                })
-                            }}>
+                        onValueChange={(subject) => {
+                            this.setState({
+                                defaultSubject: subject,
+                            })
+                        }}>
                         {subjectsItems}
                     </Picker>
                 </View>

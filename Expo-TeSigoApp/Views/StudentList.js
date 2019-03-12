@@ -27,7 +27,7 @@ export default class StudentList extends Component {
 
     // Método que redirige la navegación al perfil del alumno
     getStudentProfile(student) {
-        this.props.navigation.navigate('StudentProfile', { 
+        this.props.navigation.navigate('StudentProfile', {
             idStudent: student.idAlumno,
             idCourse: this.state.idCourse,
             studentName: student.nombreAlumno + " " + student.apellidoPaternoAlumno + " " + student.apellidoMaternoAlumno,
@@ -46,21 +46,31 @@ export default class StudentList extends Component {
 
     componentDidMount() {
         this.APIHandler.getFromAPI('http://206.189.195.214:8080/api/curso/' + this.state.idCourse + '/alumnos').
-        then(resultJSON => {
-            let expandableItems = []
-            for(i = 0; i < resultJSON.lenght; i++) {
-                expandableItems.push(false);
-            }
-            this.setState({
-                students: resultJSON,
-                isLoading: false,
-                expandableItems: expandableItems
-            })  
-        })
+            then(resultJSON => {
+                let expandableItems = []
+                for (i = 0; i < resultJSON.lenght; i++) {
+                    expandableItems.push(false);
+                }
+                this.setState({
+                    students: resultJSON,
+                    isLoading: false,
+                    expandableItems: expandableItems
+                })
+            })
     }
 
     static navigationOptions = {
-        title: 'Lista de alumnos'
+        title: 'Lista de alumnos',
+        headerStyle: {
+            backgroundColor: 'green',
+        },
+        headerTitleStyle: {
+            fontWeight: "bold",
+            color: "#fff",
+            fontSize: 18,
+            zIndex: 1,
+            lineHeight: 23
+        },
     };
 
     // Método que redirige la navegación a la vista de avance general del curso
@@ -81,9 +91,9 @@ export default class StudentList extends Component {
                 <View key={id + 2} style={styles.flowRight}>
                     <View style={styles.button}>
                         <Button key={id + 3}
-                                title='Ver Perfil'
-                                color='#429b00'
-                                onPress={this.getStudentProfile.bind(this, info)}>
+                            title='Ver Perfil'
+                            color='#429b00'
+                            onPress={this.getStudentProfile.bind(this, info)}>
                         </Button>
                     </View>
                 </View>
@@ -93,16 +103,16 @@ export default class StudentList extends Component {
 
     render() {
         let studentsList = this.state.isLoading === true ? null :
-        this.state.students.map((student, index) => {
-            return (this.renderInfo(student, index));
-        });
-        if(this.state.isLoading) {
-            return(
+            this.state.students.map((student, index) => {
+                return (this.renderInfo(student, index));
+            });
+        if (this.state.isLoading) {
+            return (
                 <View style={styles.activityIndicator}>
                     <Text style={styles.loadingText}>
                         Cargando listado de alumnos
                     </Text>
-                    <ActivityIndicator size='large'/>
+                    <ActivityIndicator size='large' />
                 </View>
             );
         } else {
@@ -113,8 +123,8 @@ export default class StudentList extends Component {
                     </Text>
                     <View style={styles.progressButton}>
                         <Button title="Ver avance del curso"
-                                color='#429b00'
-                                onPress={this.getCourseSubjectProgress.bind(this)}>
+                            color='#429b00'
+                            onPress={this.getCourseSubjectProgress.bind(this)}>
                         </Button>
                     </View>
                     {studentsList}

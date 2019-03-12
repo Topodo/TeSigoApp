@@ -18,7 +18,17 @@ export default class ShowEvidence extends React.Component {
     }
 
     static navigationOptions = {
-        title: 'Evidencia cualitativa'
+        title: 'Evidencia cualitativa',
+        headerStyle: {
+            backgroundColor: 'green',
+        },
+        headerTitleStyle: {
+            fontWeight: "bold",
+            color: "#fff",
+            fontSize: 18,
+            zIndex: 1,
+            lineHeight: 23
+        },
     }
 
     // Método que retorna la fecha en formato DD/MM/AA
@@ -126,15 +136,15 @@ export default class ShowEvidence extends React.Component {
             <ScrollView style={styles.backColor}>
                 <Text style={styles.titles}> Nombre de la evidencia: </Text>
                 <View style={styles.subTitleContainer}>
-                    <Text style={styles.subTitles}> { this.state.evidenceName } </Text>
+                    <Text style={styles.subTitles}> {this.state.evidenceName} </Text>
                 </View>
                 <Text style={styles.titles}> Contexto de la evidencia: </Text>
                 <View style={styles.subTitleContainer}>
-                    <Text style={styles.subTitles}> { this.state.evidenceContext } </Text>
+                    <Text style={styles.subTitles}> {this.state.evidenceContext} </Text>
                 </View>
                 <Text style={styles.titles}> Fecha de la evidencia: </Text>
                 <View style={styles.subTitleContainer}>
-                    <Text style={styles.subTitles}> { this.state.evidenceDate } </Text>
+                    <Text style={styles.subTitles}> {this.state.evidenceDate} </Text>
                 </View>
                 {this.player}
             </ScrollView>

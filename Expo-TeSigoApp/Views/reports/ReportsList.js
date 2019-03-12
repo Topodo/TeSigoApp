@@ -6,8 +6,8 @@ import {
     Dimensions,
     StyleSheet,
     TouchableOpacity,
-    Image, 
-    ActivityIndicator  
+    Image,
+    ActivityIndicator
 } from 'react-native';
 import APIHandler from '../../Utils/APIHandler'
 
@@ -26,7 +26,17 @@ export default class ReportsList extends Component {
     }
 
     static navigationOptions = {
-        title: 'Reportes'
+        title: 'Reportes',
+        headerStyle: {
+            backgroundColor: 'green',
+        },
+        headerTitleStyle: {
+            fontWeight: "bold",
+            color: "#fff",
+            fontSize: 18,
+            zIndex: 1,
+            lineHeight: 23
+        },
     }
 
     componentWillMount() {
@@ -56,15 +66,15 @@ export default class ReportsList extends Component {
 
     // Método que renderiza un reporte
     renderReport(report, index) {
-        let arrowRotation = this.state.showReport[index] ? 
-            [{rotate: '-180deg'}] : [{rotate: '0deg'}]
-        let reportComponent = this.state.showReport[index] ? 
+        let arrowRotation = this.state.showReport[index] ?
+            [{ rotate: '-180deg' }] : [{ rotate: '0deg' }]
+        let reportComponent = this.state.showReport[index] ?
             <View>
                 <Text>
-                    { this.state.reports[index]['descripcionReporte'] }
+                    {this.state.reports[index]['descripcionReporte']}
                 </Text>
             </View> : null
-        return(
+        return (
             <View key={index}>
                 <TouchableOpacity style={styles.ColapsableTouchable}
                     onPress={() => {
@@ -77,40 +87,40 @@ export default class ReportsList extends Component {
                     <View style={[styles.flowRight]}>
                         <View style={styles.SubItemText}>
                             <Text >
-                                { (index + 1).toString() + '.- ' + report['asunto'] }
+                                {(index + 1).toString() + '.- ' + report['asunto']}
                             </Text>
                         </View>
-                        <Image source={require('../Images/expand-arrow.png')} 
-                            style={[styles.ArrowImage, {transform: arrowRotation}, {marginRight: '20%'}]}/>
+                        <Image source={require('../Images/expand-arrow.png')}
+                            style={[styles.ArrowImage, { transform: arrowRotation }, { marginRight: '20%' }]} />
                     </View>
                 </TouchableOpacity>
                 <View style={styles.EvidenceContainer}>
-                    { reportComponent }
+                    {reportComponent}
                 </View>
             </View>
         )
     }
 
     render() {
-        if(this.state.isLoading) {
-            return(
+        if (this.state.isLoading) {
+            return (
                 <View style={styles.activityIndicator}>
                     <Text style={styles.loadingText}>
                         Cargando el listado de evidencias cualitativas
                     </Text>
-                    <ActivityIndicator size='large'/>
+                    <ActivityIndicator size='large' />
                 </View>
             );
-        } 
+        }
         let reports = this.state.reports.map((report, index) => {
-            return(this.renderReport(report, index))
+            return (this.renderReport(report, index))
         })
-        return(
+        return (
             <ScrollView style={styles.backColor}>
                 <Text style={styles.titleText}>
                     {this.state.studentName + ' - ' + this.state.course}
                 </Text>
-                { reports }
+                {reports}
             </ScrollView>
         )
     }

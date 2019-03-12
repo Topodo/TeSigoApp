@@ -7,8 +7,11 @@ import {
     StyleSheet,
     TouchableOpacity,
     Picker,
-    ActivityIndicator
+    ActivityIndicator,
+    BackHandler,
+    Alert
 } from 'react-native';
+import { NavigationEvents } from 'react-navigation'
 import APIHandler from '../Utils/APIHandler';
 
 export default class GetCourses extends Component {
@@ -30,18 +33,27 @@ export default class GetCourses extends Component {
         });
     }
 
+    componentWillUnmount() {
+        BackHandler.removeEventListener('hardwareBackPress', this.handleBackButton);
+    }
+
     componentDidMount() {
+        BackHandler.addEventListener('hardwareBackPress', this.handleBackButton)
         this.apiHandler.getFromAPI('http://206.189.195.214:8080/api/profesor/' + this.state.idProfessorFirebase + '/cursos').
             then(resultJSON => {
                 this.setState({
                     courses: resultJSON,
                     isLoading: false
-                })        
-            }
-        )
+                })
+            })
+    }
+
+    componentDidFocus() {
+        BackHandler.addEventListener('hardwareBackPress', this.handleBackButton)
     }
 
     goToStudentsList(infoCourse) {
+        BackHandler.removeEventListener('hardwareBackPress', this.handleBackButton)
         this.props.navigation.navigate("StudentList", {
             course: infoCourse.gradoCurso,
             idCourse: infoCourse.idCurso,
@@ -53,41 +65,64 @@ export default class GetCourses extends Component {
         return (
             <View key={id} style={styles.CourseContainer}>
                 <Button title={(id + 1).toString() + '.- ' + info.gradoCurso}
-                    onPress = {this.goToStudentsList.bind(this, info)}
+                    onPress={this.goToStudentsList.bind(this, info)}
                     color='#429b00'>
                 </Button>
             </View>
         );
     }
 
+    handleBackButton() {
+        Alert.alert(
+            'Cerrar la aplicación',
+            '¿Desea cerrar la aplicación?', [{
+                text: 'Cancelar',
+                onPress: () => console.log('Cancel Pressed'),
+                style: 'cancel'
+            }, {
+                text: 'OK',
+                onPress: () => BackHandler.exitApp()
+            },], {
+                cancelable: false
+            }
+        )
+        return true;
+    }
+
     static navigationOptions = {
-        title: 'Mis cursos'
+        title: 'Mis cursos',
+        headerStyle: {
+            backgroundColor: 'green',
+        },
+        headerTitleStyle: {
+            fontWeight: "bold",
+            color: "#fff",
+            fontSize: 18,
+            zIndex: 1,
+            lineHeight: 23
+        },
+        headerLeft: null
     };
 
     render() {
-        if(this.state.isLoading) {
-            return(
+        if (this.state.isLoading) {
+            return (
                 <View style={styles.activityIndicator}>
                     <Text style={styles.loadingText}>
                         Cargando mis cursos
                     </Text>
-                    <ActivityIndicator size='large'/>
+                    <ActivityIndicator size='large' />
                 </View>
             );
-        } 
+        }
         let courses = this.state.courses ? this.state.courses.map((info, id) => {
             return (this.renderInfo(info, id));
         }) : null;
 
-        if(this.state.isLoading) {
-            return(
-                <View style={styles.backColor}>
-                    <ActivityIndicator/>
-                </View>
-            );
-        }
-        return(
+        return (
             <ScrollView style={styles.backColor}>
+                <NavigationEvents 
+                    onDidFocus={payload => this.componentDidFocus()} />
                 <Text style={styles.loadingText}>
                     Cursos
                 </Text>

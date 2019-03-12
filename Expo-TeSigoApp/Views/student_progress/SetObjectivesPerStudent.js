@@ -18,7 +18,7 @@ export default class ObjectivesPerStudent extends React.Component {
         super(props);
         this.state = {
             name: '',
-            subjects: [],  
+            subjects: [],
             defaultSubject: '',
             subjectsNames: [],
             isLoading: true,
@@ -30,7 +30,17 @@ export default class ObjectivesPerStudent extends React.Component {
     }
 
     static navigationOptions = {
-        title: 'Objetivos por Alumno'
+        title: 'Objetivos por Alumno',
+        headerStyle: {
+            backgroundColor: 'green',
+        },
+        headerTitleStyle: {
+            fontWeight: "bold",
+            color: "#fff",
+            fontSize: 18,
+            zIndex: 1,
+            lineHeight: 23
+        },
     };
 
 
@@ -56,19 +66,19 @@ export default class ObjectivesPerStudent extends React.Component {
     // Método que redirige a la vista GetEvaluationIndicator con los indicadores de evaluación del objetivo seleccionado
     goEvaluationIndicator(indicators) {
         this.props.navigation.navigate('SetEvalIndicator', {
-                OAName: indicators.name,
-                indicators: indicators.evalIndicators,
-                studentName: this.state.name,
-                course: this.state.course,
-                idStudent: this.state.idStudent,
-                idCourse: this.state.idCourse
-            }
+            OAName: indicators.name,
+            indicators: indicators.evalIndicators,
+            studentName: this.state.name,
+            course: this.state.course,
+            idStudent: this.state.idStudent,
+            idCourse: this.state.idCourse
+        }
         );
     }
 
     // Método que cambia el estado de los checkboxes, indicando los OAS asignados a la unidad en específico en la cual se está trabajando
-    assignCheckboxesValues(subject) {     
-        let checkedItems = [];                        
+    assignCheckboxesValues(subject) {
+        let checkedItems = [];
         this.getLearningObjectives(subject).OAs.forEach((item) => {
             let isComplete = item.percentage == 1 ? true : false;
             checkedItems.push({
@@ -86,8 +96,8 @@ export default class ObjectivesPerStudent extends React.Component {
         // Se crea el body que se adjuntará en el request 
         let body = []
         this.getLearningObjectives(this.state.defaultSubject).OAs.forEach(OA => {
-            this.state.checkedItems.forEach(item => {                
-                if(item.idOA === OA.id && item.isComplete) {
+            this.state.checkedItems.forEach(item => {
+                if (item.idOA === OA.id && item.isComplete) {
                     OA.evalIndicators.forEach(EA => {
                         body.push({
                             idIndicador: EA.id,
@@ -96,7 +106,7 @@ export default class ObjectivesPerStudent extends React.Component {
                     })
                 }
             })
-        })        
+        })
         return body
     }
 
@@ -110,7 +120,7 @@ export default class ObjectivesPerStudent extends React.Component {
                     subjectsNames: names,
                     defaultSubject: names[0],
                     idSubject: response[0].idUnidad,
-                })  
+                })
             })
             .then(() => {
                 // Se obtiene el avance del alumno en todas las unidades
@@ -120,20 +130,20 @@ export default class ObjectivesPerStudent extends React.Component {
                             subjects: response,
                         })
                     })
-                    .then(() => {    
+                    .then(() => {
                         // Se verifica el porcentaje de avance de los objetivos de aprendizaje
                         this.assignCheckboxesValues(this.state.defaultSubject)
-                        console.log(this.state)                   
+                        console.log(this.state)
                         this.setState({
                             isLoading: false,
                         })
                     }
-                ).catch(error => console.error(error))
+                    ).catch(error => console.error(error))
             })
             .catch(error => {
                 console.error(error)
             }
-        )
+            )
     }
 
     componentWillMount() {
@@ -151,16 +161,16 @@ export default class ObjectivesPerStudent extends React.Component {
     }
 
     render() {
-        if(this.state.isLoading) {
-            return(
+        if (this.state.isLoading) {
+            return (
                 <View style={styles.activityIndicator}>
                     <Text style={styles.loadingText}>
                         Cargando los objetivos de aprendizaje
                     </Text>
-                    <ActivityIndicator size='large'/>
+                    <ActivityIndicator size='large' />
                 </View>
             );
-        } 
+        }
         // Picker que contiene los cursos
         let subjectsItems = this.state.subjectsNames.map((val, ind) => {
             return <Picker.Item key={ind} value={val} label={val} />
@@ -178,7 +188,7 @@ export default class ObjectivesPerStudent extends React.Component {
                         </View>
                         <Text>
                             {(Math.round(OA.percentage * 100)).toString() + '%'}
-                        </Text>     
+                        </Text>
                         <CheckBox
                             key={id}
                             checked={this.state.checkedItems[id].isComplete}
@@ -189,10 +199,10 @@ export default class ObjectivesPerStudent extends React.Component {
                                     checkedItems: tmp
                                 })
                             }}
-                            containerStyle={styles.CheckBoxStyle}/>
+                            containerStyle={styles.CheckBoxStyle} />
                     </View>
                     <View style={styles.button}>
-                        <Button 
+                        <Button
                             onPress={this.goEvaluationIndicator.bind(this, OA)}
                             color='#429b00'
                             title="Asignar indicadores de evaluación">
@@ -209,7 +219,7 @@ export default class ObjectivesPerStudent extends React.Component {
                 <View style={styles.picker}>
                     <Picker selectedValue={this.state.defaultSubject}
                         onValueChange={(subject) => {
-                            this.setState({ 
+                            this.setState({
                                 defaultSubject: subject,
                             })
                             this.assignCheckboxesValues(subject)
@@ -229,7 +239,7 @@ export default class ObjectivesPerStudent extends React.Component {
                                     // Una vez se haya realizado los cambios, se lanza una alerta indicando si hubo éxito o no
                                     let title = 'Actualización de objetivos'
                                     let subTitle = 'Cambios realizados exitosamente'
-                                    if(response.status) {
+                                    if (response.status) {
                                         subTitle = 'Ocurrió un error interno, inténtelo nuevamente'
                                     } else {
                                         // Se obtiene el avance del alumno en todas las unidades
@@ -240,16 +250,16 @@ export default class ObjectivesPerStudent extends React.Component {
                                                 })
                                             })
                                             .catch(error => console.error(error)
-                                        )
+                                            )
                                     }
                                     // Se lanza una alerta indicando el estado de la actualización
                                     Alert.alert(
                                         title,
                                         subTitle,
-                                        [ { text: 'OK' } ]
+                                        [{ text: 'OK' }]
                                     )
                                 })
-                        }}/>
+                        }} />
                 </View>
             </ScrollView>
         )

@@ -64,10 +64,10 @@ export default class IEStudentsProgress extends Component {
     getStudent(idStudent) {
         let studentAux = null
         this.state.students.forEach(student => {
-            if(student['idAlumno'] === idStudent) {
+            if (student['idAlumno'] === idStudent) {
                 studentAux = student
             }
-        })     
+        })
         return studentAux
     }
 
@@ -85,17 +85,17 @@ export default class IEStudentsProgress extends Component {
 
     // Método que renderiza un elemento de la lista de alumnos
     renderStudentElement(student, index) {
-        return(
+        return (
             <View key={index} style={[styles.flowRight, styles.profileContainer]}>
                 <View style={styles.textProfileContainer}>
-                    <Text> { student.name } </Text>
+                    <Text> {student.name} </Text>
                 </View>
                 <View style={styles.button} key={index + 1}>
                     <Button onPress={() => {
                         this.goStudentProfile(student.idStudent, student.name)
                     }}
                         color='#429b00'
-                        title="Perfil"/>
+                        title="Perfil" />
                 </View>
             </View>
         )
@@ -103,12 +103,12 @@ export default class IEStudentsProgress extends Component {
 
     // Método que renderiza el listado alumnos
     renderStudentsList(students, IEStatus, index) {
-        let arrowRotation = this.state.selectedItems[index] ? 
-            [{rotate: '-180deg'}] : [{rotate: '0deg'}]
+        let arrowRotation = this.state.selectedItems[index] ?
+            [{ rotate: '-180deg' }] : [{ rotate: '0deg' }]
         let studentsElements = this.state.selectedItems[index] ? students.map((student, index) => {
-            return(this.renderStudentElement(student, index)) 
+            return (this.renderStudentElement(student, index))
         }) : null
-        return(
+        return (
             <View key={index}>
                 <TouchableOpacity style={styles.ColapsableTouchable}
                     onPress={() => {
@@ -120,40 +120,50 @@ export default class IEStudentsProgress extends Component {
                     }}>
                     <View style={[styles.flowRight]}>
                         <View style={styles.SubItemText}>
-                            <Text style={styles.touchableText}> { IEStatus } </Text>
+                            <Text style={styles.touchableText}> {IEStatus} </Text>
                         </View>
-                        <Image source={require('../Images/expand-arrow.png')} 
-                            style={[styles.ArrowImage, {transform: arrowRotation}, {marginRight: '20%'}]}/>
+                        <Image source={require('../Images/expand-arrow.png')}
+                            style={[styles.ArrowImage, { transform: arrowRotation }, { marginRight: '20%' }]} />
                     </View>
                 </TouchableOpacity>
-                { studentsElements }
+                {studentsElements}
             </View>
         )
     }
 
     static navigationOptions = {
-        title: 'Lista del curso'
+        title: 'Lista del curso',
+        headerStyle: {
+            backgroundColor: 'green',
+        },
+        headerTitleStyle: {
+            fontWeight: "bold",
+            color: "#fff",
+            fontSize: 18,
+            zIndex: 1,
+            lineHeight: 23
+        },
     }
 
     render() {
-        if(this.state.isLoading) {
-            return(
+        if (this.state.isLoading) {
+            return (
                 <View style={styles.activityIndicator}>
                     <Text style={styles.loadingText}>
                         Cargando la lista del curso
                     </Text>
-                    <ActivityIndicator size='large'/>
+                    <ActivityIndicator size='large' />
                 </View>
             );
-        } 
+        }
         let completeListComponent = this.renderStudentsList(this.state.completeList, "Indicador completado", 0)
         let incompleteListComponent = this.renderStudentsList(this.state.incompleteList, "Indicador no completado", 1)
-        
-        return(
+
+        return (
             <ScrollView style={styles.backColor}>
                 <Text style={styles.titleText}> {this.state.course} </Text>
-                { completeListComponent }
-                { incompleteListComponent }
+                {completeListComponent}
+                {incompleteListComponent}
             </ScrollView>
         )
     }
@@ -163,7 +173,7 @@ const width = Dimensions.get('window').height * 0.8;
 const styles = StyleSheet.create({
     touchableText: {
         fontSize: 16,
-        color: 'black'  
+        color: 'black'
     },
     textProfileContainer: {
         width: '66%',

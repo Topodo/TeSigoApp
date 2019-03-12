@@ -25,7 +25,17 @@ export default class CreateReport extends Component {
     }
 
     static navigationOptions = {
-        title: 'Crear reporte'
+        title: 'Crear reporte',
+        headerStyle: {
+            backgroundColor: 'green',
+        },
+        headerTitleStyle: {
+            fontWeight: "bold",
+            color: "#fff",
+            fontSize: 18,
+            zIndex: 1,
+            lineHeight: 23
+        },
     }
 
     componentWillMount() {
@@ -39,32 +49,32 @@ export default class CreateReport extends Component {
 
     // Método que redirige la navegación a la vista del listado de reportes del alumno, luego de subir el reporte
     goReportsList() {
-        if(this.state.reportName === '' || this.state.reportDescription === '') {
+        if (this.state.reportName === '' || this.state.reportDescription === '') {
             Alert.alert(
                 'Creación de reporte',
                 'Todos los campos son obligatorios',
-                [ { text: 'OK' } ]
+                [{ text: 'OK' }]
             )
             return;
         }
         this.APIHandler.postToAPI('http://206.189.195.214:8080/api/alumno/' + this.state.idStudent + '/reporte/nuevo',
-                                {
-                                    nombreProfesor: this.state.professorName,
-                                    descripcionReporte: this.state.reportDescription,
-                                    asunto: this.state.reportName
-                                })
+            {
+                nombreProfesor: this.state.professorName,
+                descripcionReporte: this.state.reportDescription,
+                asunto: this.state.reportName
+            })
             .then(response => {
                 // Una vez se haya realizado los cambios, se lanza una alerta indicando si hubo éxito o no
                 let title = 'Creación de reporte'
                 let subTitle = 'Reporte creado correctamente'
-                if(response.status) {
+                if (response.status) {
                     subTitle = 'Ocurrió un error interno, inténtelo nuevamente'
-                } 
+                }
                 // Se lanza una alerta indicando el estado de la actualización
                 Alert.alert(
                     title,
                     subTitle,
-                    [ { text: 'OK' } ]
+                    [{ text: 'OK' }]
                 )
             })
             .then(() => {
@@ -77,7 +87,7 @@ export default class CreateReport extends Component {
     }
 
     render() {
-        return(
+        return (
             <ScrollView style={styles.backColor}>
                 <Text style={styles.titleText}>
                     {this.state.studentName + ' - ' + this.state.course}
@@ -86,22 +96,24 @@ export default class CreateReport extends Component {
                 <FormInput onChangeText={text => {
                     this.setState({
                         reportName: text
-                    })}}
+                    })
+                }}
                     containerStyle={styles.InputContainer}
-                    multiline/>
+                    multiline />
                 <FormLabel> Descripción del reporte </FormLabel>
                 <FormInput onChangeText={text => {
                     this.setState({
                         reportDescription: text
-                    })}}
+                    })
+                }}
                     containerStyle={styles.InputContainer}
-                    multiline/>
+                    multiline />
                 <View style={styles.button}>
                     <Button title="Crear reporte"
                         color='#429b00'
                         onPress={() => {
                             this.goReportsList()
-                        }}/>
+                        }} />
                 </View>
             </ScrollView>
         )
@@ -134,6 +146,6 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         marginTop: '7%',
         marginBottom: '7%'
-    },  
+    },
 })
 

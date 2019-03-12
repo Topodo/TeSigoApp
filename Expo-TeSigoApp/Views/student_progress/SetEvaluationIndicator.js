@@ -28,7 +28,17 @@ export default class EvaluationIndicator extends Component {
     }
 
     static navigationOptions = {
-        title: 'Indicadores de evaluación'
+        title: 'Indicadores de evaluación',
+        headerStyle: {
+            backgroundColor: 'green',
+        },
+        headerTitleStyle: {
+            fontWeight: "bold",
+            color: "#fff",
+            fontSize: 18,
+            zIndex: 1,
+            lineHeight: 23
+        },
     };
 
     // Método que redirige la navegación a la vista de asignación de objetivos de aprendizaje
@@ -62,32 +72,32 @@ export default class EvaluationIndicator extends Component {
                 idIndicador: IE.id,
                 status: true
             } : {
-                idIndicador: IE.id,
-                status: false
-            }
+                    idIndicador: IE.id,
+                    status: false
+                }
             checkedItems.push(checkedItem)
         });
         this.setState({
             checkedItems: checkedItems,
             isLoading: false
-        })        
+        })
     }
 
     render() {
-        if(this.state.isLoading) {
-            return(
+        if (this.state.isLoading) {
+            return (
                 <View style={styles.activityIndicator}>
                     <Text style={styles.loadingText}>
                         Cargando los indicadores de evaluación
                     </Text>
-                    <ActivityIndicator size='large'/>
+                    <ActivityIndicator size='large' />
                 </View>
             );
-        } 
-        
+        }
+
         // Se mapean los indicadores de evaluación para renderizar
         let evalInd = this.state.evalIndicators.map((indicator, index) => {
-            return(
+            return (
                 <View key={index} style={styles.IEContainer}>
                     <View style={styles.flowRight}>
                         <View style={styles.IESubContainer}>
@@ -104,14 +114,14 @@ export default class EvaluationIndicator extends Component {
                                 this.setState({
                                     checkedItems: tmp
                                 })
-                            }}/>
+                            }} />
                     </View>
                 </View>
-                
+
             );
         });
 
-        return(
+        return (
             <ScrollView style={styles.backColor}>
                 <Text style={styles.titleText}>
                     {this.state.name + ' - ' + this.state.course}
@@ -121,7 +131,7 @@ export default class EvaluationIndicator extends Component {
                         {this.state.OAName}
                     </Text>
                 </View>
-                { evalInd }
+                {evalInd}
                 <View style={styles.button}>
                     <Button
                         title={'Actualizar Indicadores'}
@@ -132,20 +142,20 @@ export default class EvaluationIndicator extends Component {
                                     // Una vez se haya realizado los cambios, se lanza una alerta indicando si hubo éxito o no
                                     let title = 'Actualización de objetivos'
                                     let subTitle = 'Cambios realizados exitosamente'
-                                    if(response.status) {
+                                    if (response.status) {
                                         subTitle = 'Ocurrió un error interno, inténtelo nuevamente'
-                                    } 
+                                    }
                                     // Se lanza una alerta indicando el estado de la actualización
                                     Alert.alert(
                                         title,
                                         subTitle,
-                                        [ { text: 'OK' } ]
+                                        [{ text: 'OK' }]
                                     )
                                 })
                                 .then(() => {
                                     this.goToStudentProfile()
                                 })
-                        }}/>
+                        }} />
                 </View>
             </ScrollView>
         );

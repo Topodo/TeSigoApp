@@ -26,12 +26,22 @@ export default class StudentProfile extends Component {
     }
 
     static navigationOptions = {
-        title: 'Perfil del alumno'
+        title: 'Perfil del alumno',
+        headerStyle: {
+            backgroundColor: 'green',
+        },
+        headerTitleStyle: {
+            fontWeight: "bold",
+            color: "#fff",
+            fontSize: 18,
+            zIndex: 1,
+            lineHeight: 23
+        },
     }
 
     // Método que redirige la navegación a la vista de visualización de objetivos de aprendizaje
     getOAs(student) {
-        this.props.navigation.navigate('GetObjectivesPerStudent', { 
+        this.props.navigation.navigate('GetObjectivesPerStudent', {
             idStudent: student.idAlumno,
             idCourse: this.state.idCourse,
             studentName: student.nombreAlumno + " " + student.apellidoPaternoAlumno + " " + student.apellidoMaternoAlumno,
@@ -99,44 +109,44 @@ export default class StudentProfile extends Component {
                 </Text>
                 <View style={styles.button}>
                     <Button key={id + 3}
-                            title='Ver avance'
-                            color='#429b00'
-                            onPress={this.getOAs.bind(this, info)}>
+                        title='Ver avance'
+                        color='#429b00'
+                        onPress={this.getOAs.bind(this, info)}>
                     </Button>
                 </View>
                 <View style={styles.button}>
                     <Button key={id + 4}
-                            title="Asignar avance"
-                            color='#429b00'
-                            onPress={this.setOAs.bind(this, info)}>
+                        title="Asignar avance"
+                        color='#429b00'
+                        onPress={this.setOAs.bind(this, info)}>
                     </Button>
                 </View>
                 <View style={styles.button}>
                     <Button key={id + 3}
-                            title='Ver evidencias'
-                            color='#429b00'
-                            onPress={this.getEvidences.bind(this, info)}>
+                        title='Ver evidencias'
+                        color='#429b00'
+                        onPress={this.getEvidences.bind(this, info)}>
                     </Button>
                 </View>
                 <View style={styles.button}>
                     <Button key={id + 4}
-                            title="Asignar evidencias"
-                            color='#429b00'
-                            onPress={this.setEvidences.bind(this, info)}>
+                        title="Asignar evidencias"
+                        color='#429b00'
+                        onPress={this.setEvidences.bind(this, info)}>
                     </Button>
                 </View>
                 <View style={styles.button}>
                     <Button key={id + 4}
-                            title="Ver reportes"
-                            color='#429b00'
-                            onPress={this.getReports.bind(this, info)}>
+                        title="Ver reportes"
+                        color='#429b00'
+                        onPress={this.getReports.bind(this, info)}>
                     </Button>
                 </View>
                 <View style={styles.button}>
                     <Button key={id + 4}
-                            title="Asignar reportes"
-                            color='#429b00'
-                            onPress={this.setReports.bind(this, info)}>
+                        title="Asignar reportes"
+                        color='#429b00'
+                        onPress={this.setReports.bind(this, info)}>
                     </Button>
                 </View>
             </View>
@@ -161,20 +171,20 @@ export default class StudentProfile extends Component {
     }
 
     render() {
-        if(this.state.isLoading) {
-            return(
+        if (this.state.isLoading) {
+            return (
                 <View style={styles.activityIndicator}>
                     <Text style={styles.loadingText}>
                         Cargando la lista del curso
                     </Text>
-                    <ActivityIndicator size='large'/>
+                    <ActivityIndicator size='large' />
                 </View>
             );
-        } 
+        }
         const studentComp = this.renderInfo(this.state.student, 0)
-        return(
+        return (
             <ScrollView style={styles.backColor}>
-                { studentComp }
+                {studentComp}
             </ScrollView>
         )
     }

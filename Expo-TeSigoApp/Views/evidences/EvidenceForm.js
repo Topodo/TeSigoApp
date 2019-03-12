@@ -51,7 +51,17 @@ export default class EvidenceForm extends Component {
     }
 
     static navigationOptions = {
-        title: 'Formulario de evidencia'
+        title: 'Formulario de evidencia',
+        headerStyle: {
+            backgroundColor: 'green',
+        },
+        headerTitleStyle: {
+            fontWeight: "bold",
+            color: "#fff",
+            fontSize: 18,
+            zIndex: 1,
+            lineHeight: 23
+        },
     }
 
     // Método encargado de subir el archivo a Firebase, para luego subir el formulario hacia la base de datos
