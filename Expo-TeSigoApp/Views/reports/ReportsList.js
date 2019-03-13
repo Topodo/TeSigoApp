@@ -15,12 +15,12 @@ export default class ReportsList extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            idLoading: true,
             idStudent: 1,
             studentName: '',
             course: '',
             showReport: [],
-            reports: []
+            reports: [],
+            isLoading: true,
         }
         this.APIHandler = new APIHandler()
     }
@@ -106,7 +106,7 @@ export default class ReportsList extends Component {
             return (
                 <View style={styles.activityIndicator}>
                     <Text style={styles.loadingText}>
-                        Cargando el listado de evidencias cualitativas
+                        Cargando los reportes
                     </Text>
                     <ActivityIndicator size='large' />
                 </View>

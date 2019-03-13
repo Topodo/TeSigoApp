@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import APIHandler from '../../Utils/APIHandler';
 import { CheckBox } from 'react-native-elements';
+import { NavigationEvents } from 'react-navigation'
 
 export default class EvaluationIndicator extends Component {
     constructor(props) {
@@ -22,7 +23,9 @@ export default class EvaluationIndicator extends Component {
             checkedItems: [],
             isLoading: true,
             idStudent: '',
-            student: {}
+            student: {},
+            idSubject: -1,
+            alreadyMounted: false
         };
         this.APIHandler = new APIHandler();
     }
@@ -43,13 +46,10 @@ export default class EvaluationIndicator extends Component {
 
     // Método que redirige la navegación a la vista de asignación de objetivos de aprendizaje
     goToStudentProfile() {
-        this.props.navigation.navigate('StudentProfile', {
-            idStudent: this.state.idStudent,
-            idCourse: this.state.idCourse,
-            studentName: this.state.name,
-            course: this.state.course,
-            student: this.state.student
+        this.setState({
+            isLoading: true
         })
+        this.props.navigation.navigate('SetObjectivesPerStudent')
     }
 
     // Para modificar el state al cambiar de un componente a otro
@@ -61,11 +61,31 @@ export default class EvaluationIndicator extends Component {
             course: params.course,
             OAName: params.OAName,
             idStudent: params.idStudent,
-            student: params.student
+            student: params.student,
+            idSubject: params.idSubject
         })
     }
 
-    componentDidMount() {
+    componentDidFocus() {
+        if (this.state.alreadyMounted) {
+            const { params } = this.props.navigation.state;
+            this.setState({
+                evalIndicators: params.indicators,
+                name: params.studentName,
+                course: params.course,
+                OAName: params.OAName,
+                idStudent: params.idStudent,
+                student: params.student,
+                idSubject: params.idSubject,
+                isLoading: false
+            })
+        }
+    }
+
+    async componentDidMount() {
+        await this.setState({
+            alreadyMounted: true
+        })
         let checkedItems = []
         this.state.evalIndicators.forEach(IE => {
             let checkedItem = IE.isComplete ? {
@@ -117,12 +137,13 @@ export default class EvaluationIndicator extends Component {
                             }} />
                     </View>
                 </View>
-
             );
         });
 
         return (
             <ScrollView style={styles.backColor}>
+                <NavigationEvents 
+                    onDidFocus={payload => this.componentDidFocus()} />
                 <Text style={styles.titleText}>
                     {this.state.name + ' - ' + this.state.course}
                 </Text>

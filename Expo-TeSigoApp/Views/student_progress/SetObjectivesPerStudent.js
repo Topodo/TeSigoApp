@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { CheckBox } from 'react-native-elements';
 import APIHandler from '../../Utils/APIHandler';
+import { NavigationEvents } from 'react-navigation'
 
 export default class ObjectivesPerStudent extends React.Component {
     constructor(props) {
@@ -25,6 +26,7 @@ export default class ObjectivesPerStudent extends React.Component {
             checkedItems: [],
             idStudent: '',
             idCourse: '',
+            alreadyMounted: false
         }
         this.APIHandler = new APIHandler();
     }
@@ -71,9 +73,12 @@ export default class ObjectivesPerStudent extends React.Component {
             studentName: this.state.name,
             course: this.state.course,
             idStudent: this.state.idStudent,
-            idCourse: this.state.idCourse
-        }
-        );
+            idCourse: this.state.idCourse,
+            idSubject: this.getLearningObjectives(this.state.defaultSubject).id
+        });
+        this.setState({
+            isLoading: true
+        })
     }
 
     // Método que cambia el estado de los checkboxes, indicando los OAS asignados a la unidad en específico en la cual se está trabajando
@@ -133,7 +138,6 @@ export default class ObjectivesPerStudent extends React.Component {
                     .then(() => {
                         // Se verifica el porcentaje de avance de los objetivos de aprendizaje
                         this.assignCheckboxesValues(this.state.defaultSubject)
-                        console.log(this.state)
                         this.setState({
                             isLoading: false,
                         })
@@ -157,13 +161,24 @@ export default class ObjectivesPerStudent extends React.Component {
     }
 
     componentDidMount() {
+        this.setState({
+            alreadyMounted: true
+        })
         this.getOASData()
+    }
+
+    componentDidFocus() {
+        if (this.state.alreadyMounted) {
+            this.getOASData()
+        }
     }
 
     render() {
         if (this.state.isLoading) {
             return (
                 <View style={styles.activityIndicator}>
+                    <NavigationEvents
+                        onDidFocus={payload => this.componentDidFocus()} />
                     <Text style={styles.loadingText}>
                         Cargando los objetivos de aprendizaje
                     </Text>
