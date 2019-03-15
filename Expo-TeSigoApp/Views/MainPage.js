@@ -36,14 +36,14 @@ export default class MainPage extends React.Component {
     render() {
         return (
             <View style={styles.mainContainer}>
-                <View style={[styles.textContainer, { marginTop: '30%' }]}>
+                <View style={[styles.textContainer, { marginTop: '40%' }]}>
                     <Text style={styles.text}> Bienvenido/a a TeSigoApp,</Text>
                 </View>
                 <View style={styles.textContainer}>
                     <Text style={styles.text}> la app que te apoyará a llevar el seguimientos de tus estudiantes! </Text>
                 </View>
                 <View style={styles.activityIndicator}>
-                    <ActivityIndicator size='large' />
+                    <ActivityIndicator size='large' color='blue'/>
                 </View>
             </View>
         )
@@ -55,7 +55,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         width: '100%',
         height: '100%',
-        backgroundColor: 'white'
+        backgroundColor: 'green'
     },
     textContainer: {
         marginLeft: '10%',
@@ -63,10 +63,12 @@ const styles = StyleSheet.create({
     },
     text: {
         textAlign: 'center',
-        fontSize: 24
+        fontSize: 24,
+        fontWeight: 'bold',
+        color: 'white'
     },
     activityIndicator: {
         margin: 'auto',
-        marginTop: '4%'
+        marginTop: '7%'
     }
 })

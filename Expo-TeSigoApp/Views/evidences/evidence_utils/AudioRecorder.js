@@ -158,10 +158,6 @@ export default class AudioRecorder extends Component {
                                 onPress={() => {
                                     this.playAudio()
                                 }} />
-                            <MaterialCommunityIcons name="pause" style={styles.sendIcon}
-                                onPress={() => {
-                                    this.pauseAudio()
-                                }} />
                         </View>
                         <View style={styles.optionsToolbar}>
                             <MaterialIcons name="delete" style={styles.deleteIcon}

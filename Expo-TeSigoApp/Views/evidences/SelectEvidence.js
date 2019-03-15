@@ -172,7 +172,7 @@ export default class SelectEvidence extends Component {
                     <Text style={styles.iconText}> Audio </Text>
                 </View>
                 {selectedFile}
-                <View style={styles.button}>
+                <View style={[styles.button, { marginTop: 20 }]}>
                     <Button color='green' title="Buscar archivo en el dispositivo"
                         onPress={() => { this.setState({ showModal: true }) }} />
                 </View>
@@ -311,9 +311,8 @@ const styles = StyleSheet.create({
     button: {
         marginLeft: '25%',
         textAlign: 'center',
-        marginTop: 20,
         width: '50%',
-        marginBottom: '10%'
+        marginBottom: 20
     },
     touchable: {
         height: '20%',

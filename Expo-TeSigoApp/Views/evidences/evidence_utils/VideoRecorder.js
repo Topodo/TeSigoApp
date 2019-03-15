@@ -161,6 +161,7 @@ export default class ShowCamera extends React.Component {
                             isMuted={false}
                             resizeMode="cover"
                             shouldPlay
+                            useNativeControls={true}
                             style={styles.image} />
                         <View style={styles.imageToolbar}>
                             <MaterialIcons name="delete" style={styles.deleteIcon}

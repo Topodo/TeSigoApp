@@ -1,8 +1,7 @@
 import React from "react"
-import { StyleSheet, Text, View, Dimensions, ActivityIndicator, Image } from "react-native"
+import { StyleSheet, Text, View, Dimensions, ActivityIndicator, Image, Slider, ScrollView } from "react-native"
 import { Audio, Video } from 'expo'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
-import { ScrollView } from "react-native-gesture-handler";
 
 export default class ShowEvidence extends React.Component {
     constructor(props) {
@@ -13,7 +12,11 @@ export default class ShowEvidence extends React.Component {
             evidenceName: null,
             evidenceContext: null,
             evidenceType: null,
-            isLoading: true
+            isLoading: true,
+            isPaused: true,
+            durationMillis: 0,
+            positionMillis: 0,
+            playedTime: 0
         }
     }
 
@@ -57,7 +60,7 @@ export default class ShowEvidence extends React.Component {
                     volume={1.0}
                     isMuted={false}
                     resizeMode="cover"
-                    shouldPlay
+                    useNativeControls={true}
                     style={styles.evidence} />
             </View>
         )
@@ -73,13 +76,82 @@ export default class ShowEvidence extends React.Component {
         )
     }
 
-    // Método que renderiza el reproductor de audio
-    renderAudioPlayer() {
+    renderPlayButton() {
         return (
-            <View style={styles.evidence}>
-                <MaterialCommunityIcons name="microphone" style={styles.mic} />
+            <View style={{ alignItems: "center" }}>
+                <MaterialCommunityIcons name="play" style={styles.sendIcon}
+                    onPress={() => { this.playAudio() }} />
+                <Text>Reproducir</Text>
             </View>
         )
+    }
+
+    renderPauseButton() {
+        return (
+            <View style={{ alignItems: "center" }}>
+                <MaterialCommunityIcons name="pause" style={styles.sendIcon}
+                    onPress={() => { this.pauseAudio() }} />
+                <Text>Pausar</Text>
+            </View>
+        )
+    }
+
+    // Método que renderiza el reproductor de audio
+    renderAudioPlayer() {
+        let controlButton = this.state.isPaused ? this.renderPlayButton() : this.renderPauseButton()
+        return (
+            <View style={styles.evidence}>
+                <View style={styles.audioControl}>
+                    {controlButton}
+                </View>
+            </View>
+        )
+    }
+
+    // Método que se encarga de reproducir un audio
+    async playAudio() {
+        try {
+            this.timer = setInterval(() => {
+                // Se verifica si se terminó la reproducción
+                if (this.state.playedTime * 1000 >= this.state.durationMillis && this.state.playedTime > 0) {
+                    this.setState({
+                        playedTime: 0,
+                        durationMillis: 0,
+                        isPaused: true
+                    })
+                    this.soundObject = new Audio.Sound()
+                    clearInterval(this.timer)
+                }
+                // Se verifica que se haya cargado el audio, para ello basta con ver si la duración es mayor a 0
+                else if (this.state.durationMillis > 0)
+                    // Cada un segundo se aumenta el contador
+                    this.setState({
+                        playedTime: (this.state.playedTime + 1)
+                    })
+            }, 1000)
+            if (this.state.durationMillis === 0) {
+                await this.soundObject.loadAsync({ uri: this.state.evidenceUri });
+                const status = await this.soundObject.getStatusAsync()
+                this.setState({
+                    durationMillis: status.durationMillis
+                })
+            }
+            await this.soundObject.playAsync();
+            this.setState({
+                isPaused: false
+            })
+        } catch (error) {
+            console.error(error)
+        }
+    }
+
+    // Método que se encarga de pausar el audio
+    async pauseAudio() {
+        clearInterval(this.timer)
+        await this.setState({
+            isPaused: true
+        })
+        await this.soundObject.pauseAsync()
     }
 
     componentWillMount() {
@@ -91,31 +163,33 @@ export default class ShowEvidence extends React.Component {
             evidenceContext: params.evidence.contextoEvidencia,
             evidenceType: params.evidence.tipoEvidencia,
         })
+        this.soundObject = new Audio.Sound()
     }
 
-    async componentDidMount() {
-        await this.setState({
+    componentDidMount() {
+        this.setState({
             isLoading: false
         })
-
-        // Se verifica si es un audio
-        if (this.state.evidenceType === "audio") {
-            this.soundObject = new Audio.Sound();
-            try {
-                await this.soundObject.loadAsync({ uri: this.state.evidenceUri });
-                await this.soundObject.playAsync();
-            } catch (error) {
-                console.error(error)
-            }
-        }
     }
 
     render() {
         if (this.state.isLoading) {
+            let loadingText = ""
+            switch (this.state.evidenceType) {
+                case "photo":
+                    loadingText = "Cargando la evidencia fotográfica"
+                    break
+                case "video":
+                    loadingText = "Cargando la evidencia audiovisual"
+                    break
+                case "audio":
+                    loadingText = "Cargando la evidencia de audio"
+                    break
+            }
             return (
                 <View style={styles.activityIndicator}>
                     <Text style={styles.loadingText}>
-                        Cargando el listado de evidencias cualitativas
+                        {loadingText}
                     </Text>
                     <ActivityIndicator size='large' />
                 </View>
@@ -167,15 +241,20 @@ const styles = StyleSheet.create({
     },
     audioControl: {
         height: height * 0.1,
-        backgroundColor: 'black',
+        backgroundColor: 'white',
         alignItems: 'center',
         justifyContent: 'center',
         flexDirection: 'row'
     },
+    sendIcon: {
+        fontSize: height * 0.1,
+        color: 'black',
+        marginTop: height * 0.05
+    },
     sliderContainer: {
         alignItems: 'center',
         height: height * 0.1,
-        backgroundColor: 'black'
+        backgroundColor: 'white'
     },
     slider: {
         width: width * 0.8

@@ -235,8 +235,6 @@ const styles = StyleSheet.create({
         marginTop: 15,
         marginLeft: '4%',
         marginRight: '4%',
-        borderWidth: 1.5,
-        borderColor: '#429b00',
         alignItems: 'center',
         marginBottom: 10,
     },
