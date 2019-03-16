@@ -207,7 +207,10 @@ export default class EvidenceForm extends Component {
     render() {
         let calendar = this.state.showCalendar ?
             <Calendar onDayPress={day => {
-                this.setState({ evidenceDate: day.dateString })
+                this.setState({
+                    evidenceDate: day.dateString,
+                    showCalendar: false
+                })
             }} /> : null
         let calendarArrow = this.state.showCalendar ?
             [{ rotate: '-180deg' }] : [{ rotate: '0deg' }]
@@ -242,6 +245,9 @@ export default class EvidenceForm extends Component {
                             style={[styles.ArrowImage, { transform: calendarArrow }]} />
                     </View>
                 </TouchableOpacity>
+                <Text style={styles.dateText}>
+                    {this.state.evidenceDate}
+                </Text>
                 {calendar}
                 {uploadStatus}
             </ScrollView>
@@ -253,6 +259,10 @@ const height = Dimensions.get('window').height * 0.03;
 
 // Definición de estilos
 const styles = StyleSheet.create({
+    dateText: {
+        marginLeft: '5%',
+        fontSize: 12
+    },
     loadingText: {
         fontSize: 22,
         textAlign: 'center',
