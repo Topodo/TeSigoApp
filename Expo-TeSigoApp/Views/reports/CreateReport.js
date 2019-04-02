@@ -5,10 +5,26 @@ import {
     View,
     Text,
     Button,
-    Alert
+    Alert,
+    TouchableOpacity,
+    Image,
+    Dimensions
 } from 'react-native';
 import { FormLabel, FormInput, FormValidationMessage } from 'react-native-elements'
+import {
+    Calendar,
+    LocaleConfig
+} from 'react-native-calendars'
 import APIHandler from '../../Utils/APIHandler'
+
+// Configuración del calendario en español
+LocaleConfig.locales['cl'] = {
+    monthNames: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+    monthNamesShort: ['En', 'Feb', 'Mar', 'Ab', 'Ma', 'Jun', 'Jul', 'Ago', 'Sept', 'Oct', 'Nov', 'Dic'],
+    dayNames: ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'],
+    dayNamesShort: ['Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab', 'Dom']
+}
+LocaleConfig.defaultLocale = 'cl'
 
 export default class CreateReport extends Component {
     constructor(props) {
@@ -17,9 +33,11 @@ export default class CreateReport extends Component {
             professorName: '',
             reportName: '',
             reportDescription: '',
+            reportDate: '',
             idStudent: 1,
             studentName: '',
-            course: ''
+            course: '',
+            showCalendar: false,
         }
         this.APIHandler = new APIHandler()
     }
@@ -49,7 +67,7 @@ export default class CreateReport extends Component {
 
     // Método que redirige la navegación a la vista del listado de reportes del alumno, luego de subir el reporte
     goReportsList() {
-        if (this.state.reportName === '' || this.state.reportDescription === '') {
+        if (this.state.reportName === '' || this.state.reportDescription === '' || this.state.reportDate === '') {
             Alert.alert(
                 'Creación de reporte',
                 'Todos los campos son obligatorios',
@@ -61,7 +79,8 @@ export default class CreateReport extends Component {
             {
                 nombreProfesor: this.state.professorName,
                 descripcionReporte: this.state.reportDescription,
-                asunto: this.state.reportName
+                asunto: this.state.reportName,
+                fecha: this.state.reportDate
             })
             .then(response => {
                 // Una vez se haya realizado los cambios, se lanza una alerta indicando si hubo éxito o no
@@ -84,9 +103,25 @@ export default class CreateReport extends Component {
                     course: this.state.course
                 })
             })
+            .catch(error => {
+                Alert.alert(
+                    'Creación de reporte',
+                    'Ocurrió un error interno, inténtelo nuevamente',
+                    [{ text: 'OK' }]
+                )
+            })
     }
 
     render() {
+        let calendar = this.state.showCalendar ?
+            <Calendar onDayPress={day => {
+                this.setState({
+                    reportDate: day.dateString,
+                    showCalendar: false
+                })
+            }} /> : null
+        let calendarArrow = this.state.showCalendar ?
+            [{ rotate: '-180deg' }] : [{ rotate: '0deg' }]
         return (
             <ScrollView style={styles.backColor}>
                 <Text style={styles.titleText}>
@@ -101,13 +136,22 @@ export default class CreateReport extends Component {
                     containerStyle={styles.InputContainer}
                     multiline />
                 <FormLabel> Descripción del reporte </FormLabel>
-                <FormInput onChangeText={text => {
-                    this.setState({
-                        reportDescription: text
-                    })
-                }}
+                <FormInput onChangeText={text => this.setState({ reportDescription: text })}
                     containerStyle={styles.InputContainer}
                     multiline />
+                <TouchableOpacity onPress={() => this.setState({ showCalendar: !this.state.showCalendar })}>
+                    <View style={[styles.flowRight, { marginBottom: '12%' }]}>
+                        <FormLabel>
+                            Fecha del reporte
+                        </FormLabel>
+                        <Image source={require('../Images/expand-arrow.png')}
+                            style={[styles.ArrowImage, { transform: calendarArrow }]} />
+                    </View>
+                </TouchableOpacity>
+                <Text style={styles.dateText}>
+                    {this.state.reportDate}
+                </Text>
+                {calendar}
                 <View style={styles.button}>
                     <Button title="Crear reporte"
                         color='#429b00'
@@ -119,6 +163,8 @@ export default class CreateReport extends Component {
         )
     }
 }
+
+const height = Dimensions.get('window').height * 0.03;
 
 const styles = StyleSheet.create({
     backColor: {
@@ -146,6 +192,20 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         marginTop: '7%',
         marginBottom: '7%'
+    },
+    dateText: {
+        marginLeft: '5%',
+        fontSize: 12
+    },
+    ArrowImage: {
+        width: '3%',
+        height: height,
+        marginTop: 12
+    },
+    flowRight: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        alignSelf: 'stretch',
     },
 })
 
