@@ -7,6 +7,7 @@ import {
     StyleSheet,
     ActivityIndicator
 } from 'react-native';
+import * as firebase from 'firebase';
 import APIHandler from '../Utils/APIHandler';
 
 export default class StudentProfile extends Component {
@@ -20,7 +21,8 @@ export default class StudentProfile extends Component {
             idCourse: -1,
             expandableItems: [],
             subjects: [],
-            student: {}
+            student: {},
+            professorType: '',
         }
         this.APIHandler = new APIHandler();
     }
@@ -97,6 +99,93 @@ export default class StudentProfile extends Component {
         })
     }
 
+    // Método que renderiza el botón para mostrar avance
+    renderShowProgress(info) {
+        return (
+            <View style={styles.button}>
+                <Button
+                    title='Ver avance'
+                    color='#429b00'
+                    onPress={this.getOAs.bind(this, info)}>
+                </Button>
+            </View>
+        )
+    }
+
+    // Método que renderiza el botón para asignar avance
+    renderSetProgress(info) {
+        if (this.state.professorType === 'profesor')
+            return (
+                <View style={styles.button}>
+                    <Button
+                        title="Asignar avance"
+                        color='#429b00'
+                        onPress={this.setOAs.bind(this, info)}>
+                    </Button>
+                </View>
+            )
+        else
+            return null
+    }
+
+    // Método que renderiza el botón para mostrar evidencias
+    renderShowEvidences(info) {
+        return (
+            <View style={styles.button}>
+                <Button
+                    title='Ver evidencias'
+                    color='#429b00'
+                    onPress={this.getEvidences.bind(this, info)}>
+                </Button>
+            </View>
+        )
+    }
+
+    // Método que renderiza el botón para asignar evidencias
+    renderSetEvidences(info) {
+        if (this.state.professorType === 'profesor' || this.state.professorType === 'paradocente')
+            return (
+                <View style={styles.button}>
+                    <Button
+                        title="Asignar evidencias"
+                        color='#429b00'
+                        onPress={this.setEvidences.bind(this, info)}>
+                    </Button>
+                </View>
+            )
+        else
+            return null
+    }
+
+    // Método que renderiza el botón para visualizar reportes
+    renderShowReports(info) {
+        return (
+            <View style={styles.button}>
+                <Button
+                    title="Ver reportes"
+                    color='#429b00'
+                    onPress={this.getReports.bind(this, info)}>
+                </Button>
+            </View>
+        )
+    }
+
+    // Método que renderiza el botón para asignar reportes
+    renderSetReports(info) {
+        if (this.state.professorType === 'profesor' || this.state.professorType === 'paradocente')
+            return (
+                <View style={styles.button}>
+                    <Button
+                        title="Asignar reporte"
+                        color='#429b00'
+                        onPress={this.setReports.bind(this, info)}>
+                    </Button>
+                </View>
+            )
+        else
+            return null
+    }
+
     // Método que renderiza la información del alumno
     renderInfo(info, id) {
         return (
@@ -107,48 +196,12 @@ export default class StudentProfile extends Component {
                 <Text style={styles.CourseText}>
                     {this.state.course}
                 </Text>
-                <View style={styles.button}>
-                    <Button key={id + 3}
-                        title='Ver avance'
-                        color='#429b00'
-                        onPress={this.getOAs.bind(this, info)}>
-                    </Button>
-                </View>
-                <View style={styles.button}>
-                    <Button key={id + 4}
-                        title="Asignar avance"
-                        color='#429b00'
-                        onPress={this.setOAs.bind(this, info)}>
-                    </Button>
-                </View>
-                <View style={styles.button}>
-                    <Button key={id + 3}
-                        title='Ver evidencias'
-                        color='#429b00'
-                        onPress={this.getEvidences.bind(this, info)}>
-                    </Button>
-                </View>
-                <View style={styles.button}>
-                    <Button key={id + 4}
-                        title="Asignar evidencias"
-                        color='#429b00'
-                        onPress={this.setEvidences.bind(this, info)}>
-                    </Button>
-                </View>
-                <View style={styles.button}>
-                    <Button key={id + 4}
-                        title="Ver reportes"
-                        color='#429b00'
-                        onPress={this.getReports.bind(this, info)}>
-                    </Button>
-                </View>
-                <View style={styles.button}>
-                    <Button key={id + 4}
-                        title="Asignar reportes"
-                        color='#429b00'
-                        onPress={this.setReports.bind(this, info)}>
-                    </Button>
-                </View>
+                {this.renderShowProgress(info)}
+                {this.renderSetProgress(info)}
+                {this.renderShowReports(info)}
+                {this.renderSetReports(info)}
+                {this.renderShowEvidences(info)}
+                {this.renderSetEvidences(info)}
             </View>
         );
     }
@@ -165,8 +218,21 @@ export default class StudentProfile extends Component {
     }
 
     componentDidMount() {
-        this.setState({
-            isLoading: false
+        firebase.auth().onAuthStateChanged(user => {
+            // Se obtienen los datos del profesor
+            this.APIHandler.getFromAPI('http://206.189.195.214:8080/api/profesor/' + user.uid)
+                .then(response => {
+                    if (response.tipo === null)
+                        this.setState({
+                            professorType: 'profesor',
+                            isLoading: false
+                        })
+                    else
+                        this.setState({
+                            professorType: response.tipo,
+                            isLoading: false
+                        })
+                })
         })
     }
 
@@ -181,10 +247,9 @@ export default class StudentProfile extends Component {
                 </View>
             );
         }
-        const studentComp = this.renderInfo(this.state.student, 0)
         return (
             <ScrollView style={styles.backColor}>
-                {studentComp}
+                {this.renderInfo(this.state.student, 0)}
             </ScrollView>
         )
     }
