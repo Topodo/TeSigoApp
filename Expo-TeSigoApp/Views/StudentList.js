@@ -36,6 +36,12 @@ export default class StudentList extends Component {
         })
     }
 
+    orderByLastName(students) {
+        return students.sort((prevStudent, nextStudent) => {
+            return (prevStudent.apellidoPaternoAlumno - nextStudent.apellidoPaternoAlumno) * -1
+        })
+    }
+
     componentWillMount() {
         const { params } = this.props.navigation.state;
         this.setState({
@@ -52,7 +58,7 @@ export default class StudentList extends Component {
                     expandableItems.push(false);
                 }
                 this.setState({
-                    students: resultJSON,
+                    students: this.orderByLastName(resultJSON),
                     isLoading: false,
                     expandableItems: expandableItems
                 })

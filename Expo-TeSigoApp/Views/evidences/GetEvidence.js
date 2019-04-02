@@ -76,6 +76,14 @@ export default class GetEvidence extends React.Component {
         );
     }
 
+    orderByDate(evidences) {
+        return evidences.sort((prevEvidence, nextEvidence) => {
+            let prevDate = new Date(prevEvidence.fechaEvidencia)
+            let nextDate = new Date(nextEvidence.fechaEvidencia)
+            return nextDate - prevDate
+        })
+    }
+
     componentWillMount() {
         const { params } = this.props.navigation.state;
         this.setState({
@@ -90,9 +98,9 @@ export default class GetEvidence extends React.Component {
         this.APIHandler.getFromAPI('http://206.189.195.214:8080/api/formularioEvidencia/alumno/' + this.state.idStudent)
             .then(response => {
                 const evidence = {
-                    pictures: response[1].evidencias,
-                    videos: response[0].evidencias,
-                    audios: response[2].evidencias
+                    pictures: this.orderByDate(response[1].evidencias),
+                    videos: this.orderByDate(response[0].evidencias),
+                    audios: this.orderByDate(response[2].evidencias)
                 }
                 this.setState({
                     evidence: evidence,

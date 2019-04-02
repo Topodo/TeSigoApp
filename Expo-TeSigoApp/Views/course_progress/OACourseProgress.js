@@ -220,7 +220,7 @@ const styles = StyleSheet.create({
         marginRight: '3%',
         marginLeft: '3%',
         alignItems: 'center',
-        marginBottom: 12
+        marginBottom: 30
     },
     progressBar: {
         width: '60%',

@@ -39,6 +39,33 @@ export default class ReportsList extends Component {
         },
     }
 
+    // Método que retorna la fecha en formato DD/MM/AA
+    formatDate(date) {
+        if (date === null)
+            return '01/01/2012'
+        let year = ''
+        let month = ''
+        let day = ''
+        for (i = 0; i < 4; i++) {
+            year = year + date[i]
+        }
+        for (j = 5; j < 7; j++) {
+            month = month + date[j]
+        }
+        for (k = 8; k < 10; k++) {
+            day = day + date[k]
+        }
+        return day + '/' + month + '/' + year
+    }
+
+    orderByDate(reports) {
+        return reports.sort((prevReport, nextReport) => {
+            let prevDate = new Date(prevReport.fecha)
+            let nextDate = new Date(nextReport.fecha)
+            return nextDate - prevDate
+        })
+    }
+
     componentWillMount() {
         const { params } = this.props.navigation.state
         this.setState({
@@ -56,7 +83,7 @@ export default class ReportsList extends Component {
                     aux.push(false)
                 }
                 this.setState({
-                    reports: response,
+                    reports: this.orderByDate(response),
                     showReport: aux,
                     isLoading: false
                 })
@@ -86,8 +113,11 @@ export default class ReportsList extends Component {
                     }}>
                     <View style={[styles.flowRight]}>
                         <View style={styles.SubItemText}>
-                            <Text >
-                                {(index + 1).toString() + '.- ' + report['asunto']}
+                            <Text>
+                                {report['asunto']}
+                            </Text>
+                            <Text>
+                                {this.formatDate(report['fecha'])}
                             </Text>
                         </View>
                         <Image source={require('../Images/expand-arrow.png')}
@@ -149,6 +179,7 @@ const styles = StyleSheet.create({
         marginRight: '10%',
         borderWidth: 1.5,
         borderColor: '#429b00',
+        borderRadius: 8,
         alignItems: 'center',
         marginBottom: 10,
         marginTop: 10
@@ -157,7 +188,6 @@ const styles = StyleSheet.create({
         marginLeft: 4,
         marginRight: 4,
         width: width,
-        backgroundColor: '#f7ffe6'
     },
     flowRight: {
         flexDirection: 'row',
