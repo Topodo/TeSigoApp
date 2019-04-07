@@ -10,6 +10,7 @@ import {
     ActivityIndicator
 } from 'react-native';
 import APIHandler from '../../Utils/APIHandler'
+import NetworkError from '../error_components/NetworkError'
 
 export default class ReportsList extends Component {
     constructor(props) {
@@ -21,6 +22,7 @@ export default class ReportsList extends Component {
             showReport: [],
             reports: [],
             isLoading: true,
+            errorOccurs: false
         }
         this.APIHandler = new APIHandler()
     }
@@ -66,16 +68,12 @@ export default class ReportsList extends Component {
         })
     }
 
-    componentWillMount() {
-        const { params } = this.props.navigation.state
+    // Método que accede a la data de la API
+    fetchData() {
         this.setState({
-            idStudent: params.idStudent,
-            studentName: params.studentName,
-            course: params.course
+            isLoading: true,
+            errorOccurs: false
         })
-    }
-
-    componentDidMount() {
         this.APIHandler.getFromAPI('http://206.189.195.214:8080/api/alumno/' + this.state.idStudent + '/reportes')
             .then(response => {
                 let aux = []
@@ -88,7 +86,25 @@ export default class ReportsList extends Component {
                     isLoading: false
                 })
             })
-            .catch(error => console.error(error))
+            .catch(error => {
+                this.setState({
+                    isLoading: false,
+                    errorOccurs: true
+                })
+            })
+    }
+
+    componentWillMount() {
+        const { params } = this.props.navigation.state
+        this.setState({
+            idStudent: params.idStudent,
+            studentName: params.studentName,
+            course: params.course
+        })
+    }
+
+    componentDidMount() {
+        this.fetchData()
     }
 
     // Método que renderiza un reporte
@@ -142,6 +158,14 @@ export default class ReportsList extends Component {
                 </View>
             );
         }
+
+        // Si ocurrió un error al hacer fetch
+        if(this.state.errorOccurs) {
+            return (
+                <NetworkError parentFetchData={this.fetchData.bind(this)}/>
+            )
+        }
+
         let reports = this.state.reports.map((report, index) => {
             return (this.renderReport(report, index))
         })

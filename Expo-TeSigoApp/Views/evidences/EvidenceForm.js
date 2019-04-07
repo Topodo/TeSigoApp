@@ -12,6 +12,7 @@ import {
     Text
 } from 'react-native';
 import { FormLabel, FormInput } from 'react-native-elements'
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import {
     Calendar,
     LocaleConfig
@@ -217,7 +218,7 @@ export default class EvidenceForm extends Component {
 
         let uploadStatus = this.state.isUploading ? this.renderActivityIndicator() : this.renderUploadButton()
         return (
-            <ScrollView style={styles.backColor}>
+            <KeyboardAwareScrollView style={styles.backColor}>
                 <FormLabel>
                     Nombre de la evidencia
                 </FormLabel>
@@ -250,7 +251,7 @@ export default class EvidenceForm extends Component {
                 </Text>
                 {calendar}
                 {uploadStatus}
-            </ScrollView>
+            </KeyboardAwareScrollView>
         )
     }
 }

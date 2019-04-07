@@ -8,9 +8,10 @@ import {
     Alert,
     TouchableOpacity,
     Image,
-    Dimensions
+    Dimensions,
 } from 'react-native';
 import { FormLabel, FormInput, FormValidationMessage } from 'react-native-elements'
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import {
     Calendar,
     LocaleConfig
@@ -123,7 +124,7 @@ export default class CreateReport extends Component {
         let calendarArrow = this.state.showCalendar ?
             [{ rotate: '-180deg' }] : [{ rotate: '0deg' }]
         return (
-            <ScrollView style={styles.backColor}>
+            <KeyboardAwareScrollView style={styles.backColor}>
                 <Text style={styles.titleText}>
                     {this.state.studentName + ' - ' + this.state.course}
                 </Text>
@@ -159,7 +160,7 @@ export default class CreateReport extends Component {
                             this.goReportsList()
                         }} />
                 </View>
-            </ScrollView>
+            </KeyboardAwareScrollView>
         )
     }
 }

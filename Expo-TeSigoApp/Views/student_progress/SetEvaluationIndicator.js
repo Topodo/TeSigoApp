@@ -45,7 +45,7 @@ export default class EvaluationIndicator extends Component {
     };
 
     // Método que redirige la navegación a la vista de asignación de objetivos de aprendizaje
-    goToStudentProfile() {
+    setOAs() {
         this.setState({
             isLoading: true
         })
@@ -174,7 +174,7 @@ export default class EvaluationIndicator extends Component {
                                     )
                                 })
                                 .then(() => {
-                                    this.goToStudentProfile()
+                                    this.setOAs()
                                 })
                         }} />
                 </View>

@@ -13,6 +13,7 @@ import {
 import { CheckBox } from 'react-native-elements';
 import APIHandler from '../../Utils/APIHandler';
 import { NavigationEvents } from 'react-navigation'
+import NetworkError from '../error_components/NetworkError'
 
 export default class ObjectivesPerStudent extends React.Component {
     constructor(props) {
@@ -26,7 +27,8 @@ export default class ObjectivesPerStudent extends React.Component {
             checkedItems: [],
             idStudent: '',
             idCourse: '',
-            alreadyMounted: false
+            alreadyMounted: false,
+            errorOccurs: false
         }
         this.APIHandler = new APIHandler();
     }
@@ -117,6 +119,10 @@ export default class ObjectivesPerStudent extends React.Component {
 
     // Método que obtiene la data de los OAS desde el servidor
     getOASData() {
+        this.setState({
+            isLoading: true,
+            errorOccurs: false
+        })
         // Se obtienen las unidades
         this.APIHandler.getFromAPI('http://206.189.195.214:8080/api/curso/' + this.state.idCourse + '/unidades')
             .then(response => {
@@ -145,9 +151,11 @@ export default class ObjectivesPerStudent extends React.Component {
                     ).catch(error => console.error(error))
             })
             .catch(error => {
-                console.error(error)
-            }
-            )
+                this.setState({
+                    isLoading: false,
+                    errorOccurs: true
+                })
+            })
     }
 
     componentWillMount() {
@@ -186,6 +194,14 @@ export default class ObjectivesPerStudent extends React.Component {
                 </View>
             );
         }
+
+        // Si ocurrió un error al hacer fetch
+        if(this.state.errorOccurs) {
+            return (
+                <NetworkError parentFetchData={this.getOASData.bind(this)}/>
+            )
+        }
+
         // Picker que contiene los cursos
         let subjectsItems = this.state.subjectsNames.map((val, ind) => {
             return <Picker.Item key={ind} value={val} label={val} />

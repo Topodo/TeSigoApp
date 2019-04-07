@@ -10,6 +10,7 @@ import {
     ActivityIndicator
 } from 'react-native';
 import APIHandler from '../Utils/APIHandler';
+import NetworkError from './error_components/NetworkError'
 
 export default class StudentList extends Component {
     constructor(props) {
@@ -20,7 +21,8 @@ export default class StudentList extends Component {
             course: null,
             idCourse: -1,
             expandableItems: [],
-            subjects: []
+            subjects: [],
+            errorOccurs: false
         }
         this.APIHandler = new APIHandler();
     }
@@ -42,15 +44,12 @@ export default class StudentList extends Component {
         })
     }
 
-    componentWillMount() {
-        const { params } = this.props.navigation.state;
+    // Método que accede a la data de la API
+    fetchData() {
         this.setState({
-            course: params.course,
-            idCourse: params.idCourse,
-        });
-    }
-
-    componentDidMount() {
+            isLoading: true,
+            errorOccurs: false
+        })
         this.APIHandler.getFromAPI('http://206.189.195.214:8080/api/curso/' + this.state.idCourse + '/alumnos').
             then(resultJSON => {
                 let expandableItems = []
@@ -63,6 +62,24 @@ export default class StudentList extends Component {
                     expandableItems: expandableItems
                 })
             })
+            .catch(error => {
+                this.setState({
+                    isLoading: false,
+                    errorOccurs: true
+                })
+            })
+    }
+
+    componentWillMount() {
+        const { params } = this.props.navigation.state;
+        this.setState({
+            course: params.course,
+            idCourse: params.idCourse,
+        });
+    }
+
+    componentDidMount() {
+        this.fetchData()
     }
 
     static navigationOptions = {
@@ -108,6 +125,13 @@ export default class StudentList extends Component {
     }
 
     render() {
+        // Si ocurrió un error al hacer fetch
+        if(this.state.errorOccurs) {
+            return (
+                <NetworkError parentFetchData={this.fetchData.bind(this)}/>
+            )
+        }
+
         let studentsList = this.state.isLoading === true ? null :
             this.state.students.map((student, index) => {
                 return (this.renderInfo(student, index));
@@ -183,6 +207,7 @@ const styles = StyleSheet.create({
         marginRight: '4%',
         borderWidth: 1.5,
         borderColor: '#429b00',
+        borderRadius: 8,
         alignItems: 'center',
         marginBottom: 10,
     },

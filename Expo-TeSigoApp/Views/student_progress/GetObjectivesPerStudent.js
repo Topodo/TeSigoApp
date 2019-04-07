@@ -12,7 +12,7 @@ import {
     ActivityIndicator,
     Button
 } from 'react-native';
-
+import NetworkError from '../error_components/NetworkError'
 import APIHandler from '../../Utils/APIHandler';
 
 const heightDevice = Dimensions.get('window').width * 0.08;
@@ -29,7 +29,8 @@ export default class GetObjectivesPerStudent extends React.Component {
             idStudent: -1,
             isLoading: true,
             idCourse: -1,
-            idSubject: -1
+            idSubject: -1,
+            errorOccurs: false
         }
         this.APIHandler = new APIHandler();
     }
@@ -79,18 +80,12 @@ export default class GetObjectivesPerStudent extends React.Component {
         },
     };
 
-    // Método que agrega al state los datos provenientes de la lista de alumnos 
-    componentWillMount() {
-        const { params } = this.props.navigation.state
+    // Método que accede a la data de la API
+    fetchData() {
         this.setState({
-            idStudent: params.idStudent,
-            idCourse: params.idCourse,
-            name: params.studentName,
-            course: params.course
-        });
-    }
-
-    componentDidMount() {
+            isLoading: true,
+            errorOccurs: false
+        })
         // Se obtienen las unidades
         this.APIHandler.getFromAPI('http://206.189.195.214:8080/api/curso/' + this.state.idCourse + '/unidades')
             .then(response => {
@@ -113,9 +108,26 @@ export default class GetObjectivesPerStudent extends React.Component {
                     )
             })
             .catch(error => {
-                console.error(error)
-            }
-            )
+                this.setState({
+                    isLoading: false,
+                    errorOccurs: true
+                })
+            })
+    }
+
+    // Método que agrega al state los datos provenientes de la lista de alumnos 
+    componentWillMount() {
+        const { params } = this.props.navigation.state
+        this.setState({
+            idStudent: params.idStudent,
+            idCourse: params.idCourse,
+            name: params.studentName,
+            course: params.course
+        });
+    }
+
+    componentDidMount() {
+        this.fetchData()
     }
 
     render() {
@@ -129,6 +141,14 @@ export default class GetObjectivesPerStudent extends React.Component {
                 </View>
             );
         }
+
+        // Si ocurrió un error al hacer fetch
+        if(this.state.errorOccurs) {
+            return (
+                <NetworkError parentFetchData={this.fetchData.bind(this)}/>
+            )
+        }
+
         // Picker que contiene los cursos
         let subjectsItems = !this.state.isLoading ? this.state.subjectsNames.map((val, ind) => {
             return <Picker.Item key={ind} value={val} label={val} />

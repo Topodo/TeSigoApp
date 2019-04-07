@@ -31,17 +31,6 @@ import SelectEvidence from './Views/evidences/SelectEvidence'
 import ShowEvidence from './Views/evidences/ShowEvidence'
 import Logout from './Views/Logout'
 
-const headerStyle = {
-    headerStyle: {
-        backgroundColor: '#008000',
-    },
-    headerTintColor: '#fff',
-    headerTitleStyle: {
-        fontWeight: 'bold',
-        color: '#fff'
-    },
-}
-
 const AppNavigator = createStackNavigator({
     Home: {
         screen: MainPage,

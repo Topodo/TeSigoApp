@@ -12,7 +12,8 @@ import {
     Alert
 } from 'react-native';
 import { NavigationEvents } from 'react-navigation'
-import APIHandler from '../Utils/APIHandler';
+import APIHandler from '../Utils/APIHandler'
+import NetworkError from './error_components/NetworkError'
 
 export default class GetCourses extends Component {
 
@@ -21,9 +22,32 @@ export default class GetCourses extends Component {
         this.state = {
             isLoading: true,
             idProfessorFirebase: null,
-            courses: null
+            courses: null,
+            errorOccurs: false
         }
         this.apiHandler = new APIHandler();
+    }
+
+    // Método que accede a la data de la API
+    fetchData() {
+        this.setState({
+            isLoading: true,
+            errorOccurs: false
+        })
+        this.backhandler = BackHandler.addEventListener('hardwareBackPress', this.handleBackButton)
+        this.apiHandler.getFromAPI('http://206.189.195.214:8080/api/profesor/' + this.state.idProfessorFirebase + '/cursos').
+            then(resultJSON => {
+                this.setState({
+                    courses: resultJSON,
+                    isLoading: false
+                })
+            })
+            .catch(error => {
+                this.setState({
+                    isLoading: false,
+                    errorOccurs: true
+                })
+            })
     }
 
     componentWillMount() {
@@ -34,26 +58,19 @@ export default class GetCourses extends Component {
     }
 
     componentWillUnmount() {
-        BackHandler.removeEventListener('hardwareBackPress', this.handleBackButton);
+        this.backhandler.remove()
     }
 
     componentDidMount() {
-        BackHandler.addEventListener('hardwareBackPress', this.handleBackButton)
-        this.apiHandler.getFromAPI('http://206.189.195.214:8080/api/profesor/' + this.state.idProfessorFirebase + '/cursos').
-            then(resultJSON => {
-                this.setState({
-                    courses: resultJSON,
-                    isLoading: false
-                })
-            })
+        this.fetchData()
     }
 
     componentDidFocus() {
-        BackHandler.addEventListener('hardwareBackPress', this.handleBackButton)
+        this.backhandler = BackHandler.addEventListener('hardwareBackPress', this.handleBackButton)
     }
 
     goToStudentsList(infoCourse) {
-        BackHandler.removeEventListener('hardwareBackPress', this.handleBackButton)
+        this.backhandler.remove()
         this.props.navigation.navigate("StudentList", {
             course: infoCourse.gradoCurso,
             idCourse: infoCourse.idCurso,
@@ -72,7 +89,7 @@ export default class GetCourses extends Component {
         );
     }
 
-    handleBackButton() {
+    async handleBackButton() {
         Alert.alert(
             'Cerrar la aplicación',
             '¿Desea cerrar la aplicación?', [{
@@ -115,13 +132,21 @@ export default class GetCourses extends Component {
                 </View>
             );
         }
+
+        // Si ocurrió un error al hacer fetch
+        if(this.state.errorOccurs) {
+            return (
+                <NetworkError parentFetchData={this.fetchData.bind(this)}/>
+            )
+        }
+
         let courses = this.state.courses ? this.state.courses.map((info, id) => {
             return (this.renderInfo(info, id));
         }) : null;
 
         return (
             <ScrollView style={styles.backColor}>
-                <NavigationEvents 
+                <NavigationEvents
                     onDidFocus={payload => this.componentDidFocus()} />
                 <Text style={styles.loadingText}>
                     Cursos

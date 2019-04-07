@@ -10,6 +10,7 @@ import {
     ActivityIndicator
 } from 'react-native';
 import APIHandler from '../../Utils/APIHandler';
+import NetworkError from '../error_components/NetworkError'
 
 export default class GetCourses extends Component {
 
@@ -18,9 +19,31 @@ export default class GetCourses extends Component {
         this.state = {
             isLoading: true,
             idProfessorFirebase: null,
-            courses: null
+            courses: null,
+            errorOccurs: false
         }
         this.apiHandler = new APIHandler();
+    }
+
+    // Método que accede a la data de la API
+    fetchData() {
+        this.setState({
+            isLoading: true,
+            errorOccurs: false
+        })
+        this.apiHandler.getFromAPI('http://206.189.195.214:8080/api/profesor/' + this.state.idProfessorFirebase + '/cursos').
+            then(resultJSON => {
+                this.setState({
+                    courses: resultJSON,
+                    isLoading: false
+                })
+            })
+            .catch(error => {
+                this.setState({
+                    isLoading: false,
+                    errorOccurs: true
+                })
+            })
     }
 
     componentWillMount() {
@@ -31,14 +54,7 @@ export default class GetCourses extends Component {
     }
 
     componentDidMount() {
-        this.apiHandler.getFromAPI('http://206.189.195.214:8080/api/profesor/' + this.state.idProfessorFirebase + '/cursos').
-            then(resultJSON => {
-                this.setState({
-                    courses: resultJSON,
-                    isLoading: false
-                })        
-            }
-        )
+        this.fetchData()
     }
 
     goToStudentsList(infoCourse) {
@@ -53,7 +69,7 @@ export default class GetCourses extends Component {
         return (
             <View key={id} style={styles.CourseContainer}>
                 <Button title={(id + 1).toString() + '.- ' + info.gradoCurso}
-                    onPress = {this.goToStudentsList.bind(this, info)}
+                    onPress={this.goToStudentsList.bind(this, info)}
                     color='#429b00'>
                 </Button>
             </View>
@@ -65,28 +81,36 @@ export default class GetCourses extends Component {
     };
 
     render() {
-        if(this.state.isLoading) {
-            return(
+        if (this.state.isLoading) {
+            return (
                 <View style={styles.activityIndicator}>
                     <Text style={styles.loadingText}>
                         Cargando mis cursos
                     </Text>
-                    <ActivityIndicator size='large'/>
+                    <ActivityIndicator size='large' />
                 </View>
             );
-        } 
+        }
+
+        // Si ocurrió un error al hacer fetch
+        if(this.state.errorOccurs) {
+            return (
+                <NetworkError parentFetchData={this.fetchData.bind(this)}/>
+            )
+        }
+
         let courses = this.state.courses ? this.state.courses.map((info, id) => {
             return (this.renderInfo(info, id));
         }) : null;
 
-        if(this.state.isLoading) {
-            return(
+        if (this.state.isLoading) {
+            return (
                 <View style={styles.backColor}>
-                    <ActivityIndicator/>
+                    <ActivityIndicator />
                 </View>
             );
         }
-        return(
+        return (
             <ScrollView style={styles.backColor}>
                 <Text style={styles.loadingText}>
                     Cursos

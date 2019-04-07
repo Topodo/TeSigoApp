@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import APIHandler from '../../Utils/APIHandler'
 import PureChart from 'react-native-pure-chart'
+import NetworkError from '../error_components/NetworkError'
 
 export default class OACourseProgress extends Component {
     constructor(props) {
@@ -18,9 +19,33 @@ export default class OACourseProgress extends Component {
             course: '',
             idOA: 6,
             IEs: [],
-            isLoading: true
+            isLoading: true,
+            errorOccurs: false
         }
         this.APIHandler = new APIHandler()
+    }
+
+    // Método que accede a la data de la API
+    fetchData() {
+        this.setState({
+            isLoading: true,
+            errorOccurs: false
+        })
+        // Se obtiene la data de los IEs del OA
+        this.APIHandler.getFromAPI('http://206.189.195.214:8080/api/objetivoAprendizaje/' + this.state.idOA
+            + '/curso/' + this.state.idCourse + '/avance')
+            .then(response => {
+                this.setState({
+                    IEs: response,
+                    isLoading: false
+                })
+            })
+            .catch(error => {
+                this.setState({
+                    isLoading: false,
+                    errorOccurs: true
+                })
+            })
     }
 
     componentWillMount() {
@@ -33,16 +58,7 @@ export default class OACourseProgress extends Component {
     }
 
     componentDidMount() {
-        // Se obtiene la data de los IEs del OA
-        this.APIHandler.getFromAPI('http://206.189.195.214:8080/api/objetivoAprendizaje/' + this.state.idOA
-            + '/curso/' + this.state.idCourse + '/avance')
-            .then(response => {
-                this.setState({
-                    IEs: response,
-                    isLoading: false
-                })
-            })
-            .catch(error => console.error(error))
+        this.fetchData()
     }
 
     // Método que redirige la navegación hacia el listado de alumnos ordenados por IE Completo/Incompleto
@@ -152,6 +168,14 @@ export default class OACourseProgress extends Component {
                 </View>
             );
         }
+        
+        // Si ocurrió un error al hacer fetch
+        if(this.state.errorOccurs) {
+            return (
+                <NetworkError parentFetchData={this.fetchData.bind(this)}/>
+            )
+        }
+
         let IEs = this.state.IEs.map((IE, index) => {
             return (this.renderIE(IE, index))
         })

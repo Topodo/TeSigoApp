@@ -67,7 +67,7 @@ export default class Login extends React.Component {
 
             // Se verifica si se autentificó correctamente el usuario
             if (this.state.isLogged) {
-                BackHandler.removeEventListener('hardwareBackPress', this.handleBackButton)
+                this.backhandler.remove()
                 this.props.navigation.navigate('GetCourses', {
                     idProfessor: user.uid
                 })
@@ -92,14 +92,14 @@ export default class Login extends React.Component {
     };
 
     componentDidMount() {
-        BackHandler.addEventListener('hardwareBackPress', this.handleBackButton)
+        this.backhandler = BackHandler.addEventListener('hardwareBackPress', this.handleBackButton)
     }
 
     componentDidFocus() {
-        BackHandler.addEventListener('hardwareBackPress', this.handleBackButton)
+        this.backhandler = BackHandler.addEventListener('hardwareBackPress', this.handleBackButton)
     }
 
-    handleBackButton() {
+    async handleBackButton() {
         Alert.alert(
             'Cerrar la aplicación',
             '¿Desea cerrar la aplicación?', [{
@@ -117,7 +117,7 @@ export default class Login extends React.Component {
     }
 
     componentWillUnmount() {
-        BackHandler.removeEventListener('hardwareBackPress', this.handleBackButton);
+        this.backhandler.remove()
     }
 
     render() {
@@ -164,13 +164,13 @@ export default class Login extends React.Component {
 // Definición de los estilos de la vista
 const style = StyleSheet.create({
     textTitle: {
-        marginBottom: '40%',
+        marginTop: '7%',
+        marginBottom: '10%',
         fontSize: 20,
         textAlign: 'center',
         color: '#000000'
     },
     container: {
-        flex: 1,
         justifyContent: 'center',
         alignItems: 'center'
     },

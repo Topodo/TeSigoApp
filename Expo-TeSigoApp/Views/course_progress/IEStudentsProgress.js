@@ -11,6 +11,7 @@ import {
     Dimensions
 } from 'react-native';
 import APIHandler from '../../Utils/APIHandler'
+import NetworkError from '../error_components/NetworkError'
 
 export default class IEStudentsProgress extends Component {
     constructor(props) {
@@ -24,21 +25,18 @@ export default class IEStudentsProgress extends Component {
             students: [],
             completeList: [],
             incompleteList: [],
-            selectedItems: [false, false] // Para desplegar los listados colapsables
+            selectedItems: [false, false], // Para desplegar los listados colapsables
+            errorOccurs: false
         }
         this.APIHandler = new APIHandler()
     }
 
-    componentWillMount() {
-        const { params } = this.props.navigation.state
+    // Método que accede a la data de la API
+    fetchData() {
         this.setState({
-            idCourse: params.idCourse,
-            idIE: params.idIE,
-            course: params.course
+            isLoading: true,
+            errorOccurs: false
         })
-    }
-
-    componentDidMount() {
         this.APIHandler.getFromAPI('http://206.189.195.214:8080/api/indicadorEvaluacion/' + this.state.idIE + '/curso/' + this.state.idCourse + '/ordenar')
             .then(response => {
                 this.setState({
@@ -57,7 +55,25 @@ export default class IEStudentsProgress extends Component {
                         })
                     })
             })
-            .catch(error => console.error(error))
+            .catch(error => {
+                this.setState({
+                    isLoading: false,
+                    errorOccurs: true
+                })
+            })
+    }
+
+    componentWillMount() {
+        const { params } = this.props.navigation.state
+        this.setState({
+            idCourse: params.idCourse,
+            idIE: params.idIE,
+            course: params.course
+        })
+    }
+
+    componentDidMount() {
+        this.fetchData()
     }
 
     // Método que obtiene los datos de un alumno
@@ -156,6 +172,14 @@ export default class IEStudentsProgress extends Component {
                 </View>
             );
         }
+
+        // Si ocurrió un error al hacer fetch
+        if(this.state.errorOccurs) {
+            return (
+                <NetworkError parentFetchData={this.fetchData.bind(this)}/>
+            )
+        }
+        
         let completeListComponent = this.renderStudentsList(this.state.completeList, "Indicador completado", 0)
         let incompleteListComponent = this.renderStudentsList(this.state.incompleteList, "Indicador no completado", 1)
 

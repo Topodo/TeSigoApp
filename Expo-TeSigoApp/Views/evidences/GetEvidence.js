@@ -13,6 +13,7 @@ import {
     ActivityIndicator
 } from 'react-native';
 import APIHandler from '../../Utils/APIHandler'
+import NetworkError from '../error_components/NetworkError'
 
 export default class GetEvidence extends React.Component {
 
@@ -25,6 +26,7 @@ export default class GetEvidence extends React.Component {
             expandableItems: [false, false, false], // [0]: Fotografías, [1]: Videos, [2]: Audios
             isLoading: true,
             idStudent: '',
+            errorOccurs: false
         }
         this.APIHandler = new APIHandler()
     }
@@ -84,17 +86,12 @@ export default class GetEvidence extends React.Component {
         })
     }
 
-    componentWillMount() {
-        const { params } = this.props.navigation.state;
+    // Método que accede a la data de la API
+    fetchData() {
         this.setState({
-            name: params.studentName,
-            course: params.course,
-            expandableItems: [false, false, false],
-            idStudent: params.idStudent,
-        });
-    }
-
-    componentDidMount() {
+            isLoading: true,
+            errorOccurs: false
+        })
         this.APIHandler.getFromAPI('http://206.189.195.214:8080/api/formularioEvidencia/alumno/' + this.state.idStudent)
             .then(response => {
                 const evidence = {
@@ -107,6 +104,26 @@ export default class GetEvidence extends React.Component {
                     isLoading: false
                 })
             })
+            .catch(error => {
+                this.setState({
+                    isLoading: false,
+                    errorOccurs: true
+                })
+            })
+    }
+
+    componentWillMount() {
+        const { params } = this.props.navigation.state;
+        this.setState({
+            name: params.studentName,
+            course: params.course,
+            expandableItems: [false, false, false],
+            idStudent: params.idStudent,
+        });
+    }
+
+    componentDidMount() {
+        this.fetchData()
     }
 
     static navigationOptions = {
@@ -134,6 +151,14 @@ export default class GetEvidence extends React.Component {
                 </View>
             );
         }
+
+        // Si ocurrió un error al hacer fetch
+        if(this.state.errorOccurs) {
+            return (
+                <NetworkError parentFetchData={this.fetchData.bind(this)}/>
+            )
+        }
+        
         // Fotografías
         let photos = this.state.expandableItems[0] === true ?
             this.state.evidence.pictures.map((info, id) => {
@@ -264,7 +289,7 @@ const styles = StyleSheet.create({
         marginLeft: 4,
         marginRight: 4,
         width: width,
-        backgroundColor: '#f7ffe6'
+        backgroundColor: 'white'
     },
     flowRight: {
         flexDirection: 'row',

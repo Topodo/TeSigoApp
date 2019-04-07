@@ -10,6 +10,7 @@ import {
     ActivityIndicator
 } from 'react-native';
 import APIHandler from '../../Utils/APIHandler'
+import NetworkError from '../error_components/NetworkError'
 
 export default class CourseSubjectProgress extends Component {
     constructor(props) {
@@ -22,7 +23,8 @@ export default class CourseSubjectProgress extends Component {
             idSubject: 2,
             progress: [],
             isLoading: true,
-            idsSubjects: []
+            idsSubjects: [],
+            errorOccurs: false
         }
         this.APIHandler = new APIHandler()
     }
@@ -58,15 +60,12 @@ export default class CourseSubjectProgress extends Component {
         })
     }
 
-    componentWillMount() {
-        const { params } = this.props.navigation.state
+    // Método que accede a la data de la API
+    fetchData() {
         this.setState({
-            idCourse: params.idCourse,
-            course: params.course,
+            isLoading: true,
+            errorOccurs: false
         })
-    }
-
-    componentDidMount() {
         // Se obtienen las unidades
         this.APIHandler.getFromAPI('http://206.189.195.214:8080/api/curso/' + this.state.idCourse + '/unidades')
             .then(response => {
@@ -98,13 +97,30 @@ export default class CourseSubjectProgress extends Component {
                             if (count === this.state.idsSubjects.length) {
                                 this.setState({
                                     progress: progressAux,
-                                    isLoading: false
+                                    isLoading: false,
                                 })
                             }
                         })
                 })
             })
-            .catch(error => console.error(error))
+            .catch(error => {
+                this.setState({
+                    isLoading: false,
+                    errorOccurs: true
+                })
+            })
+    }
+
+    componentWillMount() {
+        const { params } = this.props.navigation.state
+        this.setState({
+            idCourse: params.idCourse,
+            course: params.course,
+        })
+    }
+
+    componentDidMount() {
+        this.fetchData()
     }
 
     static navigationOptions = {
@@ -131,6 +147,13 @@ export default class CourseSubjectProgress extends Component {
                     <ActivityIndicator size='large' />
                 </View>
             );
+        }
+
+        // Si ocurrió un error al hacer fetch
+        if(this.state.errorOccurs) {
+            return (
+                <NetworkError parentFetchData={this.fetchData.bind(this)}/>
+            )
         }
 
         // Se renderiza el picker con las unidades

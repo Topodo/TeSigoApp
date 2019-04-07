@@ -5,10 +5,12 @@ import {
     Text,
     Button,
     StyleSheet,
-    ActivityIndicator
+    ActivityIndicator,
+    Dimensions
 } from 'react-native';
 import * as firebase from 'firebase';
 import APIHandler from '../Utils/APIHandler';
+import NetworkError from './error_components/NetworkError'
 
 export default class StudentProfile extends Component {
     constructor(props) {
@@ -23,6 +25,7 @@ export default class StudentProfile extends Component {
             subjects: [],
             student: {},
             professorType: '',
+            errorOccurs: false
         }
         this.APIHandler = new APIHandler();
     }
@@ -186,8 +189,52 @@ export default class StudentProfile extends Component {
             return null
     }
 
+    getHeights() {
+        let heights = null
+        const height = Dimensions.get('screen').height
+        if (this.state.professorType === 'profesor') {
+            heights = [
+                {
+                    height: height * 0.2
+                },
+                {
+                    height: height * 0.2
+                },
+                {
+                    height: height * 0.2
+                },
+            ]
+        } else if (this.state.professorType === 'paradocente') {
+            heights = [
+                {
+                    height: height * 0.1 + 13
+                },
+                {
+                    height: height * 0.2
+                },
+                {
+                    height: height * 0.2
+                },
+            ]
+        } else {
+            heights = [
+                {
+                    height: height * 0.1 + 13
+                },
+                {
+                    height: height * 0.1 + 13
+                },
+                {
+                    height: height * 0.1 + 13
+                },
+            ]
+        }
+        return heights
+    }
+
     // Método que renderiza la información del alumno
     renderInfo(info, id) {
+        let heights = this.getHeights()
         return (
             <View key={id} style={styles.CourseContainer}>
                 <Text key={id + 1} style={styles.StudentText}>
@@ -196,28 +243,43 @@ export default class StudentProfile extends Component {
                 <Text style={styles.CourseText}>
                     {this.state.course}
                 </Text>
-                {this.renderShowProgress(info)}
-                {this.renderSetProgress(info)}
-                {this.renderShowReports(info)}
-                {this.renderSetReports(info)}
-                {this.renderShowEvidences(info)}
-                {this.renderSetEvidences(info)}
+                <View style={[styles.moduleContainer, heights[0]]}>
+                    <View style={styles.moduleSubContainer}>
+                        {this.renderShowProgress(info)}
+                        {this.renderSetProgress(info)}
+                    </View>
+                    <View style={styles.moduleTextContainer}>
+                        <Text style={styles.moduleTitle}> Avance académico </Text>
+                    </View>
+                </View>
+                <View style={[styles.moduleContainer, heights[1]]}>
+                    <View style={styles.moduleSubContainer}>
+                        {this.renderShowReports(info)}
+                        {this.renderSetReports(info)}
+                    </View>
+                    <View style={styles.moduleTextContainer}>
+                        <Text style={styles.moduleTitle}> Reportes </Text>
+                    </View>
+                </View>
+                <View style={[styles.moduleContainer, heights[2]]}>
+                    <View style={styles.moduleSubContainer}>
+                        {this.renderShowEvidences(info)}
+                        {this.renderSetEvidences(info)}
+                    </View>
+                    <View style={styles.moduleTextContainer}>
+                        <Text style={styles.moduleTitle}> Evidencias cualitativas </Text>
+                    </View>
+                </View>
             </View>
         );
     }
 
-    componentWillMount() {
-        const { params } = this.props.navigation.state
+    // Método que accede a la data de la API
+    fetchData() {
         this.setState({
-            studentName: params.studentName,
-            idStudent: params.idStudent,
-            idCourse: params.idCourse,
-            course: params.course,
-            student: params.student
+            isLoading: true,
+            errorOccurs: false
         })
-    }
-
-    componentDidMount() {
         firebase.auth().onAuthStateChanged(user => {
             // Se obtienen los datos del profesor
             this.APIHandler.getFromAPI('http://206.189.195.214:8080/api/profesor/' + user.uid)
@@ -233,7 +295,28 @@ export default class StudentProfile extends Component {
                             isLoading: false
                         })
                 })
+                .catch(error => {
+                    this.setState({
+                        isLoading: false,
+                        errorOccurs: true
+                    })
+                })
         })
+    }
+
+    componentWillMount() {
+        const { params } = this.props.navigation.state
+        this.setState({
+            studentName: params.studentName,
+            idStudent: params.idStudent,
+            idCourse: params.idCourse,
+            course: params.course,
+            student: params.student
+        })
+    }
+
+    componentDidMount() {
+        this.fetchData()
     }
 
     render() {
@@ -247,6 +330,14 @@ export default class StudentProfile extends Component {
                 </View>
             );
         }
+
+        // Si ocurrió un error al hacer fetch
+        if (this.state.errorOccurs) {
+            return (
+                <NetworkError parentFetchData={this.fetchData.bind(this)} />
+            )
+        }
+
         return (
             <ScrollView style={styles.backColor}>
                 {this.renderInfo(this.state.student, 0)}
@@ -254,6 +345,8 @@ export default class StudentProfile extends Component {
         )
     }
 }
+
+const width = Dimensions.get('screen').width
 
 // Definición de estilos
 const styles = StyleSheet.create({
@@ -292,8 +385,9 @@ const styles = StyleSheet.create({
     },
     button: {
         width: '70%',
+        marginTop: 7,
+        marginBottom: 5,
         marginRight: '5%',
-        marginBottom: 10,
         marginLeft: '5%'
     },
     CourseContainer: {
@@ -306,4 +400,35 @@ const styles = StyleSheet.create({
     backColor: {
         backgroundColor: '#FFFFFF'
     },
+    moduleSubContainer: {
+        borderColor: 'green',
+        borderWidth: 1.5,
+        borderRadius: 8,
+        position: 'absolute',
+        marginTop: 5,
+        width: width * 0.8,
+        marginLeft: width * 0.1,
+        alignItems: 'center',
+    },
+    moduleContainer: {
+        marginBottom: 13,
+        width: width,
+        alignItems: 'center'
+    },
+    moduleTitle: {
+        color: 'gray',
+        fontSize: 8,
+        textAlign: 'center'
+    },
+    moduleTextContainer: {
+        borderColor: 'green',
+        borderWidth: 1.5,
+        borderRadius: 8,
+        position: 'absolute',
+        width: '25%',
+        marginLeft: '7%',
+        marginTop: -2.5,
+        backgroundColor: 'white',
+        alignItems: 'center'
+    }
 })
