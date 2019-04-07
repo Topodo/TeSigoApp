@@ -5,11 +5,11 @@ import {
     Text,
     Button,
     StyleSheet,
-    TouchableOpacity,
-    Picker,
+    BackHandler,
     ActivityIndicator
 } from 'react-native';
 import APIHandler from '../Utils/APIHandler';
+import { NavigationEvents } from 'react-navigation'
 import NetworkError from './error_components/NetworkError'
 
 export default class StudentList extends Component {
@@ -70,7 +70,13 @@ export default class StudentList extends Component {
             })
     }
 
+    goBack = () => {
+        this.props.navigation.goBack()
+        return true
+    }
+
     componentWillMount() {
+        BackHandler.addEventListener('hardwareBackPress', this.goBack)
         const { params } = this.props.navigation.state;
         this.setState({
             course: params.course,
@@ -80,6 +86,14 @@ export default class StudentList extends Component {
 
     componentDidMount() {
         this.fetchData()
+    }
+
+    componentDidFocus() {
+        BackHandler.addEventListener('hardwareBackPress', this.goBack)
+    }
+
+    componentWillUnmount() {
+        BackHandler.removeEventListener('hardwareBackPress', this.goBack)
     }
 
     static navigationOptions = {
@@ -126,9 +140,9 @@ export default class StudentList extends Component {
 
     render() {
         // Si ocurrió un error al hacer fetch
-        if(this.state.errorOccurs) {
+        if (this.state.errorOccurs) {
             return (
-                <NetworkError parentFetchData={this.fetchData.bind(this)}/>
+                <NetworkError parentFetchData={this.fetchData.bind(this)} />
             )
         }
 
@@ -148,6 +162,8 @@ export default class StudentList extends Component {
         } else {
             return (
                 <ScrollView style={styles.backColor}>
+                    <NavigationEvents
+                        onDidFocus={payload => this.componentDidFocus()} />
                     <Text style={styles.titleText}>
                         {'Curso: ' + this.state.course}
                     </Text>

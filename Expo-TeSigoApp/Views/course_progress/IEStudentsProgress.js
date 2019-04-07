@@ -254,7 +254,7 @@ const styles = StyleSheet.create({
         marginLeft: 4,
         marginRight: 4,
         width: width,
-        backgroundColor: '#f7ffe6'
+        backgroundColor: 'white'
     },
     ArrowImage: {
         width: '4%',
