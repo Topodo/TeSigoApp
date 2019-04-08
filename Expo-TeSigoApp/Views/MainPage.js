@@ -30,7 +30,7 @@ export default class MainPage extends React.Component {
                     this.props.navigation.navigate('Login')
                 }
             })
-        }, 4000)
+        }, 2000)
     }
 
     render() {
