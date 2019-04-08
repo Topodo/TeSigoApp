@@ -11,8 +11,9 @@ import {
 } from 'react-native';
 import APIHandler from '../../Utils/APIHandler'
 import NetworkError from '../error_components/NetworkError'
+import * as firebase from 'firebase'
 
-export default class CourseSubjectProgress extends Component {
+export default class SubjectCourseProgress extends Component {
     constructor(props) {
         super(props)
         this.state = {
@@ -66,49 +67,51 @@ export default class CourseSubjectProgress extends Component {
             isLoading: true,
             errorOccurs: false
         })
-        // Se obtienen las unidades
-        this.APIHandler.getFromAPI('http://206.189.195.214:8080/api/curso/' + this.state.idCourse + '/unidades')
-            .then(response => {
-                const names = this.getSubjectsNames(response)
-                let aux = []
-                response.forEach(subject => {
-                    aux.push(subject.idUnidad)
+        firebase.auth().onAuthStateChanged(user => {
+            // Se obtienen las unidades
+            this.APIHandler.getFromAPI('http://206.189.195.214:8080/api/profesor/' + user.uid + '/curso/' + this.state.idCourse + '/unidades')
+                .then(response => {
+                    const names = this.getSubjectsNames(response)
+                    let aux = []
+                    response.forEach(subject => {
+                        aux.push(subject.idUnidad)
+                    })
+                    this.setState({
+                        subjectsNames: names,
+                        defaultSubject: names[0].id,
+                        idSubject: response[0].idUnidad,
+                        idsSubjects: aux
+                    })
                 })
-                this.setState({
-                    subjectsNames: names,
-                    defaultSubject: names[0].id,
-                    idSubject: response[0].idUnidad,
-                    idsSubjects: aux
-                })
-            })
-            .then(() => {
-                // Se obtiene el avance del curso en todas las unidades 
-                let progressAux = []
-                let count = 0
-                this.state.idsSubjects.forEach(id => {
-                    this.APIHandler.getFromAPI('http://206.189.195.214:8080/api/unidad/' +
-                        id.toString() + '/curso/' + this.state.idCourse + '/avance')
-                        .then(response => {
-                            progressAux.push({
-                                idSubject: id,
-                                progress: response
-                            })
-                            count++
-                            if (count === this.state.idsSubjects.length) {
-                                this.setState({
-                                    progress: progressAux,
-                                    isLoading: false,
+                .then(() => {
+                    // Se obtiene el avance del curso en todas las unidades 
+                    let progressAux = []
+                    let count = 0
+                    this.state.idsSubjects.forEach(id => {
+                        this.APIHandler.getFromAPI('http://206.189.195.214:8080/api/unidad/' +
+                            id.toString() + '/curso/' + this.state.idCourse + '/avance')
+                            .then(response => {
+                                progressAux.push({
+                                    idSubject: id,
+                                    progress: response
                                 })
-                            }
-                        })
+                                count++
+                                if (count === this.state.idsSubjects.length) {
+                                    this.setState({
+                                        progress: progressAux,
+                                        isLoading: false,
+                                    })
+                                }
+                            })
+                    })
                 })
-            })
-            .catch(error => {
-                this.setState({
-                    isLoading: false,
-                    errorOccurs: true
+                .catch(error => {
+                    this.setState({
+                        isLoading: false,
+                        errorOccurs: true
+                    })
                 })
-            })
+        })
     }
 
     componentWillMount() {
@@ -150,9 +153,9 @@ export default class CourseSubjectProgress extends Component {
         }
 
         // Si ocurrió un error al hacer fetch
-        if(this.state.errorOccurs) {
+        if (this.state.errorOccurs) {
             return (
-                <NetworkError parentFetchData={this.fetchData.bind(this)}/>
+                <NetworkError parentFetchData={this.fetchData.bind(this)} />
             )
         }
 

@@ -14,6 +14,7 @@ import { CheckBox } from 'react-native-elements';
 import APIHandler from '../../Utils/APIHandler';
 import { NavigationEvents } from 'react-navigation'
 import NetworkError from '../error_components/NetworkError'
+import * as firebase from 'firebase'
 
 export default class ObjectivesPerStudent extends React.Component {
     constructor(props) {
@@ -123,39 +124,41 @@ export default class ObjectivesPerStudent extends React.Component {
             isLoading: true,
             errorOccurs: false
         })
-        // Se obtienen las unidades
-        this.APIHandler.getFromAPI('http://206.189.195.214:8080/api/curso/' + this.state.idCourse + '/unidades')
-            .then(response => {
-                const names = this.getSubjectsNames(response)
-                this.setState({
-                    subjectsNames: names,
-                    defaultSubject: names[0],
-                    idSubject: response[0].idUnidad,
-                })
-            })
-            .then(() => {
-                // Se obtiene el avance del alumno en todas las unidades
-                this.APIHandler.getFromAPI('http://206.189.195.214:8080/api/unidad/all/alumno/' + this.state.idStudent)
-                    .then(response => {
-                        this.setState({
-                            subjects: response,
-                        })
+        firebase.auth().onAuthStateChanged(user => {
+            // Se obtienen las unidades
+            this.APIHandler.getFromAPI('http://206.189.195.214:8080/api/profesor/' + user.uid + '/curso/' + this.state.idCourse + '/unidades')
+                .then(response => {
+                    const names = this.getSubjectsNames(response)
+                    this.setState({
+                        subjectsNames: names,
+                        defaultSubject: names[0],
+                        idSubject: response[0].idUnidad,
                     })
-                    .then(() => {
-                        // Se verifica el porcentaje de avance de los objetivos de aprendizaje
-                        this.assignCheckboxesValues(this.state.defaultSubject)
-                        this.setState({
-                            isLoading: false,
-                        })
-                    }
-                    ).catch(error => console.error(error))
-            })
-            .catch(error => {
-                this.setState({
-                    isLoading: false,
-                    errorOccurs: true
                 })
-            })
+                .then(() => {
+                    // Se obtiene el avance del alumno en todas las unidades
+                    this.APIHandler.getFromAPI('http://206.189.195.214:8080/api/unidad/all/alumno/' + this.state.idStudent)
+                        .then(response => {
+                            this.setState({
+                                subjects: response,
+                            })
+                        })
+                        .then(() => {
+                            // Se verifica el porcentaje de avance de los objetivos de aprendizaje
+                            this.assignCheckboxesValues(this.state.defaultSubject)
+                            this.setState({
+                                isLoading: false,
+                            })
+                        }
+                        ).catch(error => console.error(error))
+                })
+                .catch(error => {
+                    this.setState({
+                        isLoading: false,
+                        errorOccurs: true
+                    })
+                })
+        })
     }
 
     componentWillMount() {
@@ -169,10 +172,10 @@ export default class ObjectivesPerStudent extends React.Component {
     }
 
     componentDidMount() {
+        this.getOASData()
         this.setState({
             alreadyMounted: true
         })
-        this.getOASData()
     }
 
     componentDidFocus() {
@@ -196,9 +199,9 @@ export default class ObjectivesPerStudent extends React.Component {
         }
 
         // Si ocurrió un error al hacer fetch
-        if(this.state.errorOccurs) {
+        if (this.state.errorOccurs) {
             return (
-                <NetworkError parentFetchData={this.getOASData.bind(this)}/>
+                <NetworkError parentFetchData={this.getOASData.bind(this)} />
             )
         }
 
@@ -206,9 +209,9 @@ export default class ObjectivesPerStudent extends React.Component {
         let subjectsItems = this.state.subjectsNames.map((val, ind) => {
             return <Picker.Item key={ind} value={val} label={val} />
         });
-
         // Se mapean los objetivos de aprendizaje de la unidad
         let learningCheckBoxes = this.getLearningObjectives(this.state.defaultSubject).OAs.map((OA, id) => {
+            if (this.state.checkedItems === [] || this.state.checkedItems === null) return null
             return (
                 <View style={styles.OAContainer} key={id}>
                     <View style={[styles.flowRight]}>
@@ -273,15 +276,8 @@ export default class ObjectivesPerStudent extends React.Component {
                                     if (response.status) {
                                         subTitle = 'Ocurrió un error interno, inténtelo nuevamente'
                                     } else {
-                                        // Se obtiene el avance del alumno en todas las unidades
-                                        this.APIHandler.getFromAPI('http://206.189.195.214:8080/api/unidad/all/alumno/' + this.state.idStudent)
-                                            .then(response => {
-                                                this.setState({
-                                                    subjects: response,
-                                                })
-                                            })
-                                            .catch(error => console.error(error)
-                                            )
+                                        // Se recarga la data
+                                        this.getOASData()
                                     }
                                     // Se lanza una alerta indicando el estado de la actualización
                                     Alert.alert(

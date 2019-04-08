@@ -1,4 +1,3 @@
-import React, { Component } from 'react';
 import {
     Platform,
     StyleSheet,
@@ -6,13 +5,11 @@ import {
     View
 } from 'react-native';
 import {
-    StackNavigator,
     createStackNavigator,
     createDrawerNavigator
 } from 'react-navigation';
 import Login from './Views/Login';
 import MainPage from './Views/MainPage';
-import SignUp from './Views/SignUp';
 import SetEvaluationIndicator from './Views/student_progress/SetEvaluationIndicator';
 import SetObjectivesPerStudent from './Views/student_progress/SetObjectivesPerStudent';
 import GetObjectivesPerStudent from './Views/student_progress/GetObjectivesPerStudent';
@@ -24,7 +21,7 @@ import StudentProfile from './Views/StudentProfile';
 import EvidenceForm from './Views/evidences/EvidenceForm'
 import CreateReport from './Views/reports/CreateReport'
 import ReportsList from './Views/reports/ReportsList'
-import CourseSubjectProgress from './Views/course_progress/CourseSubjectProgress'
+import CourseSubjectProgress from './Views/course_progress/SubjectCourseProgress'
 import OACourseProgress from './Views/course_progress/OACourseProgress'
 import IEStudentsProgress from './Views/course_progress/IEStudentsProgress'
 import SelectEvidence from './Views/evidences/SelectEvidence'
