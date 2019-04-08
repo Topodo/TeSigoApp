@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import {
-    ScrollView,
+    BackHandler,
     StyleSheet,
     View,
     Text,
@@ -10,13 +10,14 @@ import {
     Image,
     Dimensions,
 } from 'react-native';
-import { FormLabel, FormInput, FormValidationMessage } from 'react-native-elements'
+import { FormLabel, FormInput } from 'react-native-elements'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import {
     Calendar,
     LocaleConfig
 } from 'react-native-calendars'
 import APIHandler from '../../Utils/APIHandler'
+import { NavigationEvents } from 'react-navigation'
 
 // Configuración del calendario en español
 LocaleConfig.locales['cl'] = {
@@ -58,12 +59,26 @@ export default class CreateReport extends Component {
     }
 
     componentWillMount() {
+        BackHandler.addEventListener('hardwareBackPress', this.goBack)
         const { params } = this.props.navigation.state
         this.setState({
             idStudent: params.idStudent,
             studentName: params.studentName,
             course: params.course
         })
+    }
+
+    goBack = () => {
+        this.props.navigation.goBack()
+        return true
+    }
+
+    componentDidFocus() {
+        BackHandler.addEventListener('hardwareBackPress', this.goBack)
+    }
+
+    componentWillUnmount() {
+        BackHandler.removeEventListener('hardwareBackPress', this.goBack)
     }
 
     // Método que redirige la navegación a la vista del listado de reportes del alumno, luego de subir el reporte
@@ -125,6 +140,8 @@ export default class CreateReport extends Component {
             [{ rotate: '-180deg' }] : [{ rotate: '0deg' }]
         return (
             <KeyboardAwareScrollView style={styles.backColor}>
+                <NavigationEvents
+                    onDidFocus={payload => this.componentDidFocus()} />
                 <Text style={styles.titleText}>
                     {this.state.studentName + ' - ' + this.state.course}
                 </Text>

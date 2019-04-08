@@ -6,14 +6,14 @@ import {
     Dimensions,
     StyleSheet,
     TouchableOpacity,
-    Picker,
-    ProgressBarAndroid,
+    BackHandler,
     Image,
     Button,
     ActivityIndicator
 } from 'react-native';
 import APIHandler from '../../Utils/APIHandler'
 import NetworkError from '../error_components/NetworkError'
+import { NavigationEvents } from 'react-navigation'
 
 export default class GetEvidence extends React.Component {
 
@@ -112,7 +112,13 @@ export default class GetEvidence extends React.Component {
             })
     }
 
+    goBack = () => {
+        this.props.navigation.goBack()
+        return true
+    }
+
     componentWillMount() {
+        BackHandler.addEventListener('hardwareBackPress', this.goBack)
         const { params } = this.props.navigation.state;
         this.setState({
             name: params.studentName,
@@ -122,8 +128,13 @@ export default class GetEvidence extends React.Component {
         });
     }
 
-    componentDidMount() {
+    componentDidFocus() {
+        BackHandler.addEventListener('hardwareBackPress', this.goBack)
         this.fetchData()
+    }
+
+    componentWillUnmount() {
+        BackHandler.removeEventListener('hardwareBackPress', this.goBack)
     }
 
     static navigationOptions = {
@@ -144,6 +155,8 @@ export default class GetEvidence extends React.Component {
         if (this.state.isLoading) {
             return (
                 <View style={styles.activityIndicator}>
+                    <NavigationEvents
+                        onDidFocus={payload => this.componentDidFocus()} />
                     <Text style={styles.loadingText}>
                         Cargando el listado de evidencias cualitativas
                     </Text>
@@ -153,12 +166,12 @@ export default class GetEvidence extends React.Component {
         }
 
         // Si ocurrió un error al hacer fetch
-        if(this.state.errorOccurs) {
+        if (this.state.errorOccurs) {
             return (
-                <NetworkError parentFetchData={this.fetchData.bind(this)}/>
+                <NetworkError parentFetchData={this.fetchData.bind(this)} />
             )
         }
-        
+
         // Fotografías
         let photos = this.state.expandableItems[0] === true ?
             this.state.evidence.pictures.map((info, id) => {

@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import {
-    ScrollView,
+    BackHandler,
     TouchableOpacity,
     StyleSheet,
     Image,
@@ -17,9 +17,9 @@ import {
     Calendar,
     LocaleConfig
 } from 'react-native-calendars'
-
 import * as firebase from 'firebase';
 import APIHandler from '../../Utils/APIHandler'
+import { NavigationEvents } from 'react-navigation'
 
 // Configuración del calendario en español
 LocaleConfig.locales['cl'] = {
@@ -193,7 +193,13 @@ export default class EvidenceForm extends Component {
         )
     }
 
+    goBack = () => {
+        this.props.navigation.goBack()
+        return true
+    }
+
     componentWillMount() {
+        BackHandler.addEventListener('hardwareBackPress', this.goBack)
         const { params } = this.props.navigation.state
         this.setState({
             file: params.file,
@@ -203,6 +209,14 @@ export default class EvidenceForm extends Component {
             idCourse: params.idCourse,
             courseName: params.courseName,
         })
+    }
+
+    componentDidFocus() {
+        BackHandler.addEventListener('hardwareBackPress', this.goBack)
+    }
+
+    componentWillUnmount() {
+        BackHandler.removeEventListener('hardwareBackPress', this.goBack)
     }
 
     render() {
@@ -219,6 +233,8 @@ export default class EvidenceForm extends Component {
         let uploadStatus = this.state.isUploading ? this.renderActivityIndicator() : this.renderUploadButton()
         return (
             <KeyboardAwareScrollView style={styles.backColor}>
+                <NavigationEvents
+                    onDidFocus={payload => this.componentDidFocus()} />
                 <FormLabel>
                     Nombre de la evidencia
                 </FormLabel>

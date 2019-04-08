@@ -7,10 +7,12 @@ import {
     StyleSheet,
     TouchableOpacity,
     Image,
+    BackHandler,
     ActivityIndicator
 } from 'react-native';
 import APIHandler from '../../Utils/APIHandler'
 import NetworkError from '../error_components/NetworkError'
+import { NavigationEvents } from 'react-navigation'
 
 export default class ReportsList extends Component {
     constructor(props) {
@@ -95,6 +97,7 @@ export default class ReportsList extends Component {
     }
 
     componentWillMount() {
+        BackHandler.addEventListener('hardwareBackPress', this.goBack)
         const { params } = this.props.navigation.state
         this.setState({
             idStudent: params.idStudent,
@@ -103,8 +106,18 @@ export default class ReportsList extends Component {
         })
     }
 
-    componentDidMount() {
+    goBack = () => {
+        this.props.navigation.goBack()
+        return true
+    }
+
+    componentDidFocus() {
+        BackHandler.addEventListener('hardwareBackPress', this.goBack)
         this.fetchData()
+    }
+
+    componentWillUnmount() {
+        BackHandler.removeEventListener('hardwareBackPress', this.goBack)
     }
 
     // Método que renderiza un reporte
@@ -151,6 +164,8 @@ export default class ReportsList extends Component {
         if (this.state.isLoading) {
             return (
                 <View style={styles.activityIndicator}>
+                    <NavigationEvents
+                        onDidFocus={payload => this.componentDidFocus()} />
                     <Text style={styles.loadingText}>
                         Cargando los reportes
                     </Text>
@@ -160,9 +175,9 @@ export default class ReportsList extends Component {
         }
 
         // Si ocurrió un error al hacer fetch
-        if(this.state.errorOccurs) {
+        if (this.state.errorOccurs) {
             return (
-                <NetworkError parentFetchData={this.fetchData.bind(this)}/>
+                <NetworkError parentFetchData={this.fetchData.bind(this)} />
             )
         }
 

@@ -5,11 +5,13 @@ import {
     View,
     Text,
     Button,
+    BackHandler,
     ActivityIndicator
 } from 'react-native';
 import APIHandler from '../../Utils/APIHandler'
 import PureChart from 'react-native-pure-chart'
 import NetworkError from '../error_components/NetworkError'
+import { NavigationEvents } from 'react-navigation'
 
 export default class OACourseProgress extends Component {
     constructor(props) {
@@ -48,7 +50,13 @@ export default class OACourseProgress extends Component {
             })
     }
 
+    goBack = () => {
+        this.props.navigation.goBack()
+        return true
+    }
+
     componentWillMount() {
+        BackHandler.addEventListener('hardwareBackPress', this.goBack)
         const { params } = this.props.navigation.state
         this.setState({
             idCourse: params.idCourse,
@@ -57,8 +65,13 @@ export default class OACourseProgress extends Component {
         })
     }
 
-    componentDidMount() {
+    componentDidFocus() {
+        BackHandler.addEventListener('hardwareBackPress', this.goBack)
         this.fetchData()
+    }
+
+    componentWillUnmount() {
+        BackHandler.removeEventListener('hardwareBackPress', this.goBack)
     }
 
     // Método que redirige la navegación hacia el listado de alumnos ordenados por IE Completo/Incompleto
@@ -161,6 +174,8 @@ export default class OACourseProgress extends Component {
         if (this.state.isLoading) {
             return (
                 <View style={styles.activityIndicator}>
+                    <NavigationEvents
+                        onDidFocus={payload => this.componentDidFocus()} />
                     <Text style={styles.loadingText}>
                         Cargando los indicadores de evaluación
                     </Text>
@@ -168,11 +183,11 @@ export default class OACourseProgress extends Component {
                 </View>
             );
         }
-        
+
         // Si ocurrió un error al hacer fetch
-        if(this.state.errorOccurs) {
+        if (this.state.errorOccurs) {
             return (
-                <NetworkError parentFetchData={this.fetchData.bind(this)}/>
+                <NetworkError parentFetchData={this.fetchData.bind(this)} />
             )
         }
 

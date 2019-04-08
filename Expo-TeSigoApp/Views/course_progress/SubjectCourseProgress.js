@@ -5,13 +5,14 @@ import {
     View,
     Text,
     Button,
-    Alert,
+    BackHandler,
     Picker,
     ActivityIndicator
 } from 'react-native';
 import APIHandler from '../../Utils/APIHandler'
 import NetworkError from '../error_components/NetworkError'
 import * as firebase from 'firebase'
+import { NavigationEvents } from 'react-navigation'
 
 export default class SubjectCourseProgress extends Component {
     constructor(props) {
@@ -114,7 +115,13 @@ export default class SubjectCourseProgress extends Component {
         })
     }
 
+    goBack = () => {
+        this.props.navigation.goBack()
+        return true
+    }
+
     componentWillMount() {
+        BackHandler.addEventListener('hardwareBackPress', this.goBack)
         const { params } = this.props.navigation.state
         this.setState({
             idCourse: params.idCourse,
@@ -122,8 +129,13 @@ export default class SubjectCourseProgress extends Component {
         })
     }
 
-    componentDidMount() {
+    componentDidFocus() {
+        BackHandler.addEventListener('hardwareBackPress', this.goBack)
         this.fetchData()
+    }
+
+    componentWillUnmount() {
+        BackHandler.removeEventListener('hardwareBackPress', this.goBack)
     }
 
     static navigationOptions = {
@@ -144,6 +156,8 @@ export default class SubjectCourseProgress extends Component {
         if (this.state.isLoading) {
             return (
                 <View style={styles.activityIndicator}>
+                    <NavigationEvents
+                        onDidFocus={payload => this.componentDidFocus()} />
                     <Text style={styles.loadingText}>
                         Cargando los objetivos de aprendizaje
                     </Text>

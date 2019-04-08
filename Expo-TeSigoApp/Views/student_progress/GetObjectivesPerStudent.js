@@ -5,7 +5,7 @@ import {
     Text,
     Dimensions,
     StyleSheet,
-    TouchableOpacity,
+    BackHandler,
     Picker,
     ProgressBarAndroid,
     Image,
@@ -15,6 +15,7 @@ import {
 import NetworkError from '../error_components/NetworkError'
 import APIHandler from '../../Utils/APIHandler'
 import * as firebase from 'firebase'
+import { NavigationEvents } from 'react-navigation'
 
 const heightDevice = Dimensions.get('window').width * 0.08;
 
@@ -120,6 +121,7 @@ export default class GetObjectivesPerStudent extends React.Component {
 
     // Método que agrega al state los datos provenientes de la lista de alumnos 
     componentWillMount() {
+        BackHandler.addEventListener('hardwareBackPress', this.goBack)
         const { params } = this.props.navigation.state
         this.setState({
             idStudent: params.idStudent,
@@ -129,14 +131,26 @@ export default class GetObjectivesPerStudent extends React.Component {
         });
     }
 
-    componentDidMount() {
+    goBack = () => {
+        this.props.navigation.goBack()
+        return true
+    }
+
+    componentDidFocus() {
+        BackHandler.addEventListener('hardwareBackPress', this.goBack)
         this.fetchData()
+    }
+
+    componentWillUnmount() {
+        BackHandler.removeEventListener('hardwareBackPress', this.goBack)
     }
 
     render() {
         if (this.state.isLoading) {
             return (
                 <View style={styles.activityIndicator}>
+                    <NavigationEvents
+                        onDidFocus={payload => this.componentDidFocus()} />
                     <Text style={styles.loadingText}>
                         Cargando los objetivos de aprendizaje
                     </Text>

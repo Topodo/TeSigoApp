@@ -6,11 +6,13 @@ import {
     Button,
     StyleSheet,
     ActivityIndicator,
+    BackHandler,
     Dimensions
 } from 'react-native';
 import * as firebase from 'firebase';
 import APIHandler from '../Utils/APIHandler';
 import NetworkError from './error_components/NetworkError'
+import { NavigationEvents } from 'react-navigation'
 
 export default class StudentProfile extends Component {
     constructor(props) {
@@ -304,7 +306,22 @@ export default class StudentProfile extends Component {
         })
     }
 
+    goBack = () => {
+        this.props.navigation.goBack()
+        return true
+    }
+
+    componentDidFocus() {
+        BackHandler.addEventListener('hardwareBackPress', this.goBack)
+        this.fetchData()
+    }
+
+    componentWillUnmount() {
+        BackHandler.removeEventListener('hardwareBackPress', this.goBack)
+    }
+
     componentWillMount() {
+        BackHandler.addEventListener('hardwareBackPress', this.goBack)
         const { params } = this.props.navigation.state
         this.setState({
             studentName: params.studentName,
@@ -315,16 +332,14 @@ export default class StudentProfile extends Component {
         })
     }
 
-    componentDidMount() {
-        this.fetchData()
-    }
-
     render() {
         if (this.state.isLoading) {
             return (
                 <View style={styles.activityIndicator}>
+                    <NavigationEvents
+                        onDidFocus={payload => this.componentDidFocus()} />
                     <Text style={styles.loadingText}>
-                        Cargando la lista del curso
+                        Cargando el perfil del alumno
                     </Text>
                     <ActivityIndicator size='large' />
                 </View>

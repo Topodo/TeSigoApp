@@ -5,11 +5,10 @@ import {
     Text,
     Dimensions,
     StyleSheet,
-    TouchableOpacity,
-    Picker,
-    ProgressBarAndroid,
+    BackHandler,
     Image
 } from 'react-native';
+import { NavigationEvents } from 'react-navigation'
 
 const heightDevice = Dimensions.get('window').width * 0.08;
 
@@ -26,6 +25,7 @@ export default class GetEvaluationIndicator extends React.Component {
 
     // Para modificar el state al cambiar de un componente a otro
     componentWillMount() {
+        BackHandler.addEventListener('hardwareBackPress', this.goBack)
         const { params } = this.props.navigation.state;
         this.setState({
             evalIndicators: params.indicators,
@@ -33,6 +33,19 @@ export default class GetEvaluationIndicator extends React.Component {
             course: params.course,
             OAName: params.OAName
         });
+    }
+
+    goBack = () => {
+        this.props.navigation.goBack()
+        return true
+    }
+
+    componentDidFocus() {
+        BackHandler.addEventListener('hardwareBackPress', this.goBack)
+    }
+
+    componentWillUnmount() {
+        BackHandler.removeEventListener('hardwareBackPress', this.goBack)
     }
 
     static navigationOptions = {
@@ -73,6 +86,8 @@ export default class GetEvaluationIndicator extends React.Component {
 
         return (
             <ScrollView style={styles.backColor}>
+                <NavigationEvents
+                    onDidFocus={payload => this.componentDidFocus()} />
                 <Text style={styles.titleText}>
                     {this.state.name + ' - ' + this.state.course}
                 </Text>

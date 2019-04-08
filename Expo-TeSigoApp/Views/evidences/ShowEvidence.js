@@ -1,7 +1,10 @@
 import React from "react"
-import { StyleSheet, Text, View, Dimensions, ActivityIndicator, Image, Slider, ScrollView } from "react-native"
+import {
+    StyleSheet, Text, View, Dimensions, ActivityIndicator, Image, BackHandler, ScrollView
+} from "react-native"
 import { Audio, Video } from 'expo'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
+import { NavigationEvents } from 'react-navigation'
 
 export default class ShowEvidence extends React.Component {
     constructor(props) {
@@ -155,6 +158,7 @@ export default class ShowEvidence extends React.Component {
     }
 
     componentWillMount() {
+        BackHandler.addEventListener('hardwareBackPress', this.goBack)
         const { params } = this.props.navigation.state
         this.setState({
             evidenceUri: params.evidence.firebaseID,
@@ -166,10 +170,20 @@ export default class ShowEvidence extends React.Component {
         this.soundObject = new Audio.Sound()
     }
 
-    componentDidMount() {
+    goBack = () => {
+        this.props.navigation.goBack()
+        return true
+    }
+
+    componentDidFocus() {
+        BackHandler.addEventListener('hardwareBackPress', this.goBack)
         this.setState({
             isLoading: false
         })
+    }
+
+    componentWillUnmount() {
+        BackHandler.removeEventListener('hardwareBackPress', this.goBack)
     }
 
     render() {
@@ -188,6 +202,8 @@ export default class ShowEvidence extends React.Component {
             }
             return (
                 <View style={styles.activityIndicator}>
+                    <NavigationEvents
+                        onDidFocus={payload => this.componentDidFocus()} />
                     <Text style={styles.loadingText}>
                         {loadingText}
                     </Text>

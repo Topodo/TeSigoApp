@@ -5,7 +5,7 @@ import {
     Text,
     Button,
     StyleSheet,
-    TouchableOpacity,
+    BackHandler,
     Picker,
     ActivityIndicator,
     Alert
@@ -161,7 +161,13 @@ export default class ObjectivesPerStudent extends React.Component {
         })
     }
 
+    goBack = () => {
+        this.props.navigation.goBack()
+        return true
+    }
+
     componentWillMount() {
+        BackHandler.addEventListener('hardwareBackPress', this.goBack)
         const { params } = this.props.navigation.state
         this.setState({
             idStudent: params.idStudent,
@@ -180,8 +186,14 @@ export default class ObjectivesPerStudent extends React.Component {
 
     componentDidFocus() {
         if (this.state.alreadyMounted) {
+            BackHandler.addEventListener('hardwareBackPress', this.goBack)
             this.getOASData()
         }
+    }
+
+    componentWillUnmount() {
+        BackHandler.removeEventListener('hardwareBackPress', this.goBack)
+        this.setState({ alreadyMounted: false })
     }
 
     render() {

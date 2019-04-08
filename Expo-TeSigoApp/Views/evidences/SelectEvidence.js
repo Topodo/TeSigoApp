@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { ScrollView, Text, Button, StyleSheet, Dimensions, View, Alert, TouchableOpacity } from 'react-native'
+import { ScrollView, Text, Button, StyleSheet, Dimensions, View, Alert, BackHandler, TouchableOpacity } from 'react-native'
 import { ImagePicker, DocumentPicker } from 'expo'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
@@ -7,6 +7,7 @@ import ShowCamera from './evidence_utils/Camera'
 import VideoRecorder from './evidence_utils/VideoRecorder'
 import AudioRecorder from './evidence_utils/AudioRecorder'
 import Modal from 'react-native-modal'
+import { NavigationEvents } from 'react-navigation'
 
 export default class SelectEvidence extends Component {
     constructor(props) {
@@ -138,6 +139,8 @@ export default class SelectEvidence extends Component {
 
         return (
             <ScrollView style={styles.backColor}>
+                <NavigationEvents
+                    onDidFocus={payload => this.componentDidFocus()} />
                 <Text style={styles.titleText}>
                     {this.state.studentName + ' - ' + this.state.courseName}
                 </Text>
@@ -253,7 +256,21 @@ export default class SelectEvidence extends Component {
         }
     }
 
+    goBack = () => {
+        this.props.navigation.goBack()
+        return true
+    }
+
+    componentDidFocus() {
+        BackHandler.addEventListener('hardwareBackPress', this.goBack)
+    }
+
+    componentWillUnmount() {
+        BackHandler.removeEventListener('hardwareBackPress', this.goBack)
+    }
+
     async componentWillMount() {
+        BackHandler.addEventListener('hardwareBackPress', this.goBack)
         const { params } = this.props.navigation.state
         await this.setState({
             idStudent: params.idStudent,

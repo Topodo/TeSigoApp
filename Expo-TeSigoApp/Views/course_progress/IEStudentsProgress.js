@@ -8,10 +8,12 @@ import {
     ActivityIndicator,
     TouchableOpacity,
     Image,
+    BackHandler,
     Dimensions
 } from 'react-native';
 import APIHandler from '../../Utils/APIHandler'
 import NetworkError from '../error_components/NetworkError'
+import { NavigationEvents } from 'react-navigation'
 
 export default class IEStudentsProgress extends Component {
     constructor(props) {
@@ -64,6 +66,7 @@ export default class IEStudentsProgress extends Component {
     }
 
     componentWillMount() {
+        BackHandler.addEventListener('hardwareBackPress', this.goBack)
         const { params } = this.props.navigation.state
         this.setState({
             idCourse: params.idCourse,
@@ -72,8 +75,18 @@ export default class IEStudentsProgress extends Component {
         })
     }
 
-    componentDidMount() {
+    goBack = () => {
+        this.props.navigation.goBack()
+        return true
+    }
+
+    componentDidFocus() {
+        BackHandler.addEventListener('hardwareBackPress', this.goBack)
         this.fetchData()
+    }
+
+    componentWillUnmount() {
+        BackHandler.removeEventListener('hardwareBackPress', this.goBack)
     }
 
     // Método que obtiene los datos de un alumno
@@ -165,6 +178,8 @@ export default class IEStudentsProgress extends Component {
         if (this.state.isLoading) {
             return (
                 <View style={styles.activityIndicator}>
+                    <NavigationEvents
+                        onDidFocus={payload => this.componentDidFocus()} />
                     <Text style={styles.loadingText}>
                         Cargando la lista del curso
                     </Text>
@@ -174,12 +189,12 @@ export default class IEStudentsProgress extends Component {
         }
 
         // Si ocurrió un error al hacer fetch
-        if(this.state.errorOccurs) {
+        if (this.state.errorOccurs) {
             return (
-                <NetworkError parentFetchData={this.fetchData.bind(this)}/>
+                <NetworkError parentFetchData={this.fetchData.bind(this)} />
             )
         }
-        
+
         let completeListComponent = this.renderStudentsList(this.state.completeList, "Indicador completado", 0)
         let incompleteListComponent = this.renderStudentsList(this.state.incompleteList, "Indicador no completado", 1)
 

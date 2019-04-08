@@ -6,6 +6,7 @@ import {
     Button,
     StyleSheet,
     ActivityIndicator,
+    BackHandler,
     Alert
 } from 'react-native';
 import APIHandler from '../../Utils/APIHandler';
@@ -52,8 +53,14 @@ export default class EvaluationIndicator extends Component {
         this.props.navigation.navigate('SetObjectivesPerStudent')
     }
 
+    goBack = () => {
+        this.props.navigation.goBack()
+        return true
+    }
+
     // Para modificar el state al cambiar de un componente a otro
     componentWillMount() {
+        BackHandler.addEventListener('hardwareBackPress', this.goBack)
         const { params } = this.props.navigation.state;
         this.setState({
             evalIndicators: params.indicators,
@@ -68,6 +75,7 @@ export default class EvaluationIndicator extends Component {
 
     componentDidFocus() {
         if (this.state.alreadyMounted) {
+            BackHandler.addEventListener('hardwareBackPress', this.goBack)
             const { params } = this.props.navigation.state;
             this.setState({
                 evalIndicators: params.indicators,
@@ -103,10 +111,19 @@ export default class EvaluationIndicator extends Component {
         })
     }
 
+    componentWillUnmount() {
+        BackHandler.removeEventListener('hardwareBackPress', this.goBack)
+        this.setState({
+            alreadyMounted: false
+        })
+    }
+
     render() {
         if (this.state.isLoading) {
             return (
                 <View style={styles.activityIndicator}>
+                    <NavigationEvents
+                        onDidFocus={payload => this.componentDidFocus()} />
                     <Text style={styles.loadingText}>
                         Cargando los indicadores de evaluación
                     </Text>
@@ -142,8 +159,6 @@ export default class EvaluationIndicator extends Component {
 
         return (
             <ScrollView style={styles.backColor}>
-                <NavigationEvents 
-                    onDidFocus={payload => this.componentDidFocus()} />
                 <Text style={styles.titleText}>
                     {this.state.name + ' - ' + this.state.course}
                 </Text>

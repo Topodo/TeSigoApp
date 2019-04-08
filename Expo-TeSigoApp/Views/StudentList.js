@@ -84,12 +84,9 @@ export default class StudentList extends Component {
         });
     }
 
-    componentDidMount() {
-        this.fetchData()
-    }
-
     componentDidFocus() {
         BackHandler.addEventListener('hardwareBackPress', this.goBack)
+        this.fetchData()
     }
 
     componentWillUnmount() {
@@ -153,6 +150,8 @@ export default class StudentList extends Component {
         if (this.state.isLoading) {
             return (
                 <View style={styles.activityIndicator}>
+                    <NavigationEvents
+                        onDidFocus={payload => this.componentDidFocus()} />
                     <Text style={styles.loadingText}>
                         Cargando listado de alumnos
                     </Text>
@@ -162,8 +161,6 @@ export default class StudentList extends Component {
         } else {
             return (
                 <ScrollView style={styles.backColor}>
-                    <NavigationEvents
-                        onDidFocus={payload => this.componentDidFocus()} />
                     <Text style={styles.titleText}>
                         {'Curso: ' + this.state.course}
                     </Text>
