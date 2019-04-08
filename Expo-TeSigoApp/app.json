@@ -26,7 +26,13 @@
       "supportsTablet": true
     },
     "android": {
-      "permissions": ["CAMERA"],
+      "permissions": [
+        "CAMERA",
+        "RECORD_AUDIO",
+        "MANAGE_DOCUMENTS",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE"
+      ],
       "package": "cl.diinf.tesigoapp"
     }
   }
