@@ -263,16 +263,20 @@ export default class SelectEvidence extends Component {
 
     componentDidFocus() {
         BackHandler.addEventListener('hardwareBackPress', this.goBack)
+        // Se hace nulo el archivo seleccionado
+        this.setState({
+            file: null
+        })
     }
 
     componentWillUnmount() {
         BackHandler.removeEventListener('hardwareBackPress', this.goBack)
     }
 
-    async componentWillMount() {
+    componentWillMount() {
         BackHandler.addEventListener('hardwareBackPress', this.goBack)
         const { params } = this.props.navigation.state
-        await this.setState({
+        this.setState({
             idStudent: params.idStudent,
             studentName: params.studentName,
             idCourse: params.idCourse,

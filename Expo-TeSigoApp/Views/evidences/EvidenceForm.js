@@ -130,11 +130,10 @@ export default class EvidenceForm extends Component {
                     subTitle,
                     [{ text: 'OK' }]
                 )
-                this.props.navigation.navigate('SelectEvidence', {
+                this.props.navigation.navigate('GetEvidence', {
                     idStudent: this.state.idStudent,
                     studentName: this.state.studentName,
-                    idCourse: this.state.idCourse,
-                    courseName: this.state.courseName
+                    course: this.state.courseName
                 })
             })
         }

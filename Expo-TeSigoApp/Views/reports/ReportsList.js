@@ -107,7 +107,7 @@ export default class ReportsList extends Component {
     }
 
     goBack = () => {
-        this.props.navigation.goBack()
+        this.props.navigation.navigate('StudentProfile')
         return true
     }
 

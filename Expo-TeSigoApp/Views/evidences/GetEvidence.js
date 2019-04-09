@@ -113,7 +113,7 @@ export default class GetEvidence extends React.Component {
     }
 
     goBack = () => {
-        this.props.navigation.goBack()
+        this.props.navigation.navigate('StudentProfile')
         return true
     }
 
