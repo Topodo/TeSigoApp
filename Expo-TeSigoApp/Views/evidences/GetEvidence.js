@@ -151,6 +151,17 @@ export default class GetEvidence extends React.Component {
         },
     };
 
+    // Método que renderiza un indicador en caso de que no hayan evidencias
+    renderEmptyList(type) {
+        return (
+            <View style={styles.activityIndicator}>
+                <Text style={styles.loadingText}>
+                    {'No hay ' + type + ' para mostrar'}
+                </Text>
+            </View>
+        )
+    }
+
     render() {
         if (this.state.isLoading) {
             return (
@@ -174,23 +185,31 @@ export default class GetEvidence extends React.Component {
 
         // Fotografías
         let photos = this.state.expandableItems[0] === true ?
-            this.state.evidence.pictures.map((info, id) => {
-                return (this.renderInfo(info, id))
-            }) : null;
+            (this.state.evidence.pictures.length === 0 ? this.renderEmptyList("fotografías") :
+                this.state.evidence.pictures.map((info, id) => {
+                    return (this.renderInfo(info, id))
+                }))
+            : null;
         let photosArrow = this.state.expandableItems[0] === true ?
             [{ rotate: '-180deg' }] : [{ rotate: '0deg' }];
+
         // Videos
         let videos = this.state.expandableItems[1] === true ?
-            this.state.evidence.videos.map((info, id) => {
-                return (this.renderInfo(info, id))
-            }) : null;
+            (this.state.evidence.videos.length === 0 ? this.renderEmptyList("videos") :
+                this.state.evidence.videos.map((info, id) => {
+                    return (this.renderInfo(info, id))
+                }))
+            : null;
         let videosArrow = this.state.expandableItems[1] === true ?
             [{ rotate: '-180deg' }] : [{ rotate: '0deg' }];
+
         // Audios
         let audios = this.state.expandableItems[2] === true ?
-            this.state.evidence.audios.map((info, id) => {
-                return (this.renderInfo(info, id))
-            }) : null;
+            (this.state.evidence.audios.length === 0 ? this.renderEmptyList("archivos de sonido") :
+                this.state.evidence.audios.map((info, id) => {
+                    return (this.renderInfo(info, id))
+                }))
+            : null;
         let audiosArrow = this.state.expandableItems[2] === true ?
             [{ rotate: '-180deg' }] : [{ rotate: '0deg' }];
 

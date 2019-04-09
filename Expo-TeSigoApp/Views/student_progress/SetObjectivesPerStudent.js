@@ -125,39 +125,50 @@ export default class ObjectivesPerStudent extends React.Component {
             errorOccurs: false
         })
         firebase.auth().onAuthStateChanged(user => {
-            // Se obtienen las unidades
-            this.APIHandler.getFromAPI('http://206.189.195.214:8080/api/profesor/' + user.uid + '/curso/' + this.state.idCourse + '/unidades')
-                .then(response => {
-                    const names = this.getSubjectsNames(response)
-                    this.setState({
-                        subjectsNames: names,
-                        defaultSubject: names[0],
-                        idSubject: response[0].idUnidad,
-                    })
-                })
-                .then(() => {
-                    // Se obtiene el avance del alumno en todas las unidades
-                    this.APIHandler.getFromAPI('http://206.189.195.214:8080/api/unidad/all/alumno/' + this.state.idStudent)
-                        .then(response => {
-                            this.setState({
-                                subjects: response,
-                            })
-                        })
-                        .then(() => {
-                            // Se verifica el porcentaje de avance de los objetivos de aprendizaje
-                            this.assignCheckboxesValues(this.state.defaultSubject)
-                            this.setState({
-                                isLoading: false,
-                            })
+            if (user) {
+                // Se obtienen las unidades
+                this.APIHandler.getFromAPI('http://206.189.195.214:8080/api/profesor/' + user.uid + '/curso/' + this.state.idCourse + '/unidades')
+                    .then(response => {
+                        const names = this.getSubjectsNames(response)
+                        let defaultSubject = ''
+                        let idSubject = -1
+                        if (this.state.defaultSubject !== '') {
+                            defaultSubject = this.state.defaultSubject
+                            idSubject = this.state.idSubject
+                        } else {
+                            defaultSubject = names[0]
+                            idSubject = response[0].idUnidad
                         }
-                        ).catch(error => console.error(error))
-                })
-                .catch(error => {
-                    this.setState({
-                        isLoading: false,
-                        errorOccurs: true
+                        this.setState({
+                            subjectsNames: names,
+                            defaultSubject: defaultSubject,
+                            idSubject: idSubject,
+                        })
                     })
-                })
+                    .then(() => {
+                        // Se obtiene el avance del alumno en todas las unidades
+                        this.APIHandler.getFromAPI('http://206.189.195.214:8080/api/unidad/all/alumno/' + this.state.idStudent)
+                            .then(response => {
+                                this.setState({
+                                    subjects: response,
+                                })
+                            })
+                            .then(() => {
+                                // Se verifica el porcentaje de avance de los objetivos de aprendizaje
+                                this.assignCheckboxesValues(this.state.defaultSubject)
+                                this.setState({
+                                    isLoading: false,
+                                })
+                            }
+                            ).catch(error => console.error(error))
+                    })
+                    .catch(error => {
+                        this.setState({
+                            isLoading: false,
+                            errorOccurs: true
+                        })
+                    })
+            }
         })
     }
 

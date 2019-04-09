@@ -13,10 +13,10 @@ export default class Logout extends React.Component {
     constructor(props) {
         super(props)
     }
-    async componentDidMount() {
+    componentDidMount() {
         try {
-            await firebase.auth().signOut()
-            this.props.navigation.navigate('Login')
+            firebase.auth().signOut()
+                .then(() => this.props.navigation.navigate('Login'))
         } catch (error) {
             console.error(error)
         }

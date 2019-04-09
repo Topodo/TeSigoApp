@@ -34,6 +34,8 @@ export default class Login extends React.Component {
     // Método asíncrono para logear utilizando firebase
     async login() {
         try {
+            // Se verifica si el usuario está logeado en la aplicación
+            await firebase.auth().signOut()
             await firebase.auth().signInWithEmailAndPassword(this.state.email, this.state.password);
             this.setState({
                 isLogged: true
@@ -68,9 +70,11 @@ export default class Login extends React.Component {
             // Se verifica si se autentificó correctamente el usuario
             if (this.state.isLogged) {
                 this.backhandler.remove()
-                this.props.navigation.navigate('GetCourses', {
-                    idProfessor: user.uid
-                })
+                firebase.auth().onAuthStateChanged(user =>
+                    this.props.navigation.navigate('GetCourses', {
+                        idProfessor: user.uid
+                    })
+                )
             }
         }
     };
@@ -91,12 +95,16 @@ export default class Login extends React.Component {
         headerLeft: null
     };
 
-    componentDidMount() {
-        this.backhandler = BackHandler.addEventListener('hardwareBackPress', this.handleBackButton)
-    }
-
     componentDidFocus() {
         this.backhandler = BackHandler.addEventListener('hardwareBackPress', this.handleBackButton)
+        // Se reinicia el state
+        this.setState({
+            email: '',
+            password: '',
+            errorMessage: null,
+            isLoading: false,
+            isLogged: false
+        })
     }
 
     async handleBackButton() {
@@ -193,6 +201,7 @@ const style = StyleSheet.create({
     textButton: {
         color: '#FFFFFF',
         fontSize: 18,
+        marginTop: 2
     },
     errorText: {
         color: '#9B1200',

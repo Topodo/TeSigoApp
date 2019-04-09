@@ -38,10 +38,19 @@ export default class StudentList extends Component {
         })
     }
 
-    orderByLastName(students) {
-        return students.sort((prevStudent, nextStudent) => {
-            return (prevStudent.apellidoPaternoAlumno - nextStudent.apellidoPaternoAlumno) * -1
-        })
+    orderByLastName(property) {
+        var sortOrder = 1;
+        if(property[0] === "-") {
+            sortOrder = -1;
+            property = property.substr(1);
+        }
+        return function (a,b) {
+            if(sortOrder == -1){
+                return b[property].toLowerCase().localeCompare(a[property].toLowerCase(), 'cl');
+            }else{
+                return a[property].toLowerCase().localeCompare(b[property].toLowerCase(), 'cl');
+            }        
+        }
     }
 
     // Método que accede a la data de la API
@@ -57,7 +66,7 @@ export default class StudentList extends Component {
                     expandableItems.push(false);
                 }
                 this.setState({
-                    students: this.orderByLastName(resultJSON),
+                    students: resultJSON.sort(this.orderByLastName("apellidoPaternoAlumno")),
                     isLoading: false,
                     expandableItems: expandableItems
                 })

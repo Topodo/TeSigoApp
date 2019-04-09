@@ -89,33 +89,35 @@ export default class GetObjectivesPerStudent extends React.Component {
             errorOccurs: false
         })
         firebase.auth().onAuthStateChanged(user => {
-            // Se obtienen las unidades
-            this.APIHandler.getFromAPI('http://206.189.195.214:8080/api/profesor/' + user.uid + '/curso/' + this.state.idCourse + '/unidades')
-                .then(response => {
-                    const names = this.getSubjectsNames(response)
-                    this.setState({
-                        subjectsNames: names,
-                        defaultSubject: names[0],
-                        idSubject: response[0].idUnidad,
+            if (user) {
+                // Se obtienen las unidades
+                this.APIHandler.getFromAPI('http://206.189.195.214:8080/api/profesor/' + user.uid + '/curso/' + this.state.idCourse + '/unidades')
+                    .then(response => {
+                        const names = this.getSubjectsNames(response)
+                        this.setState({
+                            subjectsNames: names,
+                            defaultSubject: names[0],
+                            idSubject: response[0].idUnidad,
+                        })
                     })
-                })
-                .then(() => {
-                    // Se obtiene el avance del alumno en todas las unidades
-                    this.APIHandler.getFromAPI('http://206.189.195.214:8080/api/unidad/all/alumno/' + this.state.idStudent)
-                        .then(response => {
-                            this.setState({
-                                subjects: response,
-                                isLoading: false
-                            })
-                        }
-                        )
-                })
-                .catch(error => {
-                    this.setState({
-                        isLoading: false,
-                        errorOccurs: true
+                    .then(() => {
+                        // Se obtiene el avance del alumno en todas las unidades
+                        this.APIHandler.getFromAPI('http://206.189.195.214:8080/api/unidad/all/alumno/' + this.state.idStudent)
+                            .then(response => {
+                                this.setState({
+                                    subjects: response,
+                                    isLoading: false
+                                })
+                            }
+                            )
                     })
-                })
+                    .catch(error => {
+                        this.setState({
+                            isLoading: false,
+                            errorOccurs: true
+                        })
+                    })
+            }
         })
     }
 

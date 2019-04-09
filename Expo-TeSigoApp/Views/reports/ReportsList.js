@@ -120,6 +120,17 @@ export default class ReportsList extends Component {
         BackHandler.removeEventListener('hardwareBackPress', this.goBack)
     }
 
+    // Método que renderiza un indicador en caso de que no hayan reportes
+    renderEmptyList() {
+        return (
+            <View style={styles.activityIndicator}>
+                <Text style={styles.loadingText}>
+                    No hay reportes para mostrar
+                </Text>
+            </View>
+        )
+    }
+
     // Método que renderiza un reporte
     renderReport(report, index) {
         let arrowRotation = this.state.showReport[index] ?
@@ -181,9 +192,10 @@ export default class ReportsList extends Component {
             )
         }
 
-        let reports = this.state.reports.map((report, index) => {
-            return (this.renderReport(report, index))
-        })
+        let reports = this.state.reports.length === 0 ? this.renderEmptyList() :
+            this.state.reports.map((report, index) => {
+                return (this.renderReport(report, index))
+            })
         return (
             <ScrollView style={styles.backColor}>
                 <Text style={styles.titleText}>

@@ -69,8 +69,9 @@ export default class SubjectCourseProgress extends Component {
             errorOccurs: false
         })
         firebase.auth().onAuthStateChanged(user => {
-            // Se obtienen las unidades
-            this.APIHandler.getFromAPI('http://206.189.195.214:8080/api/profesor/' + user.uid + '/curso/' + this.state.idCourse + '/unidades')
+            if(user) {
+                // Se obtienen las unidades
+                this.APIHandler.getFromAPI('http://206.189.195.214:8080/api/profesor/' + user.uid + '/curso/' + this.state.idCourse + '/unidades')
                 .then(response => {
                     const names = this.getSubjectsNames(response)
                     let aux = []
@@ -112,6 +113,7 @@ export default class SubjectCourseProgress extends Component {
                         errorOccurs: true
                     })
                 })
+            }
         })
     }
 
