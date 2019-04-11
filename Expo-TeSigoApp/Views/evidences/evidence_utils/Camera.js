@@ -29,7 +29,7 @@ export default class ShowCamera extends React.Component {
             let photo = await this.camera.takePictureAsync()
             let resizedPhoto = await ImageManipulator.manipulateAsync(
                 photo.uri,
-                [{ resize: { width: 1080, height: 720 } }],
+                [],
                 { compress: 1, format: 'png', base64: false }
             )
             this.setState({
