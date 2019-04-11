@@ -308,6 +308,7 @@ const styles = StyleSheet.create({
         marginRight: '10%',
         borderWidth: 1.5,
         borderColor: '#429b00',
+        borderRadius: 8,
         alignItems: 'center',
         marginBottom: 10,
         marginTop: 10

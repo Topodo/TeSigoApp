@@ -173,11 +173,11 @@ export default class EvidenceForm extends Component {
 
     renderActivityIndicator() {
         return (
-            <View style={styles.activityIndicator}>
-                <Text style={styles.loadingText}>
+            <View style={styles.uploadStatusContainer}>
+                <Text style={styles.uploadText}>
                     Subiendo la evidencia
                 </Text>
-                <ActivityIndicator size='large' />
+                <ActivityIndicator size='small' />
             </View>
         )
     }
@@ -279,6 +279,17 @@ const styles = StyleSheet.create({
         marginLeft: '5%',
         fontSize: 12
     },
+    uploadStatusContainer: {
+        height: 80,
+        marginTop: 10,
+        marginBottom: 10
+    },  
+    uploadText: {
+        fontSize: 18,
+        textAlign: 'center',
+        marginTop: 10,
+        marginBottom: 7
+    },
     loadingText: {
         fontSize: 22,
         textAlign: 'center',
@@ -294,12 +305,6 @@ const styles = StyleSheet.create({
         margin: 'auto',
         marginTop: '4%'
     },
-    loadingText: {
-        fontSize: 22,
-        textAlign: 'center',
-        marginBottom: '8%',
-        marginTop: '5%'
-    },
     backColor: {
         backgroundColor: 'white'
     },
@@ -310,15 +315,6 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         borderWidth: 1.5,
         borderColor: '#429b00'
-    },
-    loadingText: {
-        fontSize: 22,
-        textAlign: 'center',
-        marginBottom: '8%'
-    },
-    activityIndicator: {
-        margin: 'auto',
-        marginTop: '4%',
     },
     titleText: {
         fontSize: 20,

@@ -1,6 +1,6 @@
 import React from "react"
 import { StyleSheet, Text, View, Dimensions, Slider, Image } from "react-native"
-import { Camera, Permissions, Audio } from 'expo'
+import { Camera, Permissions, Audio, ImageManipulator } from 'expo'
 import { Icon } from 'native-base'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
@@ -27,16 +27,14 @@ export default class ShowCamera extends React.Component {
     async snap() {
         if (this.camera) {
             let photo = await this.camera.takePictureAsync()
-            const soundObject = new Audio.Sound();
-            try {
-                await soundObject.loadAsync(require('../../../audio/camera-shutter-click-08.mp3'));
-                await soundObject.playAsync();
-                await this.setState({
-                    image: photo
-                })
-            } catch (error) {
-                console.error(error)
-            }
+            let resizedPhoto = await ImageManipulator.manipulateAsync(
+                photo.uri,
+                [{ resize: { width: 1080, height: 720 } }],
+                { compress: 1, format: 'png', base64: false }
+            )
+            this.setState({
+                image: resizedPhoto
+            })
         }
     }
 
@@ -155,8 +153,8 @@ const styles = StyleSheet.create({
         color: 'white',
         marginTop: height * 0.05
     },
-    closeCamera: { 
-        color: 'white', 
+    closeCamera: {
+        color: 'white',
         fontSize: height * 0.05
     },
     deleteIcon: {
