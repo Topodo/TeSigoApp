@@ -245,8 +245,8 @@ const styles = StyleSheet.create({
         marginLeft: '5%',
     },
     picker: {
-        marginLeft: '20%',
-        marginRight: '20%',
+        marginLeft: '10%',
+        marginRight: '10%',
         marginBottom: '7%',
         borderRadius: 8,
         borderWidth: 1.5,

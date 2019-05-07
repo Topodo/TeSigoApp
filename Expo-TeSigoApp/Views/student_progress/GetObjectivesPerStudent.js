@@ -199,7 +199,7 @@ export default class GetObjectivesPerStudent extends React.Component {
                             source={isComplete}
                         />
                     </View>
-                    <View style={styles.button}>
+                    <View>
                         <Button onPress={this.goEvaluationIndicators.bind(this, OA)}
                             color='#429b00'
                             title="Ver indicadores de evaluación">
@@ -249,8 +249,8 @@ const styles = StyleSheet.create({
         backgroundColor: '#FFFFFF'
     },
     picker: {
-        marginLeft: '20%',
-        marginRight: '20%',
+        marginLeft: '10%',
+        marginRight: '10%',
         marginBottom: '7%',
         borderRadius: 8,
         borderWidth: 1.5,

@@ -19,8 +19,8 @@ export default class ShowCamera extends React.Component {
 
     async componentWillMount() {
         //Getting Permission result from app details.
-        const { status } = await Permissions.askAsync(Permissions.CAMERA);
-        this.setState({ hasCameraPermission: status === 'granted' });
+        const { status } = await Permissions.askAsync(Permissions.CAMERA)
+        this.setState({ hasCameraPermission: status === 'granted' })
     }
 
     // Método que se encarga de tomar la foto

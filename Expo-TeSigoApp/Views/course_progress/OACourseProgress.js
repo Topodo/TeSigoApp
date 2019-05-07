@@ -6,7 +6,8 @@ import {
     Text,
     Button,
     BackHandler,
-    ActivityIndicator
+    ActivityIndicator,
+    FlatList
 } from 'react-native';
 import APIHandler from '../../Utils/APIHandler'
 import PureChart from 'react-native-pure-chart'
@@ -83,15 +84,19 @@ export default class OACourseProgress extends Component {
         })
     }
 
+    // Métodos utilizados en el Flatlist
+    _keyExtractor = (item, index) => index.toString()
+
     // Método que renderiza la información de un IE
-    renderIE(IE, index) {
+    renderIE = ({ item: IE, index }) => {
         return (
             <View key={index} style={[styles.flowRight, styles.IEContainer]}>
-                <View style={styles.IETitleContainer}>
+                <ScrollView nestedScrollEnabled={true}
+                    style={styles.IETitleContainer}>
                     <Text>
                         {'IE' + (index + 1).toString() + ': ' + IE.IEName}
                     </Text>
-                </View>
+                </ScrollView>
                 <View style={styles.button}>
                     <Button onPress={() => {
                         this.goIEStudentProgress(IE)
@@ -134,8 +139,7 @@ export default class OACourseProgress extends Component {
         ]
 
         return (
-            <View style={[styles.graphContainer]}>
-                <Text style={styles.titleText}>Gráfico</Text>
+            <View style={styles.graphContainer}>
                 <View style={styles.legendContainer}>
                     <Text style={{ fontSize: 10 }}> Completos </Text>
                     <View style={[styles.legendTag, { backgroundColor: 'green' }]} />
@@ -146,10 +150,10 @@ export default class OACourseProgress extends Component {
                     <Text style={[styles.labelText]}> Cantidad de </Text>
                     <Text style={styles.labelText}> alumnos </Text>
                 </View>
-                <View style={{ width: '93%' }}>
+                <View style={{ width: '80%' }}>
                     <PureChart data={data} type='bar' />
                 </View>
-                <View style={{ alignItems: 'center', marginBottom: 12 }}>
+                <View style={{ alignItems: 'center', marginBottom: 10}}>
                     <Text style={styles.labelText}> Indicadores de Evaluación </Text>
                 </View>
             </View>
@@ -191,15 +195,15 @@ export default class OACourseProgress extends Component {
             )
         }
 
-        let IEs = this.state.IEs.map((IE, index) => {
-            return (this.renderIE(IE, index))
-        })
         return (
-            <ScrollView style={styles.backColor}>
-                <Text style={styles.titleText}> {this.state.course} </Text>
-                {IEs}
-                {this.renderGraph(this.state.IEs)}
-            </ScrollView>
+            <FlatList
+                nestedScrollEnabled={true}
+                style={styles.backColor}
+                data={this.state.IEs}
+                keyExtractor={this._keyExtractor}
+                ListHeaderComponent={() => <Text style={styles.titleText}> {this.state.course} </Text>}
+                renderItem={this.renderIE}
+                ListFooterComponent={() => this.renderGraph(this.state.IEs)} />
         )
     }
 }
@@ -215,8 +219,9 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         borderColor: '#429b00',
         width: '35%',
-        height: '12%',
+        height: 50,
         marginLeft: '50%',
+        marginTop: 10,
         alignItems: 'center',
     },
     yLabel: {
@@ -256,10 +261,9 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         borderColor: '#429b00',
         width: '94%',
-        marginRight: '3%',
         marginLeft: '3%',
+        marginBottom: 10,
         alignItems: 'center',
-        marginBottom: 30
     },
     progressBar: {
         width: '60%',
@@ -282,7 +286,7 @@ const styles = StyleSheet.create({
         width: '80%'
     },
     backColor: {
-        backgroundColor: '#FFFFFF'
+        backgroundColor: '#FFFFFF',
     },
     titleText: {
         fontSize: 20,
@@ -296,7 +300,8 @@ const styles = StyleSheet.create({
         borderWidth: 1.5,
         borderRadius: 8,
         borderColor: '#429b00',
-        marginBottom: 10
+        marginBottom: 10,
+        height: 150
     },
     IETitle: {
         fontSize: 18,
@@ -309,6 +314,7 @@ const styles = StyleSheet.create({
         marginLeft: '3%',
         marginBottom: '4%',
         marginRight: '4%',
-        width: '60%'
+        width: '60%',
+        height: 130
     }
 })

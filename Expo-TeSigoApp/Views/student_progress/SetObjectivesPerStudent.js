@@ -172,6 +172,65 @@ export default class ObjectivesPerStudent extends React.Component {
         })
     }
 
+    // Método que renderiza el componente OA
+    renderOA(OA, id) {
+        if (this.state.checkedItems === [] || this.state.checkedItems === null) return null
+        return (
+            <View style={styles.OAContainer} key={id}>
+                <View style={[styles.flowRight]}>
+                    <View style={styles.OAText}>
+                        <Text>
+                            {(id + 1).toString() + '.- ' + OA.name}
+                        </Text>
+                    </View>
+                    <Text>
+                        {(Math.round(OA.percentage * 100)).toString() + '%'}
+                    </Text>
+                    <CheckBox
+                        key={id}
+                        checked={this.state.checkedItems[id].isComplete}
+                        onPress={() => {
+                            let tmp = this.state.checkedItems;
+                            tmp[id].isComplete = !this.state.checkedItems[id].isComplete;
+                            this.setState({
+                                checkedItems: tmp
+                            })
+                        }}
+                        containerStyle={styles.CheckBoxStyle} />
+                </View>
+                <View>
+                    <Button
+                        onPress={this.goEvaluationIndicator.bind(this, OA)}
+                        color='#429b00'
+                        title="Asignar indicadores de evaluación">
+                    </Button>
+                </View>
+            </View>
+        );
+    }
+
+    handleSend = () => {
+        const body = this.updateOASStatuses()
+        this.APIHandler.putToAPI('http://206.189.195.214:8080/api/acompletado/update/' + this.state.idStudent + '/indicadores', body)
+            .then(response => {
+                // Una vez se haya realizado los cambios, se lanza una alerta indicando si hubo éxito o no
+                let title = 'Actualización de objetivos'
+                let subTitle = 'Cambios realizados exitosamente'
+                if (response.status) {
+                    subTitle = 'Ocurrió un error interno, inténtelo nuevamente'
+                } else {
+                    // Se recarga la data
+                    this.getOASData()
+                }
+                // Se lanza una alerta indicando el estado de la actualización
+                Alert.alert(
+                    title,
+                    subTitle,
+                    [{ text: 'OK' }]
+                )
+            })
+    }
+
     goBack = () => {
         this.props.navigation.navigate('StudentProfile')
         return true
@@ -233,41 +292,7 @@ export default class ObjectivesPerStudent extends React.Component {
             return <Picker.Item key={ind} value={val} label={val} />
         });
         // Se mapean los objetivos de aprendizaje de la unidad
-        let learningCheckBoxes = this.getLearningObjectives(this.state.defaultSubject).OAs.map((OA, id) => {
-            if (this.state.checkedItems === [] || this.state.checkedItems === null) return null
-            return (
-                <View style={styles.OAContainer} key={id}>
-                    <View style={[styles.flowRight]}>
-                        <View style={styles.OAText}>
-                            <Text>
-                                {(id + 1).toString() + '.- ' + OA.name}
-                            </Text>
-                        </View>
-                        <Text>
-                            {(Math.round(OA.percentage * 100)).toString() + '%'}
-                        </Text>
-                        <CheckBox
-                            key={id}
-                            checked={this.state.checkedItems[id].isComplete}
-                            onPress={() => {
-                                let tmp = this.state.checkedItems;
-                                tmp[id].isComplete = !this.state.checkedItems[id].isComplete;
-                                this.setState({
-                                    checkedItems: tmp
-                                })
-                            }}
-                            containerStyle={styles.CheckBoxStyle} />
-                    </View>
-                    <View style={styles.button}>
-                        <Button
-                            onPress={this.goEvaluationIndicator.bind(this, OA)}
-                            color='#429b00'
-                            title="Asignar indicadores de evaluación">
-                        </Button>
-                    </View>
-                </View>
-            );
-        });
+        let learningCheckBoxes = this.getLearningObjectives(this.state.defaultSubject).OAs.map((OA, id) => { return this.renderOA(OA, id) });
         return (
             <ScrollView style={styles.backColor}>
                 <Text style={styles.titleText}>
@@ -289,27 +314,7 @@ export default class ObjectivesPerStudent extends React.Component {
                     <Button
                         title={'Actualizar avance'}
                         color='#429b00'
-                        onPress={() => {
-                            const body = this.updateOASStatuses()
-                            this.APIHandler.putToAPI('http://206.189.195.214:8080/api/acompletado/update/' + this.state.idStudent + '/indicadores', body)
-                                .then(response => {
-                                    // Una vez se haya realizado los cambios, se lanza una alerta indicando si hubo éxito o no
-                                    let title = 'Actualización de objetivos'
-                                    let subTitle = 'Cambios realizados exitosamente'
-                                    if (response.status) {
-                                        subTitle = 'Ocurrió un error interno, inténtelo nuevamente'
-                                    } else {
-                                        // Se recarga la data
-                                        this.getOASData()
-                                    }
-                                    // Se lanza una alerta indicando el estado de la actualización
-                                    Alert.alert(
-                                        title,
-                                        subTitle,
-                                        [{ text: 'OK' }]
-                                    )
-                                })
-                        }} />
+                        onPress={this.handleSend} />
                 </View>
             </ScrollView>
         )
@@ -337,8 +342,8 @@ const styles = StyleSheet.create({
         backgroundColor: 'white'
     },
     picker: {
-        marginLeft: '20%',
-        marginRight: '20%',
+        marginLeft: '10%',
+        marginRight: '10%',
         marginBottom: '7%',
         borderRadius: 8,
         borderWidth: 1.5,
