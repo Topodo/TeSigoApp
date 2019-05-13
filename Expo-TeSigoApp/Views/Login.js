@@ -11,10 +11,12 @@ import {
     TouchableOpacity,
     ActivityIndicator,
     Alert,
-    BackHandler
+    BackHandler,
+    AsyncStorage
 } from 'react-native';
+import { SecureStore } from 'expo'
 import * as firebase from 'firebase';
-import Firebase from '../Utils/firebase'
+import APIHandler from '../Utils/APIHandler'
 import { NavigationEvents } from 'react-navigation'
 
 // Definición del componente para el Login
@@ -27,19 +29,20 @@ export default class Login extends React.Component {
             password: '',
             errorMessage: null,
             isLoading: false,
-            isLogged: false
+            isLogged: false,
         };
+        this.APIHandler = new APIHandler()
     }
 
     // Método asíncrono para logear utilizando firebase
     async login() {
         try {
             // Se verifica si el usuario está logeado en la aplicación
-            await firebase.auth().signOut()
-            await firebase.auth().signInWithEmailAndPassword(this.state.email, this.state.password);
-            this.setState({
+            await this.setState({
                 isLogged: true
             })
+            await firebase.auth().signOut()
+            await firebase.auth().signInWithEmailAndPassword(this.state.email, this.state.password);
         } catch (error) {
             this.setState({
                 errorMessage: 'Correo o contraseña incorrectas. Inténtelo nuevamente.',
@@ -70,11 +73,19 @@ export default class Login extends React.Component {
             // Se verifica si se autentificó correctamente el usuario
             if (this.state.isLogged) {
                 this.backhandler.remove()
-                firebase.auth().onAuthStateChanged(user =>
-                    this.props.navigation.navigate('GetCourses', {
-                        idProfessor: user.uid
-                    })
-                )
+                firebase.auth().onAuthStateChanged(user => {
+                    if (user) {
+                        this.APIHandler.getToken(user.uid)
+                            .then(response => {
+                                SecureStore.setItemAsync('api_tesigoapp_token', response.token)
+                                    .then(() => {
+                                        this.props.navigation.navigate('GetCourses', {
+                                            idProfessor: user.uid
+                                        })
+                                    })
+                            })
+                    }
+                })
             }
         }
     };
@@ -97,10 +108,12 @@ export default class Login extends React.Component {
 
     componentDidFocus() {
         this.backhandler = BackHandler.addEventListener('hardwareBackPress', this.handleBackButton)
+        try {
+            firebase.auth().signOut()
+        } catch (error) { console.error(error) }
+
         // Se reinicia el state
         this.setState({
-            email: '',
-            password: '',
             errorMessage: null,
             isLoading: false,
             isLogged: false

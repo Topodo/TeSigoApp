@@ -387,8 +387,8 @@ const styles = StyleSheet.create({
         marginLeft: '10%',
         marginRight: '10%',
         textAlign: 'center',
-        marginTop: '2%',
-        marginBottom: '3%',
+        marginTop: 7,
+        marginBottom: 7,
         height: 40
     },
     textButton: {

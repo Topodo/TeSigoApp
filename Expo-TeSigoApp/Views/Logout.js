@@ -6,7 +6,9 @@ import {
     View,
     TouchableOpacity,
     ActivityIndicator,
+    AsyncStorage
 } from 'react-native';
+import { SecureStore } from 'expo'
 import * as firebase from 'firebase';
 
 export default class Logout extends React.Component {
@@ -16,7 +18,10 @@ export default class Logout extends React.Component {
     componentDidMount() {
         try {
             firebase.auth().signOut()
-                .then(() => this.props.navigation.navigate('Login'))
+                .then(() => {
+                    SecureStore.deleteItemAsync('api_tesigoapp_token')
+                        .then(() => this.props.navigation.navigate('Login'))
+                })
         } catch (error) {
             console.error(error)
         }
