@@ -76,14 +76,8 @@ export default class Login extends React.Component {
                 firebase.auth().onAuthStateChanged(user => {
                     if (user) {
                         this.APIHandler.getToken(user.uid)
-                            .then(response => {
-                                SecureStore.setItemAsync('api_tesigoapp_token', response.token)
-                                    .then(() => {
-                                        this.props.navigation.navigate('GetCourses', {
-                                            idProfessor: user.uid
-                                        })
-                                    })
-                            })
+                            .then(response => SecureStore.setItemAsync('api_tesigoapp_token', response.token)
+                                .then(() => this.props.navigation.navigate('GetCourses', { idProfessor: user.uid })))
                     }
                 })
             }

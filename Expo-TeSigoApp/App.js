@@ -9,23 +9,23 @@ import {
     createDrawerNavigator
 } from 'react-navigation';
 import Login from './Views/Login';
-import MainPage from './Views/MainPage';
-import SetEvaluationIndicator from './Views/student_progress/SetEvaluationIndicator';
-import SetObjectivesPerStudent from './Views/student_progress/SetObjectivesPerStudent';
-import GetObjectivesPerStudent from './Views/student_progress/GetObjectivesPerStudent';
-import GetEvaluationIndicator from './Views/student_progress/GetEvaluationIndicator';
-import GetEvidence from './Views/evidences/GetEvidence';
-import StudentList from './Views/StudentList';
-import GetCourses from './Views/GetCourses';
+import MainPage from './Views/WelcomePage';
+import SetEvaluationIndicator from './Views/student_progress/UpdateIEStudentProgress';
+import SetObjectivesPerStudent from './Views/student_progress/UpdateOAStudentProgress';
+import GetObjectivesPerStudent from './Views/student_progress/OAStudentProgress';
+import GetEvaluationIndicator from './Views/student_progress/IEStudentProgress';
+import GetEvidence from './Views/evidences/EvidencesList';
+import StudentList from './Views/StudentsList';
+import GetCourses from './Views/CoursesList';
 import StudentProfile from './Views/StudentProfile';
 import EvidenceForm from './Views/evidences/EvidenceForm'
 import CreateReport from './Views/reports/CreateReport'
 import ReportsList from './Views/reports/ReportsList'
 import CourseSubjectProgress from './Views/course_progress/SubjectCourseProgress'
 import OACourseProgress from './Views/course_progress/OACourseProgress'
-import IEStudentsProgress from './Views/course_progress/IEStudentsProgress'
+import IEStudentsProgress from './Views/course_progress/IECourseProgress'
 import SelectEvidence from './Views/evidences/SelectEvidence'
-import ShowEvidence from './Views/evidences/ShowEvidence'
+import ShowEvidence from './Views/evidences/EvidencePlayer'
 import Logout from './Views/Logout'
 
 const AppNavigator = createStackNavigator({
