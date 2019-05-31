@@ -81,7 +81,7 @@ export default class GetCourses extends Component {
     renderInfo(info, id) {
         return (
             <View key={id} style={styles.CourseContainer}>
-                <Button title={(id + 1).toString() + '.- ' + info.gradoCurso}
+                <Button title={info.gradoCurso}
                     onPress={this.goToStudentsList.bind(this, info)}
                     color='#429b00'>
                 </Button>

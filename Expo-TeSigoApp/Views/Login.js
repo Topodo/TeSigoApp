@@ -25,8 +25,8 @@ export default class Login extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            email: '',
-            password: '',
+            email: 'cecilia.maturana.ibaceta@gmail.com',
+            password: 'cecilia9721',
             errorMessage: null,
             isLoading: false,
             isLogged: false,
@@ -41,7 +41,6 @@ export default class Login extends React.Component {
             await this.setState({
                 isLogged: true
             })
-            await firebase.auth().signOut()
             await firebase.auth().signInWithEmailAndPassword(this.state.email, this.state.password);
         } catch (error) {
             this.setState({
@@ -62,25 +61,32 @@ export default class Login extends React.Component {
                 errorMessage: 'Es necesario completar los campos.'
             })
         } else {
-            this.setState({
-                isLoading: true
-            });
             this.login()
-                .then(this.setState({
-                    isLoading: false
-                }))
-
-            // Se verifica si se autentificó correctamente el usuario
-            if (this.state.isLogged) {
-                this.backhandler.remove()
-                firebase.auth().onAuthStateChanged(user => {
-                    if (user) {
-                        this.APIHandler.getToken(user.uid)
-                            .then(response => SecureStore.setItemAsync('api_tesigoapp_token', response.token)
-                                .then(() => this.props.navigation.navigate('GetCourses', { idProfessor: user.uid })))
+                .then(() => {
+                    // Se verifica si se autentificó correctamente el usuario
+                    if (this.state.isLogged) {
+                        firebase.auth().onAuthStateChanged(user => {
+                            if (user) {
+                                this.APIHandler.getToken(user.uid)
+                                    .then(response => {
+                                        SecureStore.setItemAsync('api_tesigoapp_token', response.token)
+                                        .then(() => {
+                                            this.props.navigation.navigate('GetCourses', { idProfessor: user.uid })
+                                        })
+                                    })
+                                    .catch(error => this.setState({
+                                        errorMessage: 'Problema en la autenticación. Inténtelo nuevamente.',
+                                        isLogged: false
+                                    }))
+                            } else {
+                                this.setState({
+                                    errorMessage: 'Problema en la autenticación. Inténtelo nuevamente.',
+                                    isLogged: false
+                                })
+                            }
+                        })
                     }
                 })
-            }
         }
     };
 
@@ -142,7 +148,7 @@ export default class Login extends React.Component {
                 {this.state.errorMessage}
             </Text> : null;
         // Se define una variable que muestra un botón o un activity indicator
-        let loginButton = !this.state.isLoading ?
+        let loginButton = !this.state.isLogged ?
             <TouchableOpacity style={style.button}
                 onPress={this.goToMainView}>
                 <Text style={style.textButton}>

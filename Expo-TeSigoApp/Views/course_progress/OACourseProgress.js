@@ -89,20 +89,32 @@ export default class OACourseProgress extends Component {
 
     // Método que renderiza la información de un IE
     renderIE = ({ item: IE, index }) => {
+        const percentage = IE.completeCount / (IE.completeCount + IE.incompleteCount)
         return (
-            <View key={index} style={[styles.flowRight, styles.IEContainer]}>
-                <ScrollView nestedScrollEnabled={true}
-                    style={styles.IETitleContainer}>
-                    <Text>
-                        {'IE' + (index + 1).toString() + ': ' + IE.IEName}
-                    </Text>
-                </ScrollView>
-                <View style={styles.button}>
-                    <Button onPress={() => {
-                        this.goIEStudentProgress(IE)
-                    }}
+            <View key={index} style={[styles.IEContainer]}>
+                <View style={styles.flowRight}>
+                    <ScrollView nestedScrollEnabled={true}
+                        style={styles.IETitleContainer}>
+                        <Text>
+                            {'IE' + (index + 1).toString() + ': ' + IE.IEName}
+                        </Text>
+                    </ScrollView>
+                    <View style={styles.percentageContainer}>
+                        <Text>
+                            {(Math.round(percentage * 100)).toString() + '%'}
+                        </Text>
+                    </View>
+                </View>
+                <View>
+                    <Button onPress={() => this.goIEStudentProgress(IE)}
                         color='#429b00'
                         title="Lista de alumnos" />
+                </View>
+                <View style={[styles.moduleTextContainer, { marginLeft: '20%' }]}>
+                    <Text style={styles.moduleTitle}> Descripción </Text>
+                </View>
+                <View style={[styles.moduleTextContainer, { marginLeft: '74%' }]}>
+                    <Text style={styles.moduleTitle}> % Avance </Text>
                 </View>
             </View>
         )
@@ -153,7 +165,7 @@ export default class OACourseProgress extends Component {
                 <View style={{ width: '80%' }}>
                     <PureChart data={data} type='bar' />
                 </View>
-                <View style={{ alignItems: 'center', marginBottom: 10}}>
+                <View style={{ alignItems: 'center', marginBottom: 10 }}>
                     <Text style={styles.labelText}> Indicadores de Evaluación </Text>
                 </View>
             </View>
@@ -301,7 +313,6 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         borderColor: '#429b00',
         marginBottom: 10,
-        height: 150
     },
     IETitle: {
         fontSize: 18,
@@ -314,7 +325,25 @@ const styles = StyleSheet.create({
         marginLeft: '3%',
         marginBottom: '4%',
         marginRight: '4%',
-        width: '60%',
-        height: 130
+        width: '70%',
+    },
+    moduleTitle: {
+        color: 'gray',
+        fontSize: 10,
+        textAlign: 'center'
+    },
+    moduleTextContainer: {
+        borderColor: 'green',
+        borderWidth: 1.5,
+        borderRadius: 8,
+        position: 'absolute',
+        width: '10%',
+        marginTop: -5.5,
+        backgroundColor: 'white',
+        alignItems: 'center'
+    },
+    percentageContainer: {
+        width: '20%',
+        alignItems: 'center',
     }
 })

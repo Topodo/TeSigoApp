@@ -69,50 +69,50 @@ export default class SubjectCourseProgress extends Component {
             errorOccurs: false
         })
         firebase.auth().onAuthStateChanged(user => {
-            if(user) {
+            if (user) {
                 // Se obtienen las unidades
                 this.APIHandler.getFromAPI('http://206.189.195.214:8080/api/profesor/' + user.uid + '/curso/' + this.state.idCourse + '/unidades')
-                .then(response => {
-                    const names = this.getSubjectsNames(response)
-                    let aux = []
-                    response.forEach(subject => {
-                        aux.push(subject.idUnidad)
+                    .then(response => {
+                        const names = this.getSubjectsNames(response)
+                        let aux = []
+                        response.forEach(subject => {
+                            aux.push(subject.idUnidad)
+                        })
+                        this.setState({
+                            subjectsNames: names,
+                            defaultSubject: names[0].id,
+                            idSubject: response[0].idUnidad,
+                            idsSubjects: aux
+                        })
                     })
-                    this.setState({
-                        subjectsNames: names,
-                        defaultSubject: names[0].id,
-                        idSubject: response[0].idUnidad,
-                        idsSubjects: aux
-                    })
-                })
-                .then(() => {
-                    // Se obtiene el avance del curso en todas las unidades 
-                    let progressAux = []
-                    let count = 0
-                    this.state.idsSubjects.forEach(id => {
-                        this.APIHandler.getFromAPI('http://206.189.195.214:8080/api/unidad/' +
-                            id.toString() + '/curso/' + this.state.idCourse + '/avance')
-                            .then(response => {
-                                progressAux.push({
-                                    idSubject: id,
-                                    progress: response
-                                })
-                                count++
-                                if (count === this.state.idsSubjects.length) {
-                                    this.setState({
-                                        progress: progressAux,
-                                        isLoading: false,
+                    .then(() => {
+                        // Se obtiene el avance del curso en todas las unidades 
+                        let progressAux = []
+                        let count = 0
+                        this.state.idsSubjects.forEach(id => {
+                            this.APIHandler.getFromAPI('http://206.189.195.214:8080/api/unidad/' +
+                                id.toString() + '/curso/' + this.state.idCourse + '/avance')
+                                .then(response => {
+                                    progressAux.push({
+                                        idSubject: id,
+                                        progress: response
                                     })
-                                }
-                            })
+                                    count++
+                                    if (count === this.state.idsSubjects.length) {
+                                        this.setState({
+                                            progress: progressAux,
+                                            isLoading: false,
+                                        })
+                                    }
+                                })
+                        })
                     })
-                })
-                .catch(error => {
-                    this.setState({
-                        isLoading: false,
-                        errorOccurs: true
+                    .catch(error => {
+                        this.setState({
+                            isLoading: false,
+                            errorOccurs: true
+                        })
                     })
-                })
             }
         })
     }
@@ -138,6 +138,40 @@ export default class SubjectCourseProgress extends Component {
 
     componentWillUnmount() {
         BackHandler.removeEventListener('hardwareBackPress', this.goBack)
+    }
+
+    // Método que renderiza un objetivo de aprendizaje y su porcentaje de avance
+    renderOA = (OA, index) => {
+        return (
+            <View key={index} style={styles.OAContainer}>
+                <View style={[styles.flowRight]}>
+                    <View style={styles.OATitleContainer}>
+                        <Text>
+                            {(index + 1).toString() + '.- ' + OA.OAName}
+                        </Text>
+                    </View>
+                    <View style={styles.percentageContainer}>
+                        <Text>
+                            {(Math.round(OA.percentage * 100)).toString() + '%'}
+                        </Text>
+                    </View>
+                </View>
+                <View>
+                    <Button onPress={() => {
+                        this.goOAView(OA.idOA)
+                    }}
+                        color='#429b00'
+                        title="Ver indicadores de evaluación">
+                    </Button>
+                </View>
+                <View style={[styles.moduleTextContainer, { marginLeft: '20%' }]}>
+                    <Text style={styles.moduleTitle}> Descripción </Text>
+                </View>
+                <View style={[styles.moduleTextContainer, { marginLeft: '72%' }]}>
+                    <Text style={styles.moduleTitle}> % Avance </Text>
+                </View>
+            </View>
+        )
     }
 
     static navigationOptions = {
@@ -181,30 +215,7 @@ export default class SubjectCourseProgress extends Component {
         })
         // Se renderiza los avances en cada uno de los objetivos de aprendizaje
         let progress = this.getSubjectData(this.state.defaultSubject).map((OA, index) => {
-            return (
-                <View key={index} style={styles.OAContainer}>
-                    <View style={[styles.flowRight]}>
-                        <View style={styles.OATitleContainer}>
-                            <Text>
-                                {(index + 1).toString() + '.- ' + OA.OAName}
-                            </Text>
-                        </View>
-                        <View>
-                            <Text>
-                                {(Math.round(OA.percentage * 100)).toString() + '%'}
-                            </Text>
-                        </View>
-                    </View>
-                    <View>
-                        <Button onPress={() => {
-                            this.goOAView(OA.idOA)
-                        }}
-                            color='#429b00'
-                            title="Ver indicadores de evaluación">
-                        </Button>
-                    </View>
-                </View>
-            )
+            return (this.renderOA(OA, index))
         })
 
         return (
@@ -288,6 +299,25 @@ const styles = StyleSheet.create({
         marginLeft: '3%',
         marginBottom: '4%',
         marginRight: '4%',
-        width: '80%'
+        width: '70%'
+    },
+    moduleTitle: {
+        color: 'gray',
+        fontSize: 10,
+        textAlign: 'center'
+    },
+    moduleTextContainer: {
+        borderColor: 'green',
+        borderWidth: 1.5,
+        borderRadius: 8,
+        position: 'absolute',
+        width: '10%',
+        marginTop: -5.5,
+        backgroundColor: 'white',
+        alignItems: 'center'
+    },
+    percentageContainer: {
+        width: '20%',
+        alignItems: 'center',
     }
 })

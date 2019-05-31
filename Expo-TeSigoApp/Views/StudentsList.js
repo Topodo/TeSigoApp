@@ -174,7 +174,7 @@ export default class StudentList extends Component {
                         {'Curso: ' + this.state.course}
                     </Text>
                     <View style={styles.progressButton}>
-                        <Button title="Ver avance del curso"
+                        <Button title="Ver avance global"
                             color='#429b00'
                             onPress={this.getCourseSubjectProgress.bind(this)}>
                         </Button>
