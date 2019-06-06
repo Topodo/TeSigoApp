@@ -69,6 +69,8 @@ export default class Login extends React.Component {
                             if (user) {
                                 this.APIHandler.getToken(user.uid)
                                     .then(response => {
+                                        console.log(user)
+                                        console.log(response)
                                         SecureStore.setItemAsync('api_tesigoapp_token', response.token)
                                         .then(() => {
                                             this.props.navigation.navigate('GetCourses', { idProfessor: user.uid })
@@ -107,11 +109,7 @@ export default class Login extends React.Component {
     };
 
     componentDidFocus() {
-        this.backhandler = BackHandler.addEventListener('hardwareBackPress', this.handleBackButton)
-        try {
-            firebase.auth().signOut()
-        } catch (error) { console.error(error) }
-
+        BackHandler.addEventListener('hardwareBackPress', this.handleBackButton)
         // Se reinicia el state
         this.setState({
             errorMessage: null,
@@ -138,7 +136,7 @@ export default class Login extends React.Component {
     }
 
     componentWillUnmount() {
-        this.backhandler.remove()
+        BackHandler.removeEventListener('hardwareBackPress', this.handleBackButton)
     }
 
     render() {

@@ -20,7 +20,7 @@ export default class MainPage extends React.Component {
 
     componentDidMount() {
         /**
-         * El flujo de la página principal de la aplicación consiste de tres casos:
+         * El flujo de la página principal de la aplicación consiste de cuatro casos:
          * 
          * 1.- El primer caso ocurre cuando hay un usuario autentificado en la aplicación
          * y además posee su respectivo JWT (JSON Web Token) almacenado de forma encriptada
@@ -32,29 +32,36 @@ export default class MainPage extends React.Component {
          * antes de redirigir la navegación hacia la vista Login, se procede a desautentificar
          * al usuario actual y luego se realiza el cambio de componente.
          * 
-         * 3.- El tercer caso ocurre cuando no hay un usuario autentificado ni un JWT en el storage.
+         * 3.- El tercer caso ocurre cuando hay un token almacenado en la aplicación pero no está 
+         * el usuario autentificado. en dicho caso, antes de redirigir la navegación hacia la vista
+         * Login, se procede a eliminar el token en el SecureStore de la aplicación y luego se 
+         * realiza el cambio de componente.
+         * 
+         * 4.- El cuarto caso ocurre cuando no hay un usuario autentificado ni un JWT en el storage.
          * En dicho caso solo es necesario redirigir la navegación hacia la vista de Login.
          * 
          * Finalmente, se da un total de 2 segundos para mostrar el componente de bienvenida.
          */
-        setTimeout(() => {
-            SecureStore.getItemAsync('api_tesigoapp_token')
-                .then(token =>
-                    // Se verifica si el usuario está logeado en la aplicación y si tiene un JWT asociado
-                    firebase.auth().onAuthStateChanged(user => {
-                        if (user && token) {
-                            this.props.navigation.navigate('GetCourses', {
-                                idProfessor: user.uid
-                            })
-                        } else if (user && !token) {
-                            firebase.auth().signOut()
-                            this.props.navigation.navigate('Login')
-                        } else {
-                            this.props.navigation.navigate('Login')
-                        }
-                    })
-                )
-        }, 2000)
+        setTimeout(() => { }, 2000)
+        SecureStore.getItemAsync('api_tesigoapp_token')
+            .then(token =>
+                // Se verifica si el usuario está logeado en la aplicación y si tiene un JWT asociado
+                firebase.auth().onAuthStateChanged(user => {
+                    if (user && token) {
+                        this.props.navigation.navigate('GetCourses', {
+                            idProfessor: user.uid
+                        })
+                    } else if (user && !token) {
+                        firebase.auth().signOut()
+                            .then(() => this.props.navigation.navigate('Login'))
+                    } else if (!user && token) {
+                        SecureStore.deleteItemAsync('api_tesigoapp_token')
+                            .then(() => this.props.navigation.navigate('Login'))
+                    } else {
+                        this.props.navigation.navigate('Login')
+                    }
+                })
+            )
     }
 
     render() {

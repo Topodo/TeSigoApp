@@ -58,6 +58,54 @@ export default class EvaluationIndicator extends Component {
         return true
     }
 
+    // Método que renderiza un indicador de evaluación
+    renderIE(indicator, index) {
+        return (
+            <View key={index} style={styles.IEContainer}>
+                <View style={styles.flowRight}>
+                    <View style={styles.IESubContainer}>
+                        <Text style={styles.IEText}>
+                            {(index + 1).toString() + '.- ' + indicator.description}
+                        </Text>
+                    </View>
+                    <CheckBox key={index}
+                        checked={this.state.checkedItems[index].status}
+                        containerStyle={styles.CheckBoxStyle}
+                        onPress={() => {
+                            let tmp = this.state.checkedItems;
+                            tmp[index].status = !this.state.checkedItems[index].status;
+                            this.setState({
+                                checkedItems: tmp
+                            })
+                        }} />
+                </View>
+            </View>
+        )
+    }
+
+    // Método que maneja el funcionamiento del botón de envío
+    handleSend = () => {
+        this.APIHandler.putToAPI('http://206.189.195.214:8080/api/acompletado/update/' + this.state.idStudent + '/indicadores', this.state.checkedItems)
+            .then(response => {
+                // Una vez se haya realizado los cambios, se lanza una alerta indicando si hubo éxito o no
+                let title = 'Actualización de objetivos'
+                let subTitle = 'Cambios realizados exitosamente'
+                if (response.status) {
+                    subTitle = 'Ocurrió un error interno, inténtelo nuevamente'
+                }
+                // Se lanza una alerta indicando el estado de la actualización
+                Alert.alert(
+                    title,
+                    subTitle,
+                    [{ text: 'OK' }]
+                )
+            })
+            .then(() => {
+                this.setOAs()
+            })
+            .catch(error => console.error(error))
+    }
+
     // Para modificar el state al cambiar de un componente a otro
     componentWillMount() {
         BackHandler.addEventListener('hardwareBackPress', this.goBack)
@@ -133,30 +181,7 @@ export default class EvaluationIndicator extends Component {
         }
 
         // Se mapean los indicadores de evaluación para renderizar
-        let evalInd = this.state.evalIndicators.map((indicator, index) => {
-            return (
-                <View key={index} style={styles.IEContainer}>
-                    <View style={styles.flowRight}>
-                        <View style={styles.IESubContainer}>
-                            <Text style={styles.IEText}>
-                                {(index + 1).toString() + '.- ' + indicator.description}
-                            </Text>
-                        </View>
-                        <CheckBox key={index}
-                            checked={this.state.checkedItems[index].status}
-                            containerStyle={styles.CheckBoxStyle}
-                            onPress={() => {
-                                let tmp = this.state.checkedItems;
-                                tmp[index].status = !this.state.checkedItems[index].status;
-                                this.setState({
-                                    checkedItems: tmp
-                                })
-                            }} />
-                    </View>
-                </View>
-            );
-        });
-
+        let evalInd = this.state.evalIndicators.map((indicator, index) => { return this.renderIE(indicator, index) })
         return (
             <ScrollView style={styles.backColor}>
                 <Text style={styles.titleText}>
@@ -172,26 +197,7 @@ export default class EvaluationIndicator extends Component {
                     <Button
                         title={'Actualizar Indicadores'}
                         color='#429b00'
-                        onPress={() => {
-                            this.APIHandler.putToAPI('http://206.189.195.214:8080/api/acompletado/update/' + this.state.idStudent + '/indicadores', this.state.checkedItems)
-                                .then(response => {
-                                    // Una vez se haya realizado los cambios, se lanza una alerta indicando si hubo éxito o no
-                                    let title = 'Actualización de objetivos'
-                                    let subTitle = 'Cambios realizados exitosamente'
-                                    if (response.status) {
-                                        subTitle = 'Ocurrió un error interno, inténtelo nuevamente'
-                                    }
-                                    // Se lanza una alerta indicando el estado de la actualización
-                                    Alert.alert(
-                                        title,
-                                        subTitle,
-                                        [{ text: 'OK' }]
-                                    )
-                                })
-                                .then(() => {
-                                    this.setOAs()
-                                })
-                        }} />
+                        onPress={this.handleSend} />
                 </View>
             </ScrollView>
         );
@@ -262,8 +268,8 @@ const styles = StyleSheet.create({
         marginLeft: '10%',
         marginRight: '10%',
         textAlign: 'center',
-        marginTop: '2%',
-        marginBottom: '3%',
+        marginTop: 7,
+        marginBottom: 7,
         height: 40
     },
 })
