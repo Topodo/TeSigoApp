@@ -139,7 +139,8 @@ export default class CreateReport extends Component {
         let calendarArrow = this.state.showCalendar ?
             [{ rotate: '-180deg' }] : [{ rotate: '0deg' }]
         return (
-            <KeyboardAwareScrollView style={styles.backColor}>
+            <KeyboardAwareScrollView style={styles.backColor}
+                enableOnAndroid={true}>
                 <NavigationEvents
                     onDidFocus={payload => this.componentDidFocus()} />
                 <Text style={styles.titleText}>

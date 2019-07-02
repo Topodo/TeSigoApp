@@ -27,13 +27,8 @@ export default class ShowCamera extends React.Component {
     async snap() {
         if (this.camera) {
             let photo = await this.camera.takePictureAsync()
-            let resizedPhoto = await ImageManipulator.manipulateAsync(
-                photo.uri,
-                [],
-                { compress: 1, format: 'png', base64: false }
-            )
             this.setState({
-                image: resizedPhoto
+                image: photo
             })
         }
     }

@@ -68,7 +68,7 @@ export default class APIHandler {
                 }
             })
             const data = await response.json()
-            return data
+            return data.token
         } catch (error) {
             const response = await fetch('http://206.189.195.214:8080/api/get_token?firebaseID=' + uid, {
                 method: 'POST',
@@ -78,7 +78,7 @@ export default class APIHandler {
                 }
             })
             const data = await response.json()
-            return data
+            return data.token
         }
     }
 

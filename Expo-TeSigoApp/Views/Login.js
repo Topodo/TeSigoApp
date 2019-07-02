@@ -38,10 +38,20 @@ export default class Login extends React.Component {
     async login() {
         try {
             // Se verifica si el usuario está logeado en la aplicación
-            await this.setState({
+            this.setState({
                 isLogged: true
             })
-            await firebase.auth().signInWithEmailAndPassword(this.state.email, this.state.password);
+            const userCredentials = await firebase.auth().signInWithEmailAndPassword(this.state.email, this.state.password)
+                if (userCredentials.user) {
+                    const token = await this.APIHandler.getToken(userCredentials.user.uid)
+                    await SecureStore.setItemAsync('api_tesigoapp_token', token)
+                    this.props.navigation.navigate('GetCourses', { idProfessor: userCredentials.user.uid })
+                } else {
+                    this.setState({
+                        errorMessage: 'Problema en la autenticación. Inténtelo nuevamente.',
+                        isLogged: false
+                    })
+                }
         } catch (error) {
             this.setState({
                 errorMessage: 'Correo o contraseña incorrectas. Inténtelo nuevamente.',
@@ -62,33 +72,6 @@ export default class Login extends React.Component {
             })
         } else {
             this.login()
-                .then(() => {
-                    // Se verifica si se autentificó correctamente el usuario
-                    if (this.state.isLogged) {
-                        firebase.auth().onAuthStateChanged(user => {
-                            if (user) {
-                                this.APIHandler.getToken(user.uid)
-                                    .then(response => {
-                                        console.log(user)
-                                        console.log(response)
-                                        SecureStore.setItemAsync('api_tesigoapp_token', response.token)
-                                        .then(() => {
-                                            this.props.navigation.navigate('GetCourses', { idProfessor: user.uid })
-                                        })
-                                    })
-                                    .catch(error => this.setState({
-                                        errorMessage: 'Problema en la autenticación. Inténtelo nuevamente.',
-                                        isLogged: false
-                                    }))
-                            } else {
-                                this.setState({
-                                    errorMessage: 'Problema en la autenticación. Inténtelo nuevamente.',
-                                    isLogged: false
-                                })
-                            }
-                        })
-                    }
-                })
         }
     };
 

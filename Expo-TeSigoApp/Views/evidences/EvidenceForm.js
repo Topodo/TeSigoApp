@@ -20,7 +20,7 @@ import {
 import * as firebase from 'firebase';
 import APIHandler from '../../Utils/APIHandler'
 import { NavigationEvents } from 'react-navigation'
-
+import { ImageManipulator } from 'expo'
 // Configuración del calendario en español
 LocaleConfig.locales['cl'] = {
     monthNames: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
@@ -46,7 +46,8 @@ export default class EvidenceForm extends Component {
             studentName: null,
             idCourse: -1,
             courseName: null,
-            isUploading: false
+            isUploading: false,
+            progress: 0
         }
         this.APIHandler = new APIHandler()
     }
@@ -82,6 +83,15 @@ export default class EvidenceForm extends Component {
             await this.setState({
                 isUploading: true
             })
+            // si es una imagen, se cambia el formato de esta a PNG
+            if (this.state.fileType === 'photo') {
+                const imagePNG = await ImageManipulator.manipulateAsync(
+                    uri,
+                    [],
+                    { compress: 1, format: 'png', base64: false }
+                )
+                uri = imagePNG.uri
+            }
             const blob = await new Promise((resolve, reject) => {
                 const xhr = new XMLHttpRequest();
                 xhr.onload = function () {
@@ -100,42 +110,50 @@ export default class EvidenceForm extends Component {
                 .storage()
                 .ref()
                 .child(this.state.evidenceName.replace(' ', ''));
-            const snapshot = await ref.put(blob);
 
-            blob.close();
+            const snapshot = ref.put(blob)
 
-            const downloadURL = await snapshot.ref.getDownloadURL();
-
-
-            // Se sube el formulario a la base de datos
-            this.APIHandler.postToAPI('http://206.189.195.214:8080/api/formularioEvidencia/alumno/' + this.state.idStudent, {
-                nombreEvidencia: this.state.evidenceName,
-                contextoEvidencia: this.state.evidenceContext,
-                fechaEvidencia: this.state.evidenceDate,
-                firebaseID: downloadURL,
-                tipoEvidencia: this.state.fileType
-            }).then(response => {
+            // Se maneja el progreso de subida del archivo
+            snapshot.on(firebase.storage.TaskEvent.STATE_CHANGED, uploadTask => {
+                let progress = (uploadTask.bytesTransferred / uploadTask.totalBytes)
                 this.setState({
-                    isUploading: false
-                }) // Una vez se haya realizado los cambios, se lanza una alerta indicando si hubo éxito o no
-                let title = 'Formulario creado'
-                let subTitle = 'Formulario creado y evidencia subida correctamente'
-                if (response.status) {
-                    title = "Error al cargar los datos"
-                    subTitle = 'Ocurrió un error interno, inténtelo nuevamente'
-                }
-                // Se lanza una alerta indicando el estado de la actualización
-                Alert.alert(
-                    title,
-                    subTitle,
-                    [{ text: 'OK' }]
-                )
-                this.props.navigation.navigate('GetEvidence', {
-                    idStudent: this.state.idStudent,
-                    studentName: this.state.studentName,
-                    course: this.state.courseName
+                    progress: progress
                 })
-            })
+            }, error => console.error(error)
+                , () => {
+                    snapshot.snapshot.ref.getDownloadURL().then(downloadURL => {
+                        // Se sube el formulario a la base de datos
+                        this.APIHandler.postToAPI('http://206.189.195.214:8080/api/formularioEvidencia/alumno/' + this.state.idStudent, {
+                            nombreEvidencia: this.state.evidenceName,
+                            contextoEvidencia: this.state.evidenceContext,
+                            fechaEvidencia: this.state.evidenceDate,
+                            firebaseID: downloadURL,
+                            tipoEvidencia: this.state.fileType
+                        }).then(response => {
+                            this.setState({
+                                isUploading: false
+                            }) // Una vez se haya realizado los cambios, se lanza una alerta indicando si hubo éxito o no
+                            let title = 'Formulario creado'
+                            let subTitle = 'Formulario creado y evidencia subida correctamente'
+                            if (response.status) {
+                                title = "Error al cargar los datos"
+                                subTitle = 'Ocurrió un error interno, inténtelo nuevamente'
+                            }
+                            // Se lanza una alerta indicando el estado de la actualización
+                            Alert.alert(
+                                title,
+                                subTitle,
+                                [{ text: 'OK' }]
+                            )
+                            this.props.navigation.navigate('GetEvidence', {
+                                idStudent: this.state.idStudent,
+                                studentName: this.state.studentName,
+                                course: this.state.courseName
+                            })
+                        })
+                        blob.close();
+                    })
+                })
         }
     }
 
@@ -175,7 +193,7 @@ export default class EvidenceForm extends Component {
         return (
             <View style={styles.uploadStatusContainer}>
                 <Text style={styles.uploadText}>
-                    Subiendo la evidencia
+                    {`Subiendo la evidencia ${Math.round(this.state.progress * 100).toString()}%`}
                 </Text>
                 <ActivityIndicator size='small' />
             </View>
@@ -231,7 +249,8 @@ export default class EvidenceForm extends Component {
 
         let uploadStatus = this.state.isUploading ? this.renderActivityIndicator() : this.renderUploadButton()
         return (
-            <KeyboardAwareScrollView style={styles.backColor}>
+            <KeyboardAwareScrollView style={styles.backColor}
+                enableOnAndroid={true}>
                 <NavigationEvents
                     onDidFocus={payload => this.componentDidFocus()} />
                 <FormLabel>
@@ -283,7 +302,7 @@ const styles = StyleSheet.create({
         height: 80,
         marginTop: 10,
         marginBottom: 10
-    },  
+    },
     uploadText: {
         fontSize: 18,
         textAlign: 'center',
